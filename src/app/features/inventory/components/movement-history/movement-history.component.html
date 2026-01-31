@@ -1,0 +1,209 @@
+<div class="history-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">📋</span>
+      Historial de Movimientos
+    </h2>
+
+    <a routerLink="/dashboard/inventory" class="btn-back">
+      <span class="btn-icon">←</span>
+      Volver
+    </a>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">🔩</span>
+          Repuesto
+        </label>
+        <select [formControl]="partFilterControl" class="filter-select">
+          <option value="">Todos los repuestos</option>
+          @for (part of partsCatalog; track part.id) {
+            <option [value]="part.id">{{ part.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">🔄</span>
+          Tipo
+        </label>
+        <select [formControl]="typeFilterControl" class="filter-select">
+          <option value="">Todos los tipos</option>
+          <option value="PURCHASE">Compra</option>
+          <option value="SALE">Venta</option>
+          <option value="REPAIR_USE">Uso en reparacion</option>
+          <option value="REPAIR_RETURN">Devolucion reparacion</option>
+          <option value="ADJUSTMENT">Ajuste</option>
+          <option value="DAMAGE">Dano/Perdida</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">📅</span>
+          Desde
+        </label>
+        <input
+          type="date"
+          [formControl]="dateFromControl"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">
+          <span class="filter-icon">📅</span>
+          Hasta
+        </label>
+        <input
+          type="date"
+          [formControl]="dateToControl"
+          class="filter-input"
+        />
+      </div>
+
+      @if (hasActiveFilters()) {
+        <button class="btn-clear-filters" (click)="clearFilters()">
+          <span class="btn-icon">✕</span>
+          Limpiar
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Movements List -->
+  <div class="movements-section">
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner
+          size="large"
+          message="Cargando movimientos..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else if (movements.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No hay movimientos</h3>
+        <p>{{ hasActiveFilters() ? 'No se encontraron movimientos con los filtros seleccionados' : 'Aún no se han registrado movimientos de inventario' }}</p>
+        @if (hasActiveFilters()) {
+          <button class="btn-primary" (click)="clearFilters()">
+            <span class="btn-icon">🔄</span>
+            Limpiar filtros
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="movements-table-container">
+        <table class="movements-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Repuesto</th>
+              <th>Tipo</th>
+              <th>Cantidad</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (movement of movements; track movement.id) {
+              <tr>
+                <td class="date-cell">
+                  <span class="date-value">{{ movement.createdAt | date:'dd/MM/yyyy' }}</span>
+                  <span class="time-value">{{ movement.createdAt | date:'HH:mm' }}</span>
+                </td>
+                <td class="part-cell">
+                  <div class="part-info">
+                    <span class="part-icon">🔩</span>
+                    <div class="part-details">
+                      <span class="part-name">{{ movement.partCatalog.name }}</span>
+                      @if (movement.partCatalog.phone) {
+                        <span class="part-phone">{{ movement.partCatalog.phone.brand }} {{ movement.partCatalog.phone.model }}</span>
+                      }
+                    </div>
+                  </div>
+                </td>
+                <td class="type-cell">
+                  <span class="type-badge"
+                        [class.type-in]="isIncoming(movement.movementType)"
+                        [class.type-out]="isOutgoing(movement.movementType)">
+                    {{ isIncoming(movement.movementType) ? '📥 Entrada' : '📤 Salida' }}
+                  </span>
+                </td>
+                <td class="quantity-cell">
+                  <span class="quantity-value"
+                        [class.positive]="isIncoming(movement.movementType)"
+                        [class.negative]="isOutgoing(movement.movementType)">
+                    {{ isIncoming(movement.movementType) ? '+' : '-' }}{{ movement.quantity }}
+                  </span>
+                </td>
+                <td class="notes-cell">
+                  @if (movement.notes) {
+                    <span class="notes-text">{{ movement.notes }}</span>
+                  } @else {
+                    <span class="notes-empty">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Cards View -->
+      <div class="movements-cards">
+        @for (movement of movements; track movement.id) {
+          <div class="movement-card">
+            <div class="card-header">
+              <div class="movement-date">
+                <span class="date-value">{{ movement.createdAt | date:'dd/MM/yyyy' }}</span>
+                <span class="time-value">{{ movement.createdAt | date:'HH:mm' }}</span>
+              </div>
+              <span class="type-badge"
+                    [class.type-in]="isIncoming(movement.movementType)"
+                    [class.type-out]="isOutgoing(movement.movementType)">
+                {{ isIncoming(movement.movementType) ? '📥 Entrada' : '📤 Salida' }}
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="part-info">
+                <span class="part-icon">🔩</span>
+                <div class="part-details">
+                  <span class="part-name">{{ movement.partCatalog.name }}</span>
+                  @if (movement.partCatalog.phone) {
+                    <span class="part-phone">{{ movement.partCatalog.phone.brand }} {{ movement.partCatalog.phone.model }}</span>
+                  }
+                </div>
+              </div>
+              <span class="quantity-value"
+                    [class.positive]="isIncoming(movement.movementType)"
+                    [class.negative]="isOutgoing(movement.movementType)">
+                {{ isIncoming(movement.movementType) ? '+' : '-' }}{{ movement.quantity }}
+              </span>
+            </div>
+            @if (movement.notes) {
+              <div class="card-notes">
+                <span class="notes-label">Notas:</span>
+                <span class="notes-text">{{ movement.notes }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <app-pagination
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

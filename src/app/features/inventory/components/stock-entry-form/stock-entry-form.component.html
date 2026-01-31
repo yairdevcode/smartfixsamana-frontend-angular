@@ -1,0 +1,214 @@
+<div class="form-container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <app-spinner
+        size="large"
+        message="Cargando catálogo de repuestos..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-icon">📥</div>
+        <h2 class="form-title">Registrar Movimiento de Stock</h2>
+        <p class="form-subtitle">Registra entradas o salidas de inventario</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="movement-form">
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">🔩</span>
+            Seleccionar Repuesto
+          </h3>
+
+          <div class="form-group">
+            <label class="form-label" for="partCatalogId">
+              <span class="label-icon">📦</span>
+              Repuesto
+            </label>
+            <select
+              id="partCatalogId"
+              formControlName="partCatalogId"
+              class="form-select"
+              [disabled]="isSubmitting"
+              (change)="onPartSelected($event)">
+              <option value="" disabled>Selecciona un repuesto</option>
+              @for (part of partsCatalog; track part.id) {
+                <option [value]="part.id">
+                  {{ part.name }} (Stock: {{ part.quantity }})
+                </option>
+              }
+            </select>
+            @if (form.get('partCatalogId')?.invalid && form.get('partCatalogId')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                Debes seleccionar un repuesto
+              </div>
+            }
+          </div>
+
+          @if (selectedPart) {
+            <div class="current-stock-info">
+              <div class="stock-display">
+                <span class="stock-label">Stock Actual:</span>
+                <span class="stock-value"
+                      [class.low]="selectedPart.quantity <= selectedPart.minStock">
+                  {{ selectedPart.quantity }}
+                </span>
+              </div>
+              <div class="stock-display">
+                <span class="stock-label">Stock Mínimo:</span>
+                <span class="stock-value">{{ selectedPart.minStock }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">📋</span>
+            Detalles del Movimiento
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="movementType">
+                <span class="label-icon">🔄</span>
+                Tipo de Movimiento
+              </label>
+              <select
+                id="movementType"
+                formControlName="movementType"
+                class="form-select"
+                [disabled]="isSubmitting">
+                <option value="IN">📥 Entrada (IN)</option>
+                <option value="OUT">📤 Salida (OUT)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="quantity">
+                <span class="label-icon">🔢</span>
+                Cantidad
+              </label>
+              <input
+                id="quantity"
+                type="number"
+                formControlName="quantity"
+                class="form-input"
+                min="1"
+                [disabled]="isSubmitting"
+              />
+              @if (form.get('quantity')?.invalid && form.get('quantity')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  La cantidad debe ser al menos 1
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reason">
+              <span class="label-icon">📋</span>
+              Razón del Movimiento
+            </label>
+            <input
+              id="reason"
+              type="text"
+              formControlName="reason"
+              class="form-input"
+              placeholder="Ej: Compra a proveedor, Reparación, Ajuste de inventario..."
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('reason')?.invalid && form.get('reason')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                La razón es requerida
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="notes">
+              <span class="label-icon">📝</span>
+              Notas (Opcional)
+            </label>
+            <textarea
+              id="notes"
+              formControlName="notes"
+              class="form-textarea"
+              rows="3"
+              placeholder="Detalles adicionales, proveedor, referencia..."
+              [disabled]="isSubmitting">
+            </textarea>
+          </div>
+        </div>
+
+        @if (selectedPart) {
+          <div class="preview-section">
+            <h3 class="section-title">
+              <span class="section-icon">👁️</span>
+              Vista Previa del Resultado
+            </h3>
+            <div class="stock-preview">
+              <div class="preview-item">
+                <span class="preview-label">Stock Actual</span>
+                <span class="preview-value">{{ selectedPart.quantity }}</span>
+              </div>
+              <div class="preview-arrow">
+                {{ form.get('movementType')?.value === 'IN' ? '➕' : '➖' }}
+              </div>
+              <div class="preview-item">
+                <span class="preview-label">Cantidad</span>
+                <span class="preview-value">{{ form.get('quantity')?.value }}</span>
+              </div>
+              <div class="preview-arrow">=</div>
+              <div class="preview-item result">
+                <span class="preview-label">Nuevo Stock</span>
+                <span class="preview-value"
+                      [class.low]="isLowStockAfterMovement()"
+                      [class.healthy]="!isLowStockAfterMovement()">
+                  {{ getNewQuantity() }}
+                </span>
+              </div>
+            </div>
+
+            @if (isLowStockAfterMovement()) {
+              <div class="low-stock-warning">
+                <span class="warning-icon">⚠️</span>
+                El nuevo stock estará por debajo del mínimo requerido
+              </div>
+            }
+          </div>
+        }
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            <span class="btn-icon">❌</span>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [class.btn-in]="form.get('movementType')?.value === 'IN'"
+            [class.btn-out]="form.get('movementType')?.value === 'OUT'"
+            [disabled]="form.invalid || isSubmitting">
+            @if (isSubmitting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              Registrando...
+            } @else {
+              <span class="btn-icon">{{ form.get('movementType')?.value === 'IN' ? '📥' : '📤' }}</span>
+              Registrar {{ form.get('movementType')?.value === 'IN' ? 'Entrada' : 'Salida' }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

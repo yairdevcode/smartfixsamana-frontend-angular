@@ -1,0 +1,63 @@
+# Example docker-compose.staging.yml for EC2 staging deployment
+# Copy this file to your EC2 staging instance at: /home/ubuntu/smartfix-samana-staging/docker-compose.staging.yml
+
+version: '3.8'
+
+services:
+  # Backend Service (Staging)
+  app_smartfixsamana_staging:
+    image: ${DOCKER_USERNAME}/smartfix-samana:ss-backend-staging
+    container_name: smartfix-backend-staging
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+      - DB_HOST=db_staging
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME_STAGING}
+      - DB_USERNAME=${DB_USERNAME_STAGING}
+      - DB_PASSWORD=${DB_PASSWORD_STAGING}
+      - JWT_SECRET=${JWT_SECRET_STAGING}
+      - JWT_EXPIRATION=86400000
+    networks:
+      - smartfix-staging-network
+    depends_on:
+      - db_staging
+
+  # Frontend Service (Staging)
+  frontend_staging:
+    image: ${DOCKER_USERNAME}/smartfix-samana:ss-frontend-staging
+    container_name: smartfix-frontend-staging
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    networks:
+      - smartfix-staging-network
+    depends_on:
+      - app_smartfixsamana_staging
+
+  # Database Service (Staging)
+  db_staging:
+    image: mysql:8.0
+    container_name: smartfix-db-staging
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD_STAGING}
+      - MYSQL_DATABASE=${DB_NAME_STAGING}
+      - MYSQL_USER=${DB_USERNAME_STAGING}
+      - MYSQL_PASSWORD=${DB_PASSWORD_STAGING}
+    volumes:
+      - db_data_staging:/var/lib/mysql
+    networks:
+      - smartfix-staging-network
+
+networks:
+  smartfix-staging-network:
+    driver: bridge
+
+volumes:
+  db_data_staging:
+    driver: local

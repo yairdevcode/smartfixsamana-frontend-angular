@@ -1,0 +1,101 @@
+<div class="phones-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">📱</span>
+      Catálogo de Celulares
+    </h2>
+    
+    <div class="header-actions">
+      <div class="search-container">
+        <input 
+          type="text" 
+          [formControl]="searchControl" 
+          placeholder="Buscar marca o modelo..." 
+          class="search-input"
+          [disabled]="isLoading"
+        />
+        @if (isSearching) {
+          <app-spinner size="small" [showMessage]="false"></app-spinner>
+        } @else {
+          <span class="search-icon">🔍</span>
+        }
+      </div>
+      
+      @if(admin) {
+        <button class="btn-primary" (click)="create()">
+          <span class="btn-icon">➕</span>
+          Nuevo Celular
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Cards de celulares -->
+  <div class="cards-container">
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner 
+          size="large" 
+          message="Cargando celulares..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else {
+      @for (phone of phones; track $index) {
+        <div class="phone-card">
+          <div class="card-header">
+            <div class="phone-icon">📱</div>
+            <div class="phone-info">
+              <h3 class="phone-brand">{{ phone.brand }}</h3>
+              <p class="phone-model">{{ phone.model }}</p>
+            </div>
+          </div>
+          
+          @if(admin) {
+            <div class="card-actions">
+              <button 
+                class="btn-edit" 
+                (click)="update(phone.id!)"
+                [disabled]="isDeleting">
+                <span class="btn-icon">✏️</span>
+                Editar
+              </button>
+              <button 
+                class="btn-delete" 
+                (click)="delete(phone)"
+                [disabled]="isDeleting">
+                @if (isDeleting) {
+                  <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+                } @else {
+                  <span class="btn-icon">🗑️</span>
+                  Eliminar
+                }
+              </button>
+            </div>
+          }
+        </div>
+      }
+      
+      @if (phones.length === 0 && !isLoading) {
+        <div class="empty-state">
+          <div class="empty-icon">📱</div>
+          <h3>No hay celulares disponibles</h3>
+          <p>Comienza agregando dispositivos al catálogo</p>
+          @if(admin) {
+            <button class="btn-primary" (click)="create()">
+              <span class="btn-icon">➕</span>
+              Agregar Celular
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Paginación -->
+  <app-pagination 
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (pageChange)="goToPage($event)">
+  </app-pagination>
+</div>

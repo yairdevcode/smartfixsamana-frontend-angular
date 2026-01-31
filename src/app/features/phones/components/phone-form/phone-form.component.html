@@ -1,0 +1,86 @@
+<div class="form-container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <app-spinner 
+        size="large" 
+        message="Cargando datos del teléfono..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-icon">📱</div>
+        <h2 class="form-title">{{ isEditMode ? "Editar Teléfono" : "Nuevo Teléfono" }}</h2>
+        <p class="form-subtitle">{{ isEditMode ? "Actualiza la información del dispositivo" : "Registra un nuevo modelo de teléfono" }}</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="phone-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-icon">🏢</span>
+              Marca
+            </label>
+            <input 
+              type="text" 
+              formControlName="brand" 
+              class="form-input"
+              placeholder="Ej: Samsung, Apple, Xiaomi"
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('brand')?.invalid && form.get('brand')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                La marca es requerida
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-icon">📱</span>
+              Modelo
+            </label>
+            <input 
+              type="text" 
+              formControlName="model" 
+              class="form-input"
+              placeholder="Ej: Galaxy S23, iPhone 14, Redmi Note 12"
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('model')?.invalid && form.get('model')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                El modelo es requerido
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn-cancel" 
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            <span class="btn-icon">❌</span>
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-submit" 
+            [disabled]="form.invalid || isSubmitting">
+            @if (isSubmitting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+            } @else {
+              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
+              {{ isEditMode ? "Actualizar" : "Guardar" }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

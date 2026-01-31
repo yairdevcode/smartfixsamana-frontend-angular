@@ -1,0 +1,14 @@
+<div class="spinner-container" [class.overlay]="overlay">
+  <div class="spinner-content">
+    <div 
+      class="spinner" 
+      [class]="'spinner-' + size + ' spinner-' + color"
+      role="status" 
+      aria-label="Cargando">
+      <div class="spinner-circle"></div>
+    </div>
+    <div class="spinner-message" *ngIf="showMessage && message">
+      {{ message }}
+    </div>
+  </div>
+</div>

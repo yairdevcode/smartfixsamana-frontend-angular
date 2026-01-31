@@ -1,0 +1,75 @@
+@if (showPagination) {
+  <div class="pagination-container">
+    <!-- Información de resultados y selector de tamaño -->
+    <div class="pagination-info">
+      @if (showResultsInfo && totalElements > 0) {
+        <span class="results-info">
+          Mostrando {{ startItem }}-{{ endItem }} de {{ totalElements }} resultados
+        </span>
+      }
+
+      @if (showPageSizeSelector) {
+        <div class="page-size-selector">
+          <label for="pageSize">Items por página:</label>
+          <select
+            id="pageSize"
+            [ngModel]="pageSize"
+            (ngModelChange)="onPageSizeChange($event)"
+            class="page-size-select">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </div>
+      }
+    </div>
+
+    <!-- Controles de paginación -->
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <!-- Botón Primera Página -->
+        <button
+          class="pagination-btn first-page"
+          [disabled]="!hasPreviousPage"
+          (click)="goToFirstPage()"
+          title="Primera página">
+          <span class="btn-icon">⏮️</span>
+        </button>
+
+        <!-- Botón Página Anterior -->
+        <button
+          class="pagination-btn previous-page"
+          [disabled]="!hasPreviousPage"
+          (click)="goToPreviousPage()"
+          title="Página anterior">
+          <span class="btn-icon">◀️</span>
+        </button>
+
+        <!-- Indicador de Página Actual -->
+        <div class="current-page-indicator">
+          <span class="page-info">
+            Página {{ displayPageNumber }} de {{ totalPages }}
+          </span>
+        </div>
+
+        <!-- Botón Página Siguiente -->
+        <button
+          class="pagination-btn next-page"
+          [disabled]="!hasNextPage"
+          (click)="goToNextPage()"
+          title="Página siguiente">
+          <span class="btn-icon">▶️</span>
+        </button>
+
+        <!-- Botón Última Página -->
+        <button
+          class="pagination-btn last-page"
+          [disabled]="!hasNextPage"
+          (click)="goToLastPage()"
+          title="Última página">
+          <span class="btn-icon">⏭️</span>
+        </button>
+      </div>
+    }
+  </div>
+}

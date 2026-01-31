@@ -1,0 +1,130 @@
+<div class="repairs-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">🛠️</span>
+      Gestión de Reparaciones
+    </h2>
+    
+    <div class="header-actions">
+      <div class="search-container">
+        <input
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Buscar por celular o cliente..."
+          class="search-input"
+          [disabled]="isLoading"
+        />
+        @if (isSearching) {
+          <app-spinner size="small" [showMessage]="false"></app-spinner>
+        } @else {
+          <span class="search-icon">🔍</span>
+        }
+      </div>
+      
+      @if (admin) {
+        <button class="btn-primary" (click)="create()">
+          <span class="btn-icon">➕</span>
+          Nueva Reparación
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Cards de reparaciones -->
+  <div class="cards-container">
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner 
+          size="large" 
+          message="Cargando reparaciones..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else {
+      @for (repair of repairs; track $index) {
+        <div class="repair-card">
+          <div class="card-header">
+            <div class="repair-info">
+              <h3 class="repair-title">{{ repair.customer.name }} {{ repair.customer.lastname }}</h3>
+            </div>
+            <div class="status-badge" [class]="'status-' + repair.state.toLowerCase().replace(' ', '-')">
+              {{ repair.state }}
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <div class="device-info">
+              <div class="device-icon">📱</div>
+              <div class="device-details">
+                <h4>{{ repair.phone.brand }} {{ repair.phone.model }}</h4>
+                <p class="device-label">Dispositivo</p>
+              </div>
+            </div>
+            
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">
+                  <span class="info-icon">⚠️</span>
+                  Falla
+                </span>
+                <span class="info-value">{{ repair.fault }}</span>
+              </div>
+              
+              <div class="info-item">
+                <span class="info-label">
+                  <span class="info-icon">📅</span>
+                  Fecha
+                </span>
+                <span class="info-value">{{ repair.date | date : "dd/MM/yyyy" }}</span>
+              </div>
+            </div>
+          </div>
+          
+          @if (admin) {
+            <div class="card-actions">
+              <button 
+                class="btn-edit" 
+                (click)="update(repair.id!)"
+                [disabled]="isDeleting">
+                <span class="btn-icon">✏️</span>
+                Editar
+              </button>
+              <button 
+                class="btn-delete" 
+                (click)="delete(repair)"
+                [disabled]="isDeleting">
+                @if (isDeleting) {
+                  <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+                } @else {
+                  <span class="btn-icon">🗑️</span>
+                  Eliminar
+                }
+              </button>
+            </div>
+          }
+        </div>
+      }
+      
+      @if (repairs.length === 0 && !isLoading) {
+        <div class="empty-state">
+          <div class="empty-icon">🔧</div>
+          <h3>No hay reparaciones disponibles</h3>
+          <p>Comienza registrando tu primera reparación</p>
+          @if (admin) {
+            <button class="btn-primary" (click)="create()">
+              <span class="btn-icon">➕</span>
+              Nueva Reparación
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Paginación -->
+  <app-pagination 
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (pageChange)="goToPage($event)">
+  </app-pagination>
+</div>

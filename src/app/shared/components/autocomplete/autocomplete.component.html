@@ -1,0 +1,74 @@
+<div class="autocomplete-container">
+  @if (label) {
+    <label class="form-label">
+      <span class="label-icon">{{ icon }}</span>
+      {{ label }}
+      @if (required) {
+        <span class="required-indicator">*</span>
+      }
+    </label>
+  }
+
+  <div class="autocomplete-wrapper">
+    <div class="search-input-container">
+      <span class="search-icon">{{ icon }}</span>
+      <input
+        type="text"
+        [formControl]="searchControl"
+        [placeholder]="placeholder"
+        [disabled]="disabled"
+        class="search-input"
+        (focus)="onInputFocus()"
+        (blur)="onInputBlur()"
+        autocomplete="off"
+      />
+
+      @if (isSearching) {
+        <span class="loading-indicator">⏳</span>
+      }
+
+      @if (hasSelection && !disabled) {
+        <button
+          type="button"
+          class="clear-button"
+          (click)="clearSelection()"
+          tabindex="-1">
+          ❌
+        </button>
+      }
+    </div>
+
+    @if (isDropdownOpen && (searchResults.length > 0 || noResultsFound || isSearching)) {
+      <div class="dropdown-menu">
+        @if (isSearching) {
+          <div class="dropdown-item loading">
+            <span class="loading-icon">⏳</span>
+            <span>Buscando...</span>
+          </div>
+        } @else if (noResultsFound) {
+          <div class="dropdown-item no-results">
+            <span class="no-results-icon">🔍</span>
+            <span>No se encontraron resultados</span>
+          </div>
+        } @else {
+          @for (item of searchResults; track item.id) {
+            <div
+              class="dropdown-item"
+              (mousedown)="selectItem(item)"
+              [class.selected]="selectedItem?.id === item.id">
+              <span class="item-icon">{{ icon }}</span>
+              <span class="item-text">{{ getDisplayText(item) }}</span>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+
+  @if (hasSelection) {
+    <div class="selected-item-preview">
+      <span class="preview-icon">✓</span>
+      <span class="preview-text">{{ getDisplayText(selectedItem) }}</span>
+    </div>
+  }
+</div>

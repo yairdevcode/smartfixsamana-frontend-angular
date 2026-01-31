@@ -1,0 +1,258 @@
+<div class="form-container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <app-spinner
+        size="large"
+        message="Cargando datos del repuesto..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-icon">📦</div>
+        <h2 class="form-title">{{ isEditMode ? "Editar Repuesto" : "Nuevo Repuesto" }}</h2>
+        <p class="form-subtitle">{{ isEditMode ? "Actualiza la información del repuesto" : "Agrega un nuevo repuesto al catálogo" }}</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="catalog-form">
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">📋</span>
+            Información del Repuesto
+          </h3>
+
+          <div class="form-group">
+            <label class="form-label" for="name">
+              <span class="label-icon">🔩</span>
+              Nombre del Repuesto
+            </label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              class="form-input"
+              placeholder="Ej: Pantalla LCD, Batería, Conector de carga..."
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                El nombre es requerido (mínimo 2 caracteres)
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="description">
+              <span class="label-icon">📝</span>
+              Descripción
+            </label>
+            <textarea
+              id="description"
+              formControlName="description"
+              class="form-input"
+              rows="3"
+              placeholder="Descripción del repuesto..."
+              [disabled]="isSubmitting"
+            ></textarea>
+            @if (form.get('description')?.invalid && form.get('description')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                La descripción es requerida
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="phoneId">
+              <span class="label-icon">📱</span>
+              Dispositivo Compatible (Opcional)
+            </label>
+            <select
+              id="phoneId"
+              formControlName="phoneId"
+              class="form-input form-select"
+              [disabled]="isSubmitting">
+              <option [ngValue]="null">-- Todos los dispositivos --</option>
+              @for (phone of phones; track phone.id) {
+                <option [ngValue]="phone.id">{{ phone.brand }} {{ phone.model }}</option>
+              }
+            </select>
+            <p class="field-hint">Selecciona un dispositivo si el repuesto es específico para un modelo</p>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">📊</span>
+            Control de Inventario
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="quantity">
+                <span class="label-icon">📦</span>
+                Cantidad en Stock
+              </label>
+              <input
+                id="quantity"
+                type="number"
+                formControlName="quantity"
+                class="form-input"
+                min="0"
+                [disabled]="isSubmitting"
+              />
+              @if (form.get('quantity')?.invalid && form.get('quantity')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  La cantidad debe ser 0 o mayor
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="minStock">
+                <span class="label-icon">⚠️</span>
+                Stock Mínimo
+              </label>
+              <input
+                id="minStock"
+                type="number"
+                formControlName="minStock"
+                class="form-input"
+                min="0"
+                [disabled]="isSubmitting"
+              />
+              @if (form.get('minStock')?.invalid && form.get('minStock')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  El stock mínimo debe ser 0 o mayor
+                </div>
+              }
+            </div>
+          </div>
+
+          @if (isLowStock && form.get('quantity')?.value !== null) {
+            <div class="low-stock-preview">
+              <span class="warning-icon">⚠️</span>
+              <span>Con estos valores, este item aparecerá como stock bajo</span>
+            </div>
+          }
+        </div>
+
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">💰</span>
+            Precios
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="purchasePrice">
+                <span class="label-icon">💵</span>
+                Precio de Compra
+              </label>
+              <input
+                id="purchasePrice"
+                type="number"
+                formControlName="purchasePrice"
+                class="form-input"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                [disabled]="isSubmitting"
+              />
+              @if (form.get('purchasePrice')?.invalid && form.get('purchasePrice')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  El precio debe ser 0 o mayor
+                </div>
+              }
+              <p class="field-hint">Costo de adquisición del repuesto</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="salePrice">
+                <span class="label-icon">💰</span>
+                Precio de Venta
+              </label>
+              <input
+                id="salePrice"
+                type="number"
+                formControlName="salePrice"
+                class="form-input"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                [disabled]="isSubmitting"
+              />
+              @if (form.get('salePrice')?.invalid && form.get('salePrice')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  El precio debe ser 0 o mayor
+                </div>
+              }
+              <p class="field-hint">Precio a cobrar al cliente</p>
+            </div>
+          </div>
+
+          @if (profitMargin !== null) {
+            <div class="profit-preview" [class.negative]="profitMargin < 0">
+              <span class="profit-icon">{{ profitMargin >= 0 ? '📈' : '📉' }}</span>
+              <span>Margen de ganancia: {{ profitMargin | number:'1.1-1' }}%</span>
+              @if (profitMargin < 0) {
+                <span class="profit-warning">(Pérdida)</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="preview-section">
+          <h3 class="section-title">
+            <span class="section-icon">👁️</span>
+            Vista Previa
+          </h3>
+          <div class="stock-preview">
+            <div class="preview-badge"
+                 [class.low]="isLowStock"
+                 [class.healthy]="!isLowStock">
+              <span class="preview-qty">{{ form.get('quantity')?.value || 0 }}</span>
+              <span class="preview-label">unidades</span>
+            </div>
+            <div class="preview-info">
+              <strong>{{ form.get('name')?.value || 'Nombre del repuesto' }}</strong>
+              <span>Stock mínimo: {{ form.get('minStock')?.value || 0 }}</span>
+              @if (form.get('salePrice')?.value) {
+                <span class="preview-price">Venta: {{ formatPrice(form.get('salePrice')?.value) }}</span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            <span class="btn-icon">❌</span>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="form.invalid || isSubmitting">
+            @if (isSubmitting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+            } @else {
+              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
+              {{ isEditMode ? "Actualizar" : "Guardar" }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

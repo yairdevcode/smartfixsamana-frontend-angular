@@ -1,0 +1,448 @@
+<div class="form-container">
+  @if (isLoadingData) {
+    <div class="loading-overlay">
+      <app-spinner
+        size="large"
+        message="Cargando datos del formulario..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else if (isLoading) {
+    <div class="loading-overlay">
+      <app-spinner
+        size="large"
+        message="Cargando datos de la reparación..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-icon">🛠️</div>
+        <h2 class="form-title">{{ isEditMode ? "Editar Reparación" : "Nueva Reparación" }}</h2>
+        <p class="form-subtitle">{{ isEditMode ? "Actualiza los detalles de la reparación" : "Registra una nueva orden de reparación" }}</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="repair-form">
+        <!-- Información del cliente y dispositivo -->
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">👤</span>
+            Información del Cliente y Dispositivo
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <app-autocomplete
+                [label]="'Cliente'"
+                [icon]="'👥'"
+                [placeholder]="'Buscar cliente por nombre, apellido o teléfono...'"
+                [searchFunction]="searchCustomers"
+                [formatDisplayFn]="formatCustomerDisplay"
+                [disabled]="isSubmitting"
+                [required]="true"
+                (itemSelected)="onCustomerSelected($event)">
+              </app-autocomplete>
+              @if (form.get('customerId')?.invalid && form.get('customerId')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  El cliente es requerido
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <app-autocomplete
+                [label]="'Dispositivo'"
+                [icon]="'📱'"
+                [placeholder]="'Buscar dispositivo por marca o modelo...'"
+                [searchFunction]="searchPhones"
+                [formatDisplayFn]="formatPhoneDisplay"
+                [disabled]="isSubmitting"
+                [required]="true"
+                (itemSelected)="onPhoneSelected($event)">
+              </app-autocomplete>
+              @if (form.get('phoneId')?.invalid && form.get('phoneId')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  El dispositivo es requerido
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista previa de la reparación -->
+        @if (getSelectedCustomer() && getSelectedPhone()) {
+          <div class="preview-section">
+            <h3 class="section-title">
+              <span class="section-icon">👁️</span>
+              Vista Previa de la Reparación
+            </h3>
+            <div class="repair-preview">
+              <div class="preview-card">
+                <div class="customer-info">
+                  <div class="preview-icon">👤</div>
+                  <div class="preview-details">
+                    <h4>{{ getSelectedCustomer()?.name }} {{ getSelectedCustomer()?.lastname }}</h4>
+                    <p>Cliente</p>
+                  </div>
+                </div>
+                <div class="arrow">➡️</div>
+                <div class="device-info">
+                  <div class="preview-icon">📱</div>
+                  <div class="preview-details">
+                    <h4>{{ getSelectedPhone()?.brand }} {{ getSelectedPhone()?.model }}</h4>
+                    <p>Dispositivo</p>
+                  </div>
+                </div>
+                @if (getSelectedState()) {
+                  <div class="arrow">➡️</div>
+                  <div class="status-info">
+                    <div class="preview-icon" [style.background-color]="getSelectedState()?.color">📊</div>
+                    <div class="preview-details">
+                      <h4>{{ getSelectedState()?.label }}</h4>
+                      <p>Estado</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Detalles de la reparación -->
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">🔧</span>
+            Detalles de la Reparación
+          </h3>
+
+          <div class="form-group">
+            <label class="form-label" for="fault">
+              <span class="label-icon">⚠️</span>
+              Descripción de la Falla
+            </label>
+            <textarea
+              id="fault"
+              formControlName="fault"
+              class="form-textarea"
+              placeholder="Describe detalladamente el problema del dispositivo..."
+              rows="4"
+              [disabled]="isSubmitting"
+            ></textarea>
+            @if (form.get('fault')?.invalid && form.get('fault')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                La descripción de la falla es requerida
+              </div>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="state">
+                <span class="label-icon">📊</span>
+                Estado
+              </label>
+              <select
+                id="state"
+                formControlName="state"
+                class="form-select"
+                required
+                [disabled]="isSubmitting">
+                <option value="" disabled>Selecciona el estado</option>
+                @for (state of repairStates; track state.value) {
+                  <option [value]="state.value">{{ state.label }}</option>
+                }
+              </select>
+              @if (form.get('state')?.invalid && form.get('state')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  El estado es requerido
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="date">
+                <span class="label-icon">📅</span>
+                Fecha de Ingreso
+              </label>
+              <input
+                id="date"
+                type="date"
+                formControlName="date"
+                class="form-input"
+                [max]="todayDate"
+                [disabled]="isSubmitting"
+              />
+              @if (form.get('date')?.invalid && form.get('date')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  La fecha es requerida
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Parts Management Section (Edit Mode Only) -->
+        @if (isEditMode) {
+          <div class="info-section parts-section">
+            <h3 class="section-title">
+              <span class="section-icon">🔩</span>
+              Repuestos Utilizados
+            </h3>
+
+            <!-- Parts List -->
+            @if (isLoadingParts) {
+              <div class="parts-loading">
+                <app-spinner size="medium" message="Cargando repuestos..." color="primary"></app-spinner>
+              </div>
+            } @else {
+              @if (repairParts.length > 0) {
+                <div class="parts-table-container">
+                  <table class="parts-table">
+                    <thead>
+                      <tr>
+                        <th>Repuesto</th>
+                        <th>Dispositivo</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (part of repairParts; track part.id) {
+                        <tr>
+                          <td class="part-name">{{ part.partCatalogName }}</td>
+                          <td class="part-phone">
+                            @if (part.phoneBrand) {
+                              {{ part.phoneBrand }} {{ part.phoneModel }}
+                            } @else {
+                              <span class="generic-part">Universal</span>
+                            }
+                          </td>
+                          <td class="part-qty">{{ part.quantity }}</td>
+                          <td class="part-price">{{ formatPrice(part.priceCharged) }}</td>
+                          <td class="part-subtotal">{{ formatPrice(part.priceCharged * part.quantity) }}</td>
+                          <td class="part-actions">
+                            <button
+                              type="button"
+                              class="btn-remove-part"
+                              (click)="removePartFromRepair(part)"
+                              [disabled]="isRemovingPartId === part.id">
+                              @if (isRemovingPartId === part.id) {
+                                <app-spinner size="small" [showMessage]="false"></app-spinner>
+                              } @else {
+                                🗑️
+                              }
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              } @else {
+                <div class="no-parts">
+                  <span class="no-parts-icon">📦</span>
+                  <p>No hay repuestos agregados a esta reparación</p>
+                </div>
+              }
+
+              <!-- Add Part Button -->
+              <button
+                type="button"
+                class="btn-add-part"
+                (click)="togglePartSelector()"
+                [disabled]="isAddingPart">
+                <span class="btn-icon">{{ showPartSelector ? '✕' : '➕' }}</span>
+                {{ showPartSelector ? 'Cancelar' : 'Agregar Repuesto' }}
+              </button>
+
+              <!-- Part Selector Panel -->
+              @if (showPartSelector) {
+                <div class="part-selector-panel">
+                  <h4 class="selector-title">
+                    <span class="selector-icon">🔍</span>
+                    Buscar Repuesto
+                  </h4>
+
+                  <div class="part-search-container">
+                    <input
+                      type="text"
+                      [formControl]="partSearchControl"
+                      class="part-search-input"
+                      placeholder="Escriba para buscar repuestos..."
+                    />
+                    @if (isSearchingParts) {
+                      <app-spinner size="small" [showMessage]="false"></app-spinner>
+                    }
+                  </div>
+
+                  <!-- Search Results -->
+                  @if (availableParts.length > 0 && !selectedPart) {
+                    <div class="search-results">
+                      @for (part of availableParts; track part.id) {
+                        <div class="search-result-item" (click)="selectPart(part)">
+                          <div class="result-info">
+                            <span class="result-name">{{ part.name }}</span>
+                            @if (part.phoneId) {
+                              <span class="result-phone">📱 {{ part.phoneBrand }} {{ part.phoneModel }}</span>
+                            }
+                          </div>
+                          <div class="result-meta">
+                            <span class="result-stock" [class.low]="part.isLowStock">
+                              {{ part.quantity }} disp.
+                            </span>
+                            <span class="result-price">{{ formatPrice(part.salePrice || 0) }}</span>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Selected Part Form -->
+                  @if (selectedPart) {
+                    <div class="selected-part-form">
+                      <div class="selected-part-info">
+                        <span class="selected-part-name">{{ selectedPart.name }}</span>
+                        @if (selectedPart.phoneId) {
+                          <span class="selected-part-phone">📱 {{ selectedPart.phoneBrand }} {{ selectedPart.phoneModel }}</span>
+                        }
+                        <span class="selected-part-stock">Disponible: {{ selectedPart.quantity }} unidades</span>
+                      </div>
+
+                      <div class="part-form-row">
+                        <div class="part-form-group">
+                          <label>Cantidad</label>
+                          <input
+                            type="number"
+                            [(ngModel)]="partQuantity"
+                            [ngModelOptions]="{standalone: true}"
+                            min="1"
+                            [max]="selectedPart.quantity"
+                            class="part-form-input"
+                          />
+                        </div>
+                        <div class="part-form-group">
+                          <label>Precio a Cobrar</label>
+                          <input
+                            type="number"
+                            [(ngModel)]="partPrice"
+                            [ngModelOptions]="{standalone: true}"
+                            min="0"
+                            step="0.01"
+                            class="part-form-input"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="part-form-actions">
+                        <button
+                          type="button"
+                          class="btn-cancel-part"
+                          (click)="resetPartSelector()">
+                          Cambiar
+                        </button>
+                        <button
+                          type="button"
+                          class="btn-confirm-part"
+                          (click)="addPartToRepair()"
+                          [disabled]="isAddingPart || partQuantity < 1 || partQuantity > selectedPart.quantity">
+                          @if (isAddingPart) {
+                            <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+                          } @else {
+                            <span class="btn-icon">✓</span>
+                          }
+                          Agregar
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+
+          <!-- Cost Summary Section -->
+          <div class="info-section cost-section">
+            <h3 class="section-title">
+              <span class="section-icon">💰</span>
+              Resumen de Costos
+            </h3>
+
+            <div class="cost-row">
+              <div class="cost-item">
+                <label class="cost-label">Mano de Obra</label>
+                <div class="labor-cost-input">
+                  <input
+                    type="number"
+                    [(ngModel)]="laborCost"
+                    [ngModelOptions]="{standalone: true}"
+                    min="0"
+                    step="0.01"
+                    class="form-input labor-input"
+                    [disabled]="isUpdatingLaborCost"
+                  />
+                  <button
+                    type="button"
+                    class="btn-update-labor"
+                    (click)="updateLaborCost()"
+                    [disabled]="isUpdatingLaborCost">
+                    @if (isUpdatingLaborCost) {
+                      <app-spinner size="small" [showMessage]="false"></app-spinner>
+                    } @else {
+                      💾
+                    }
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="cost-summary">
+              <div class="cost-summary-row">
+                <span class="cost-summary-label">Total Repuestos:</span>
+                <span class="cost-summary-value">{{ formatPrice(totalPartsCost) }}</span>
+              </div>
+              <div class="cost-summary-row">
+                <span class="cost-summary-label">Mano de Obra:</span>
+                <span class="cost-summary-value">{{ formatPrice(laborCost || 0) }}</span>
+              </div>
+              <div class="cost-summary-row total">
+                <span class="cost-summary-label">TOTAL:</span>
+                <span class="cost-summary-value">{{ formatPrice(totalCost) }}</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            <span class="btn-icon">❌</span>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="form.invalid || isSubmitting || !isFormReady">
+            @if (isSubmitting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+            } @else {
+              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
+              {{ isEditMode ? "Actualizar" : "Guardar" }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

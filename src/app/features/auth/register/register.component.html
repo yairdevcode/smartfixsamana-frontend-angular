@@ -1,0 +1,106 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="register-header">
+      <div class="register-icon">📝</div>
+      <h2 class="register-title">Crear Cuenta</h2>
+      <p class="register-subtitle">Únete a SmartFix Samaná</p>
+    </div>
+
+    <form [formGroup]="registerform" (ngSubmit)="register()" class="register-form">
+      <div class="form-group">
+        <label class="form-label">
+          <span class="label-icon">👤</span>
+          Nombre de Usuario
+        </label>
+        <input
+          type="text"
+          formControlName="username"
+          class="form-input"
+          [class.is-invalid]="registerform.get('username')?.invalid && registerform.get('username')?.touched"
+          placeholder="Ingresa tu nombre de usuario"
+        />
+        @if (registerform.get('username')?.invalid && registerform.get('username')?.touched) {
+          <div class="error-message">
+            @if (registerform.get('username')?.errors?.['required']) {
+              <span class="error-icon">⚠️</span>
+              El nombre de usuario es obligatorio
+            } @if (registerform.get('username')?.errors?.['minlength']) {
+              <span class="error-icon">⚠️</span>
+              El nombre de usuario debe contener al menos cuatro caracteres
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="label-icon">✉️</span>
+          Correo Electrónico
+        </label>
+        <input
+          type="email"
+          formControlName="email"
+          class="form-input"
+          [class.is-invalid]="registerform.get('email')?.invalid && registerform.get('email')?.touched"
+          placeholder="ejemplo@correo.com"
+        />
+        @if (registerform.get('email')?.invalid && registerform.get('email')?.touched) {
+          <div class="error-message">
+            @if (registerform.get('email')?.errors?.['required']) {
+              <span class="error-icon">⚠️</span>
+              El email es obligatorio
+            } @if (registerform.get('email')?.errors?.['email']) {
+              <span class="error-icon">⚠️</span>
+              Por favor ingrese un email válido
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          <span class="label-icon">🔒</span>
+          Contraseña
+        </label>
+        <input
+          type="password"
+          formControlName="password"
+          class="form-input"
+          [class.is-invalid]="registerform.get('password')?.invalid && registerform.get('password')?.touched"
+          placeholder="Crea una contraseña segura"
+        />
+        @if (registerform.get('password')?.invalid && registerform.get('password')?.touched) {
+          <div class="error-message">
+            @if (registerform.get('password')?.errors?.['required']) {
+              <span class="error-icon">⚠️</span>
+              La contraseña es obligatoria
+            }
+          </div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" formControlName="admin" class="checkbox-input" />
+          <span class="checkbox-custom"></span>
+          <span class="checkbox-text">
+            <span class="label-icon">👑</span>
+            ¿Es administrador?
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="register-button" [disabled]="registerform.invalid">
+        <span class="button-icon">💾</span>
+        Registrarse
+      </button>
+
+      <div class="register-footer">
+        <p class="login-link">
+          ¿Ya tienes cuenta?
+          <a routerLink="/login">Inicia sesión aquí</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

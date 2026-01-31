@@ -1,0 +1,116 @@
+<div class="form-container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <app-spinner 
+        size="large" 
+        message="Cargando datos del cliente..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-icon">👥</div>
+        <h2 class="form-title">{{ isEditMode ? "Editar Cliente" : "Nuevo Cliente" }}</h2>
+        <p class="form-subtitle">{{ isEditMode ? "Actualiza la información del cliente" : "Registra un nuevo cliente en el sistema" }}</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="customer-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-icon">👤</span>
+              Nombre
+            </label>
+            <input 
+              type="text" 
+              formControlName="name" 
+              class="form-input"
+              placeholder="Ingresa el nombre"
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                El nombre es requerido
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-icon">👤</span>
+              Apellido
+            </label>
+            <input 
+              type="text" 
+              formControlName="lastname" 
+              class="form-input"
+              placeholder="Ingresa el apellido"
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('lastname')?.invalid && form.get('lastname')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                El apellido es requerido
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-icon">📞</span>
+              Teléfono
+            </label>
+            <input 
+              type="tel" 
+              formControlName="phone" 
+              class="form-input"
+              placeholder="(809) 555-0123"
+              [disabled]="isSubmitting"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span class="label-icon">✉️</span>
+              Email
+            </label>
+            <input 
+              type="email" 
+              formControlName="email" 
+              class="form-input"
+              placeholder="cliente@ejemplo.com"
+              [disabled]="isSubmitting"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn-cancel" 
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            <span class="btn-icon">❌</span>
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-submit" 
+            [disabled]="form.invalid || isSubmitting">
+            @if (isSubmitting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+            } @else {
+              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
+              {{ isEditMode ? "Actualizar" : "Guardar" }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

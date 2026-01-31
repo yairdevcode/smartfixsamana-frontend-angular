@@ -1,0 +1,103 @@
+<div class="inventory-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">📦</span>
+      Gestión de Inventario
+    </h2>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <button class="action-card" (click)="navigateToStockEntry()">
+      <div class="action-icon">📥</div>
+      <div class="action-content">
+        <h3>Registrar Movimiento</h3>
+        <p>Entrada o salida de stock</p>
+      </div>
+      <span class="action-arrow">→</span>
+    </button>
+
+    <button class="action-card" (click)="navigateToMovements()">
+      <div class="action-icon">📋</div>
+      <div class="action-content">
+        <h3>Historial de Movimientos</h3>
+        <p>Ver todos los movimientos</p>
+      </div>
+      <span class="action-arrow">→</span>
+    </button>
+
+    <button class="action-card" (click)="navigateToCatalog()">
+      <div class="action-icon">🔩</div>
+      <div class="action-content">
+        <h3>Catálogo de Repuestos</h3>
+        <p>Gestionar items del catálogo</p>
+      </div>
+      <span class="action-arrow">→</span>
+    </button>
+  </div>
+
+  <!-- Low Stock Alerts -->
+  <div class="alerts-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <span class="section-icon">⚠️</span>
+        Alertas de Stock Bajo
+      </h3>
+      @if (lowStockParts.length > 0) {
+        <span class="alert-badge">{{ lowStockParts.length }}</span>
+      }
+    </div>
+
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner
+          size="medium"
+          message="Cargando alertas..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else if (lowStockParts.length === 0) {
+      <div class="empty-alerts">
+        <div class="empty-icon">✅</div>
+        <h4>Sin alertas de stock bajo</h4>
+        <p>Todos los repuestos tienen stock suficiente</p>
+      </div>
+    } @else {
+      <div class="alerts-grid">
+        @for (part of lowStockParts; track part.id) {
+          <div class="alert-card">
+            <div class="alert-header">
+              <div class="alert-icon">🔩</div>
+              <div class="alert-info">
+                <h4 class="alert-name">{{ part.name }}</h4>
+                <p class="alert-status">Stock crítico</p>
+              </div>
+            </div>
+
+            <div class="stock-indicator">
+              <div class="stock-bar">
+                <div class="stock-fill"
+                     [style.width.%]="getStockPercentage(part)"
+                     [class.critical]="part.quantity === 0"
+                     [class.warning]="part.quantity > 0">
+                </div>
+              </div>
+              <div class="stock-numbers">
+                <span class="current-stock">{{ part.quantity }}</span>
+                <span class="stock-separator">/</span>
+                <span class="min-stock">{{ part.minStock }}</span>
+              </div>
+            </div>
+
+            <div class="alert-actions">
+              <button class="btn-restock" (click)="navigateToStockEntry()">
+                <span class="btn-icon">📥</span>
+                Reabastecer
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

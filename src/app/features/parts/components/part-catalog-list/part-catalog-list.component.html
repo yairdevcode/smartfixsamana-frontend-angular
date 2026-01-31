@@ -1,0 +1,181 @@
+<div class="catalog-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">📦</span>
+      Catálogo de Repuestos
+    </h2>
+
+    <div class="header-actions">
+      <div class="search-container">
+        <input
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Buscar repuesto..."
+          class="search-input"
+          [disabled]="isLoading"
+        />
+        @if (isSearching) {
+          <app-spinner size="small" [showMessage]="false"></app-spinner>
+        } @else {
+          <span class="search-icon">🔍</span>
+        }
+      </div>
+
+      <div class="filter-container">
+        <select
+          [formControl]="phoneFilterControl"
+          class="phone-filter"
+          [disabled]="isLoading">
+          <option [ngValue]="null">Todos los dispositivos</option>
+          @for (phone of phones; track phone.id) {
+            <option [ngValue]="phone.id">{{ phone.brand }} {{ phone.model }}</option>
+          }
+        </select>
+        @if (phoneFilterControl.value) {
+          <button class="btn-clear-filter" (click)="clearPhoneFilter()" title="Limpiar filtro">
+            ✕
+          </button>
+        }
+      </div>
+
+      @if (admin) {
+        <button class="btn-primary" (click)="create()">
+          <span class="btn-icon">➕</span>
+          Nuevo Item
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="cards-container">
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner
+          size="large"
+          message="Cargando catálogo..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else {
+      @for (item of partsCatalog; track item.id) {
+        <div class="catalog-card" [class.low-stock]="isLowStock(item)" [class.out-of-stock]="item.quantity === 0">
+          <div class="card-header">
+            <div class="catalog-icon">🔩</div>
+            <div class="catalog-info">
+              <h3 class="catalog-name">{{ item.name }}</h3>
+              <p class="catalog-id">ID: {{ item.id }}</p>
+              @if (item.phoneId) {
+                <p class="catalog-phone">
+                  <span class="phone-badge">📱 {{ item.phoneBrand }} {{ item.phoneModel }}</span>
+                </p>
+              }
+            </div>
+            <div class="stock-badge"
+                 [class.healthy]="getStockStatus(item) === 'healthy'"
+                 [class.warning]="getStockStatus(item) === 'warning'"
+                 [class.critical]="getStockStatus(item) === 'critical'">
+              <span class="stock-qty">{{ item.quantity }}</span>
+              <span class="stock-label">unidades</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="stock-details">
+              <div class="detail-item">
+                <span class="detail-label">
+                  <span class="detail-icon">📊</span>
+                  Stock Actual
+                </span>
+                <span class="detail-value" [class.warning]="isLowStock(item)">
+                  {{ item.quantity }}
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">
+                  <span class="detail-icon">⚠️</span>
+                  Stock Mínimo
+                </span>
+                <span class="detail-value">{{ item.minStock }}</span>
+              </div>
+            </div>
+
+            <div class="price-details">
+              <div class="detail-item">
+                <span class="detail-label">
+                  <span class="detail-icon">💵</span>
+                  Precio Compra
+                </span>
+                <span class="detail-value price">{{ formatPrice(item.purchasePrice) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">
+                  <span class="detail-icon">💰</span>
+                  Precio Venta
+                </span>
+                <span class="detail-value price sale">{{ formatPrice(item.salePrice) }}</span>
+              </div>
+            </div>
+
+            @if (item.quantity === 0) {
+              <div class="out-of-stock-warning">
+                <span class="warning-icon">🚫</span>
+                Sin stock disponible
+              </div>
+            } @else if (isLowStock(item)) {
+              <div class="low-stock-warning">
+                <span class="warning-icon">⚠️</span>
+                Stock bajo - Reabastecer pronto
+              </div>
+            }
+          </div>
+
+          @if (admin) {
+            <div class="card-actions">
+              <button
+                class="btn-edit"
+                (click)="update(item.id!)"
+                [disabled]="isDeleting">
+                <span class="btn-icon">✏️</span>
+                Editar
+              </button>
+              <button
+                class="btn-delete"
+                (click)="delete(item)"
+                [disabled]="isDeleting">
+                @if (isDeleting) {
+                  <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+                } @else {
+                  <span class="btn-icon">🗑️</span>
+                  Eliminar
+                }
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      @if (partsCatalog.length === 0 && !isLoading) {
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          <h3>No hay items en el catálogo</h3>
+          <p>Comienza agregando items al catálogo de repuestos</p>
+          @if (admin) {
+            <button class="btn-primary" (click)="create()">
+              <span class="btn-icon">➕</span>
+              Agregar Item
+            </button>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <app-pagination
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    [totalElements]="totalElements"
+    [pageSize]="pageSize"
+    (pageChange)="goToPage($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>
