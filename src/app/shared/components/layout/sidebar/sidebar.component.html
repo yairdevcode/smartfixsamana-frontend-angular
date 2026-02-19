@@ -76,6 +76,12 @@
         <span class="nav-icon">🔩</span>
         <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Repuestos</span>
       </a>
+      <a routerLink="part-types"
+         routerLinkActive="active-link"
+         (click)="onMobileLinkClick()">
+        <span class="nav-icon">🏷️</span>
+        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Tipos de Repuesto</span>
+      </a>
       <a routerLink="inventory"
          routerLinkActive="active-link"
          (click)="onMobileLinkClick()">

@@ -1,0 +1,115 @@
+<div class="form-container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <app-spinner
+        size="large"
+        message="Cargando tipo de repuesto..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-icon">🏷️</div>
+        <h2 class="form-title">{{ isEditMode ? "Editar Tipo de Repuesto" : "Nuevo Tipo de Repuesto" }}</h2>
+        <p class="form-subtitle">{{ isEditMode ? "Actualiza la información del tipo" : "Agrega un nuevo tipo de repuesto" }}</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="type-form">
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">📋</span>
+            Información del Tipo
+          </h3>
+
+          <div class="form-group">
+            <label class="form-label" for="name">
+              <span class="label-icon">🏷️</span>
+              Nombre del Tipo
+            </label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              class="form-input"
+              placeholder="Ej: Pantalla LCD, Batería, Cámara frontal..."
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                @if (form.get('name')?.errors?.['required']) {
+                  El nombre es requerido
+                } @else if (form.get('name')?.errors?.['minlength']) {
+                  El nombre debe tener al menos 2 caracteres
+                } @else if (form.get('name')?.errors?.['maxlength']) {
+                  El nombre no puede exceder 100 caracteres
+                }
+              </div>
+            }
+            <p class="field-hint">Este nombre aparecerá en el dropdown al crear repuestos</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="description">
+              <span class="label-icon">📝</span>
+              Descripción (Opcional)
+            </label>
+            <textarea
+              id="description"
+              formControlName="description"
+              class="form-input"
+              rows="3"
+              placeholder="Descripción opcional del tipo de repuesto..."
+              [disabled]="isSubmitting"
+            ></textarea>
+            @if (form.get('description')?.invalid && form.get('description')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                La descripción no puede exceder 255 caracteres
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (form.get('name')?.value) {
+          <div class="preview-section">
+            <h3 class="section-title">
+              <span class="section-icon">👁️</span>
+              Vista Previa
+            </h3>
+            <div class="type-preview">
+              <span class="preview-badge">{{ form.get('name')?.value }}</span>
+              @if (form.get('description')?.value) {
+                <span class="preview-description">{{ form.get('description')?.value }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            <span class="btn-icon">❌</span>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="form.invalid || isSubmitting">
+            @if (isSubmitting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+            } @else {
+              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
+              {{ isEditMode ? "Actualizar" : "Guardar" }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

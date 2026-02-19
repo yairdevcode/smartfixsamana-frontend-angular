@@ -5,8 +5,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PartCatalogService } from '../../services/parts-catalog.service';
 import { PhoneService } from '../../../phones/services/phone.service';
+import { PartTypeService } from '../../../part-types/services/part-type.service';
 import { PartCatalogDTO, PartCatalogResponse } from '../../../../shared/models/part-catalog';
 import { Phone } from '../../../../shared/models/phone';
+import { PartTypeResponse } from '../../../../shared/models/part-type';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import Swal from 'sweetalert2';
 
@@ -26,11 +28,13 @@ export class PartCatalogFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private partCatalogService = inject(PartCatalogService);
   private phoneService = inject(PhoneService);
+  private partTypeService = inject(PartTypeService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   form!: FormGroup;
   phones: Phone[] = [];
+  partTypes: PartTypeResponse[] = [];
   isEditMode = false;
   isLoading = false;
   isSubmitting = false;
@@ -39,13 +43,14 @@ export class PartCatalogFormComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.loadPhones();
+    this.loadPartTypes();
     this.checkEditMode();
   }
 
   private initForm(): void {
     this.form = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      description: ['', [Validators.required]],
+      description: [''],
+      partTypeId: [null, [Validators.required]],
       quantity: [0, [Validators.required, Validators.min(0)]],
       minStock: [5, [Validators.required, Validators.min(0)]],
       phoneId: [null],
@@ -61,6 +66,18 @@ export class PartCatalogFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading phones:', err);
+      }
+    });
+  }
+
+  private loadPartTypes(): void {
+    this.partTypeService.getPartTypes().subscribe({
+      next: (partTypes) => {
+        this.partTypes = partTypes;
+      },
+      error: (err) => {
+        console.error('Error loading part types:', err);
+        Swal.fire('Error', 'No se pudieron cargar los tipos de repuesto.', 'error');
       }
     });
   }
@@ -83,8 +100,8 @@ export class PartCatalogFormComponent implements OnInit {
       .subscribe({
         next: (partCatalog: PartCatalogResponse) => {
           this.form.patchValue({
-            name: partCatalog.name,
             description: partCatalog.description,
+            partTypeId: partCatalog.partTypeId || null,
             quantity: partCatalog.quantity,
             minStock: partCatalog.minStock,
             phoneId: partCatalog.phoneId || null,
@@ -106,8 +123,9 @@ export class PartCatalogFormComponent implements OnInit {
     const formValue = this.form.value;
 
     const partCatalogDTO: PartCatalogDTO = {
-      name: formValue.name,
+      name: this.selectedPartTypeName || '',
       description: formValue.description,
+      partTypeId: formValue.partTypeId,
       quantity: formValue.quantity,
       minStock: formValue.minStock,
       phoneId: formValue.phoneId || undefined,
@@ -139,6 +157,13 @@ export class PartCatalogFormComponent implements OnInit {
 
   cancel(): void {
     this.router.navigate(['/dashboard/parts']);
+  }
+
+  get selectedPartTypeName(): string | null {
+    const partTypeId = this.form.get('partTypeId')?.value;
+    if (!partTypeId) return null;
+    const partType = this.partTypes.find(pt => pt.id === partTypeId);
+    return partType?.name || null;
   }
 
   get isLowStock(): boolean {

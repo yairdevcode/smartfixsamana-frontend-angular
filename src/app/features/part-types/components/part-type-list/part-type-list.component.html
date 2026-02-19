@@ -1,0 +1,102 @@
+<div class="part-types-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">🏷️</span>
+      Tipos de Repuesto
+    </h2>
+
+    <div class="header-actions">
+      <div class="search-container">
+        <input
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Buscar tipo..."
+          class="search-input"
+          [disabled]="isLoading"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+
+      @if (admin) {
+        <button class="btn-primary" (click)="create()">
+          <span class="btn-icon">➕</span>
+          Nuevo Tipo
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="table-container">
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner
+          size="large"
+          message="Cargando tipos de repuesto..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else if (filteredPartTypes.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🏷️</div>
+        <h3>No hay tipos de repuesto</h3>
+        <p>Comienza agregando tipos de repuesto para organizarte mejor</p>
+        @if (admin) {
+          <button class="btn-primary" (click)="create()">
+            <span class="btn-icon">➕</span>
+            Agregar Tipo
+          </button>
+        }
+      </div>
+    } @else {
+      <table class="part-types-table">
+        <thead>
+          <tr>
+            <th class="th-id">ID</th>
+            <th class="th-name">Nombre</th>
+            <th class="th-description">Descripción</th>
+            @if (admin) {
+              <th class="th-actions">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (partType of filteredPartTypes; track partType.id) {
+            <tr>
+              <td class="td-id">{{ partType.id }}</td>
+              <td class="td-name">
+                <span class="type-badge">{{ partType.name }}</span>
+              </td>
+              <td class="td-description">{{ partType.description || '-' }}</td>
+              @if (admin) {
+                <td class="td-actions">
+                  <button
+                    class="btn-edit"
+                    (click)="update(partType.id)"
+                    [disabled]="isDeleting"
+                    title="Editar">
+                    <span>✏️</span>
+                  </button>
+                  <button
+                    class="btn-delete"
+                    (click)="delete(partType)"
+                    [disabled]="isDeleting"
+                    title="Eliminar">
+                    @if (isDeleting) {
+                      <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+                    } @else {
+                      <span>🗑️</span>
+                    }
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <span class="total-count">Total: {{ filteredPartTypes.length }} tipos</span>
+      </div>
+    }
+  </div>
+</div>

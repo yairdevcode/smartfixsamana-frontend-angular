@@ -7,21 +7,6 @@
           Mostrando {{ startItem }}-{{ endItem }} de {{ totalElements }} resultados
         </span>
       }
-
-      @if (showPageSizeSelector) {
-        <div class="page-size-selector">
-          <label for="pageSize">Items por página:</label>
-          <select
-            id="pageSize"
-            [ngModel]="pageSize"
-            (ngModelChange)="onPageSizeChange($event)"
-            class="page-size-select">
-            @for (size of pageSizeOptions; track size) {
-              <option [value]="size">{{ size }}</option>
-            }
-          </select>
-        </div>
-      }
     </div>
 
     <!-- Controles de paginación -->

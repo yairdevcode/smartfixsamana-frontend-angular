@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PAGE_SIZE_OPTIONS } from '../../models/paginated-response';
 
 @Component({
   selector: 'app-pagination',
@@ -20,8 +19,6 @@ export class PaginationComponent {
 
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
-
-  pageSizeOptions = PAGE_SIZE_OPTIONS;
 
   goToPreviousPage(): void {
     if (this.currentPage > 0) {

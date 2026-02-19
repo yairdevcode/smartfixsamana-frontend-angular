@@ -1,4 +1,5 @@
 import { Phone } from './phone';
+import { PartType } from './part-type';
 
 /**
  * PartCatalog model matching backend entity PartCatalog.java
@@ -8,6 +9,7 @@ export interface PartCatalog {
   id?: number;
   name: string;
   description?: string;
+  partType?: PartType;
   phone?: Phone;
   quantity: number;
   minStock: number;
@@ -23,6 +25,8 @@ export interface PartCatalogResponse {
   id: number;
   name: string;
   description?: string;
+  partTypeId?: number;
+  partTypeName?: string;
   phoneId?: number;
   phoneBrand?: string;
   phoneModel?: string;
@@ -39,6 +43,7 @@ export interface PartCatalogResponse {
 export interface PartCatalogDTO {
   name: string;
   description?: string;
+  partTypeId?: number;
   phoneId?: number;
   quantity?: number;
   minStock?: number;
@@ -71,6 +76,10 @@ export function responseToPartCatalog(response: PartCatalogResponse): PartCatalo
     id: response.id,
     name: response.name,
     description: response.description,
+    partType: response.partTypeId ? {
+      id: response.partTypeId,
+      name: response.partTypeName || ''
+    } : undefined,
     phone: response.phoneId ? {
       id: response.phoneId,
       brand: response.phoneBrand || '',
@@ -90,6 +99,7 @@ export function toPartCatalogDTO(part: Partial<PartCatalog>): PartCatalogDTO {
   return {
     name: part.name || '',
     description: part.description,
+    partTypeId: part.partType?.id,
     phoneId: part.phone?.id,
     quantity: part.quantity,
     minStock: part.minStock,

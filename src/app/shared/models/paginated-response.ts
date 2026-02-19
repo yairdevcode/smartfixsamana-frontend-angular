@@ -37,4 +37,4 @@ export const DEFAULT_PAGINATION: PaginationParams = {
 /**
  * Available page sizes for user selection
  */
-export const PAGE_SIZE_OPTIONS: number[] = [10, 25, 50];
+export const PAGE_SIZE_OPTIONS: number[] = [4, 10, 25, 50];

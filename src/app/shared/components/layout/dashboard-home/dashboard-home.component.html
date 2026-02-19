@@ -278,49 +278,60 @@
               color="primary">
             </app-spinner>
           </div>
+        } @else if (recentRepairs.length === 0) {
+          <div class="no-data">
+            <span class="no-data-icon">📭</span>
+            <p>No hay reparaciones recientes</p>
+          </div>
         } @else {
-          <div class="repairs-grid">
-            @for (repair of recentRepairs; track repair.id) {
-              <div class="repair-card">
-                <div class="repair-header">
-                  <div class="repair-state" [style.background-color]="getStateColor(repair.state)">
-                    <span class="state-icon">{{ getStateIcon(repair.state) }}</span>
-                    <span class="state-text">{{ repair.state }}</span>
-                  </div>
-                  <span class="repair-date">{{ formatDate(repair.date) }}</span>
-                </div>
-
-                <div class="repair-body">
-                  <div class="repair-info">
-                    <div class="info-row">
-                      <span class="info-icon">👤</span>
-                      <span class="info-text">{{ repair.customer.name }} {{ repair.customer.lastname }}</span>
-                    </div>
-                    <div class="info-row">
-                      <span class="info-icon">📱</span>
-                      <span class="info-text">{{ repair.phone.brand }} {{ repair.phone.model }}</span>
-                    </div>
-                    <div class="info-row fault-row">
-                      <span class="info-icon">⚠️</span>
-                      <span class="info-text fault-text">{{ repair.fault }}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="repair-footer">
-                  <a [href]="'/dashboard/repairs/edit/' + repair.id" class="view-repair-link">
-                    Ver detalles →
-                  </a>
-                </div>
-              </div>
-            }
-
-            @if (recentRepairs.length === 0) {
-              <div class="no-data">
-                <span class="no-data-icon">📭</span>
-                <p>No hay reparaciones recientes</p>
-              </div>
-            }
+          <div class="table-wrapper">
+            <table class="repairs-table">
+              <thead>
+                <tr>
+                  <th class="th-customer">Cliente</th>
+                  <th class="th-device">Dispositivo</th>
+                  <th class="th-fault">Falla</th>
+                  <th class="th-date">Fecha</th>
+                  <th class="th-status">Estado</th>
+                  <th class="th-actions">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (repair of recentRepairs; track repair.id) {
+                  <tr>
+                    <td class="td-customer">
+                      <div class="customer-cell">
+                        <span class="customer-avatar">👤</span>
+                        <span class="customer-name">{{ repair.customer.name }} {{ repair.customer.lastname }}</span>
+                      </div>
+                    </td>
+                    <td class="td-device">
+                      <div class="device-cell">
+                        <span class="device-icon">📱</span>
+                        <span class="device-name">{{ repair.phone.brand }} {{ repair.phone.model }}</span>
+                      </div>
+                    </td>
+                    <td class="td-fault">
+                      <span class="fault-text" [title]="repair.fault">{{ repair.fault }}</span>
+                    </td>
+                    <td class="td-date">
+                      <span class="date-badge">{{ formatDate(repair.date) }}</span>
+                    </td>
+                    <td class="td-status">
+                      <span class="status-badge" [style.background-color]="getStateColor(repair.state)">
+                        <span class="state-icon">{{ getStateIcon(repair.state) }}</span>
+                        {{ repair.state }}
+                      </span>
+                    </td>
+                    <td class="td-actions">
+                      <a [href]="'/dashboard/repairs/edit/' + repair.id" class="btn-view" title="Ver detalles">
+                        👁️
+                      </a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         }
       </div>

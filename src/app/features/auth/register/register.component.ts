@@ -40,13 +40,23 @@ export class RegisterComponent {
         this.router.navigate(['/login']);
       },
       error: (err) => {
+        let errorMessage = 'No se pudo registrar. Por favor, intente de nuevo.';
+        let errorTitle = 'Error';
+
+        if (err.status === 409) {
+          errorMessage = err.error?.message || 'El recurso ya existe.';
+          errorTitle = 'Recurso duplicado';
+        } else if (err.status === 403) {
+          errorMessage = err.error?.message || 'No tiene permisos para realizar esta acción.';
+          errorTitle = 'Acceso denegado';
+        }
+
         Swal.fire({
           icon: 'error',
-          title: 'Error',
-          text: 'No se pudo registrar',
+          title: errorTitle,
+          text: errorMessage,
         });
         console.error(err);
-        this.registerform.reset();
       }
     });
   }

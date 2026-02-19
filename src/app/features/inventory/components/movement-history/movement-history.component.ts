@@ -46,7 +46,7 @@ export class MovementHistoryComponent implements OnInit {
   currentPage = 0;
   totalPages = 0;
   totalElements = 0;
-  pageSize = DEFAULT_PAGINATION.size;
+  pageSize = 4;
   sortBy = 'createdAt';
   sortDirection: 'asc' | 'desc' = 'desc';
 

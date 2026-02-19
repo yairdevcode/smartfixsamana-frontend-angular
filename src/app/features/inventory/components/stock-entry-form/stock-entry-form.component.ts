@@ -9,6 +9,7 @@ import { PartCatalogResponse } from '../../../../shared/models/part-catalog';
 import { InventoryMovementDTO, MovementType } from '../../../../shared/models/inventory-movement';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-stock-entry-form',
@@ -27,6 +28,7 @@ export class StockEntryFormComponent implements OnInit {
   private partCatalogService = inject(PartCatalogService);
   private movementService = inject(InventoryMovementService);
   private router = inject(Router);
+  private authService = inject(AuthService)
 
   form!: FormGroup;
   partsCatalog: PartCatalogResponse[] = [];
@@ -133,5 +135,8 @@ export class StockEntryFormComponent implements OnInit {
 
   cancel(): void {
     this.router.navigate(['/dashboard/inventory']);
+  }
+   get admin(): boolean {
+    return this.authService.isAdmin();
   }
 }

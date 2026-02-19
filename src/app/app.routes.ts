@@ -59,6 +59,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'part-types',
+        loadChildren: () =>
+          import('./features/part-types/part-types.routes').then(
+            (m) => m.partTypesRoutes
+          ),
+      },
+      {
         path: 'inventory',
         loadChildren: () =>
           import('./features/inventory/inventory.routes').then(

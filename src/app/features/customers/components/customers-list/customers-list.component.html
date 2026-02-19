@@ -1,16 +1,16 @@
-<div class="customers-container">
+<div class="list-container">
   <div class="header-section">
     <h2 class="page-title">
       <span class="title-icon">👥</span>
       Gestión de Clientes
     </h2>
-    
+
     <div class="header-actions">
       <div class="search-container">
-        <input 
-          type="text" 
-          [formControl]="searchControl" 
-          placeholder="Buscar clientes..." 
+        <input
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Buscar clientes..."
           class="search-input"
           [disabled]="isLoading"
         />
@@ -20,8 +20,8 @@
           <span class="search-icon">🔍</span>
         }
       </div>
-      
-      @if(admin) {
+
+      @if (admin) {
         <button class="btn-primary" (click)="create()">
           <span class="btn-icon">➕</span>
           Nuevo Cliente
@@ -30,89 +30,82 @@
     </div>
   </div>
 
-  <!-- Cards de clientes -->
-  <div class="cards-container">
+  <div class="table-container">
     @if (isLoading) {
       <div class="loading-container">
-        <app-spinner 
-          size="large" 
+        <app-spinner
+          size="large"
           message="Cargando clientes..."
           color="primary">
         </app-spinner>
       </div>
+    } @else if (customers.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <h3>No hay clientes disponibles</h3>
+        <p>Comienza agregando tu primer cliente</p>
+        @if (admin) {
+          <button class="btn-primary" (click)="create()">
+            <span class="btn-icon">➕</span>
+            Agregar Cliente
+          </button>
+        }
+      </div>
     } @else {
-      @for (customer of customers; track $index) {
-        <div class="customer-card">
-          <div class="card-header">
-            <div class="customer-info">
-              <h3 class="customer-name">{{ customer.name }} {{ customer.lastname }}</h3>
-            </div>
-            <div class="customer-avatar">
-              <span class="avatar-icon">👤</span>
-            </div>
-          </div>
-          
-          <div class="card-body">
-            <div class="info-row">
-              <span class="info-label">
-                <span class="info-icon">📞</span>
-                Teléfono
-              </span>
-              <span class="info-value">{{ customer.phone }}</span>
-            </div>
-            
-            <div class="info-row">
-              <span class="info-label">
-                <span class="info-icon">✉️</span>
-                Email
-              </span>
-              <span class="info-value">{{ customer.email }}</span>
-            </div>
-          </div>
-          
-          @if(admin) {
-            <div class="card-actions">
-              <button 
-                class="btn-edit" 
-                (click)="update(customer.id!)"
-                [disabled]="isDeleting">
-                <span class="btn-icon">✏️</span>
-                Editar
-              </button>
-              <button 
-                class="btn-delete" 
-                (click)="delete(customer)"
-                [disabled]="isDeleting">
-                @if (isDeleting) {
-                  <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="th-id">ID</th>
+            <th class="th-name">Nombre Completo</th>
+            <th class="th-phone">Teléfono</th>
+            <th class="th-email">Email</th>
+            @if (admin) {
+              <th class="th-actions">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (customer of customers; track customer.id) {
+            <tr>
+              <td class="td-id">{{ customer.id }}</td>
+              <td class="td-name">
+                <div class="customer-info">
+                  <span class="customer-avatar">👤</span>
+                  <span class="customer-name">{{ customer.name }} {{ customer.lastname }}</span>
+                </div>
+              </td>
+              <td class="td-phone">
+                <span class="phone-badge">📞 {{ customer.phone }}</span>
+              </td>
+              <td class="td-email">
+                @if (customer.email) {
+                  <span class="email-badge">✉️ {{ customer.email }}</span>
                 } @else {
-                  <span class="btn-icon">🗑️</span>
-                  Eliminar
+                  <span class="no-email">Sin email</span>
                 }
-              </button>
-            </div>
+              </td>
+              @if (admin) {
+                <td class="td-actions">
+                  <button class="btn-action btn-edit" (click)="update(customer.id!)" title="Editar" [disabled]="isDeleting">
+                    ✏️
+                  </button>
+                  <button class="btn-action btn-delete" (click)="delete(customer)" title="Eliminar" [disabled]="isDeleting">
+                    🗑️
+                  </button>
+                </td>
+              }
+            </tr>
           }
-        </div>
-      }
-      
-      @if (customers.length === 0 && !isLoading) {
-        <div class="empty-state">
-          <div class="empty-icon">📭</div>
-          <h3>No hay clientes disponibles</h3>
-          <p>Comienza agregando tu primer cliente</p>
-          @if(admin) {
-            <button class="btn-primary" (click)="create()">
-              <span class="btn-icon">➕</span>
-              Agregar Cliente
-            </button>
-          }
-        </div>
-      }
+        </tbody>
+      </table>
+
+      <div class="table-footer">
+        <span class="total-count">Total: {{ customers.length }} clientes</span>
+      </div>
     }
   </div>
 
-  <!-- Paginación -->
-  <app-pagination 
+  <app-pagination
     [currentPage]="currentPage"
     [totalPages]="totalPages"
     (pageChange)="goToPage($event)">

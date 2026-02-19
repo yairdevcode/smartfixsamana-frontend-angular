@@ -23,45 +23,42 @@
           </h3>
 
           <div class="form-group">
-            <label class="form-label" for="name">
-              <span class="label-icon">🔩</span>
-              Nombre del Repuesto
+            <label class="form-label" for="partTypeId">
+              <span class="label-icon">🏷️</span>
+              Tipo de Repuesto
             </label>
-            <input
-              id="name"
-              type="text"
-              formControlName="name"
-              class="form-input"
-              placeholder="Ej: Pantalla LCD, Batería, Conector de carga..."
-              [disabled]="isSubmitting"
-            />
-            @if (form.get('name')?.invalid && form.get('name')?.touched) {
+            <select
+              id="partTypeId"
+              formControlName="partTypeId"
+              class="form-input form-select"
+              [disabled]="isSubmitting">
+              <option [ngValue]="null">-- Seleccionar tipo de repuesto --</option>
+              @for (partType of partTypes; track partType.id) {
+                <option [ngValue]="partType.id">{{ partType.name }}</option>
+              }
+            </select>
+            @if (form.get('partTypeId')?.invalid && form.get('partTypeId')?.touched) {
               <div class="error-message">
                 <span class="error-icon">⚠️</span>
-                El nombre es requerido (mínimo 2 caracteres)
+                Debe seleccionar un tipo de repuesto
               </div>
             }
+            <p class="field-hint">El tipo define la categoría del repuesto (Pantalla LCD, Batería, etc.)</p>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="description">
               <span class="label-icon">📝</span>
-              Descripción
+              Descripción (Opcional)
             </label>
             <textarea
               id="description"
               formControlName="description"
               class="form-input"
               rows="3"
-              placeholder="Descripción del repuesto..."
+              placeholder="Descripción adicional del repuesto..."
               [disabled]="isSubmitting"
             ></textarea>
-            @if (form.get('description')?.invalid && form.get('description')?.touched) {
-              <div class="error-message">
-                <span class="error-icon">⚠️</span>
-                La descripción es requerida
-              </div>
-            }
           </div>
 
           <div class="form-group">
@@ -221,7 +218,7 @@
               <span class="preview-label">unidades</span>
             </div>
             <div class="preview-info">
-              <strong>{{ form.get('name')?.value || 'Nombre del repuesto' }}</strong>
+              <strong>{{ selectedPartTypeName || 'Selecciona un tipo de repuesto' }}</strong>
               <span>Stock mínimo: {{ form.get('minStock')?.value || 0 }}</span>
               @if (form.get('salePrice')?.value) {
                 <span class="preview-price">Venta: {{ formatPrice(form.get('salePrice')?.value) }}</span>
