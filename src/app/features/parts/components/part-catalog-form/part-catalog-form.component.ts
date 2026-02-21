@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PartCatalogService } from '../../services/parts-catalog.service';
@@ -18,6 +18,7 @@ import Swal from 'sweetalert2';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterModule,
     SpinnerComponent,
   ],
@@ -32,6 +33,8 @@ export class PartCatalogFormComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
+  @ViewChild('phoneSearchInput') phoneSearchInput!: ElementRef<HTMLInputElement>;
+
   form!: FormGroup;
   phones: Phone[] = [];
   partTypes: PartTypeResponse[] = [];
@@ -39,6 +42,48 @@ export class PartCatalogFormComponent implements OnInit {
   isLoading = false;
   isSubmitting = false;
   partCatalogId: number | null = null;
+
+  phoneDropdownOpen = false;
+  phoneSearchTerm = '';
+
+  get filteredPhones(): Phone[] {
+    if (!this.phoneSearchTerm.trim()) return this.phones;
+    const term = this.phoneSearchTerm.toLowerCase();
+    return this.phones.filter(p =>
+      p.brand.toLowerCase().includes(term) || p.model.toLowerCase().includes(term)
+    );
+  }
+
+  get selectedPhoneLabel(): string {
+    const phoneId = this.form.get('phoneId')?.value;
+    if (!phoneId) return '-- Todos los dispositivos --';
+    const phone = this.phones.find(p => p.id === phoneId);
+    return phone ? `${phone.brand} ${phone.model}` : '-- Todos los dispositivos --';
+  }
+
+  togglePhoneDropdown(): void {
+    if (this.isSubmitting) return;
+    this.phoneDropdownOpen = !this.phoneDropdownOpen;
+    if (this.phoneDropdownOpen) {
+      this.phoneSearchTerm = '';
+      setTimeout(() => this.phoneSearchInput?.nativeElement?.focus(), 0);
+    }
+  }
+
+  selectPhone(phone: Phone | null): void {
+    this.form.get('phoneId')?.setValue(phone?.id ?? null);
+    this.form.get('phoneId')?.markAsTouched();
+    this.phoneDropdownOpen = false;
+    this.phoneSearchTerm = '';
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.phone-dropdown')) {
+      this.phoneDropdownOpen = false;
+    }
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -53,7 +98,7 @@ export class PartCatalogFormComponent implements OnInit {
       partTypeId: [null, [Validators.required]],
       quantity: [0, [Validators.required, Validators.min(0)]],
       minStock: [5, [Validators.required, Validators.min(0)]],
-      phoneId: [null],
+      phoneId: [null, [Validators.required]],
       purchasePrice: [null, [Validators.min(0)]],
       salePrice: [null, [Validators.min(0)]],
     });

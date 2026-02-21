@@ -64,18 +64,59 @@
           <div class="form-group">
             <label class="form-label" for="phoneId">
               <span class="label-icon">📱</span>
-              Dispositivo Compatible (Opcional)
+              Dispositivo Compatible
             </label>
-            <select
-              id="phoneId"
-              formControlName="phoneId"
-              class="form-input form-select"
-              [disabled]="isSubmitting">
-              <option [ngValue]="null">-- Todos los dispositivos --</option>
-              @for (phone of phones; track phone.id) {
-                <option [ngValue]="phone.id">{{ phone.brand }} {{ phone.model }}</option>
+            <div class="phone-dropdown" [class.disabled]="isSubmitting">
+              <div
+                class="form-input form-select phone-dropdown-trigger"
+                [class.open]="phoneDropdownOpen"
+                (click)="togglePhoneDropdown()"
+                [class.placeholder]="!form.get('phoneId')?.value">
+                {{ selectedPhoneLabel }}
+              </div>
+              @if (phoneDropdownOpen) {
+                <div class="phone-dropdown-menu">
+                  <div class="phone-dropdown-search">
+                    <input
+                      #phoneSearchInput
+                      type="text"
+                      class="form-input phone-search-input"
+                      placeholder="Buscar por marca o modelo..."
+                      [(ngModel)]="phoneSearchTerm"
+                      [ngModelOptions]="{ standalone: true }"
+                      (click)="$event.stopPropagation()"
+                    />
+                  </div>
+                  <div class="phone-dropdown-options">
+                    <div
+                      class="phone-dropdown-option"
+                      [class.selected]="!form.get('phoneId')?.value"
+                      (click)="selectPhone(null)">
+                      -- Todos los dispositivos --
+                    </div>
+                    @for (phone of filteredPhones; track phone.id) {
+                      <div
+                        class="phone-dropdown-option"
+                        [class.selected]="form.get('phoneId')?.value === phone.id"
+                        (click)="selectPhone(phone)">
+                        {{ phone.brand }} {{ phone.model }}
+                      </div>
+                    }
+                    @if (filteredPhones.length === 0 && phoneSearchTerm) {
+                      <div class="phone-dropdown-empty">
+                        No se encontraron dispositivos
+                      </div>
+                    }
+                  </div>
+                </div>
               }
-            </select>
+            </div>
+            @if (form.get('phoneId')?.invalid && form.get('phoneId')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                Debe seleccionar un dispositivo compatible
+              </div>
+            }
             <p class="field-hint">Selecciona un dispositivo si el repuesto es específico para un modelo</p>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomerService } from '../../../../features/customers/services/customers.service';
 import { PartCatalogService } from '../../../../features/parts/services/parts-catalog.service';
@@ -9,6 +9,9 @@ import { SpinnerComponent } from '../../spinner/spinner.component';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs';
 import { Phone } from '../../../models/phone';
+import { AuthService } from '../../../../core/services/auth.service';
+
+
 
 interface RepairsByStatus {
   pending: number;
@@ -25,6 +28,9 @@ interface TopRepairedDevice {
 }
 
 interface RecentActivity {
+
+  
+
   id: number;
   type: 'repair' | 'customer' | 'device' | 'part';
   description: string;
@@ -41,6 +47,8 @@ interface RecentActivity {
   styleUrls: ['./dashboard-home.component.css']
 })
 export class DashboardHomeComponent {
+
+  private authService = inject(AuthService);
 
   // Estados de carga
   isLoadingDashboard = false;
@@ -339,5 +347,9 @@ export class DashboardHomeComponent {
     if (diffInDays === 1) return 'Ayer';
     if (diffInDays < 7) return `Hace ${diffInDays} días`;
     return repairDate.toLocaleDateString('es-ES');
+  }
+
+   get admin(): boolean {
+    return this.authService.isAdmin();
   }
 }

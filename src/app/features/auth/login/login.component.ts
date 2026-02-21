@@ -46,7 +46,7 @@ export class LoginComponent {
           Swal.fire({
             icon: 'success',
             title: 'Inicio de sesión exitoso',
-            text: 'Bienvenido de nuevo, ' + response.username,
+            text: 'Bienvenido Retaso, ' + response.username,
           });
           this.router.navigate(['/dashboard']); 
         },
