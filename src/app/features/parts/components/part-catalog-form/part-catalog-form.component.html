@@ -92,7 +92,6 @@
                       class="phone-dropdown-option"
                       [class.selected]="!form.get('phoneId')?.value"
                       (click)="selectPhone(null)">
-                      -- Todos los dispositivos --
                     </div>
                     @for (phone of filteredPhones; track phone.id) {
                       <div
