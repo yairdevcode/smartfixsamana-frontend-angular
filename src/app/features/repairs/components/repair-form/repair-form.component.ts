@@ -20,7 +20,7 @@ import { PartCatalogResponse } from '../../../../shared/models/part-catalog';
 import { RepairPart, RepairPartRequest } from '../../../../shared/models/repair-part';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
-import { finalize, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
+import { finalize, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -94,15 +94,24 @@ export class RepairFormComponent implements OnInit {
         distinctUntilChanged(),
         switchMap((keyword) => {
           if (!keyword || keyword.length < 2) {
+            this.availableParts = [];
             return of([]);
           }
           this.isSearchingParts = true;
           const phoneId = this.selectedPhone?.id;
-          return this.partCatalogService.searchAvailableParts(keyword, phoneId);
+          console.log('Searching for:', keyword, 'phoneId:', phoneId);
+          return this.partCatalogService.searchAvailableParts(keyword, phoneId).pipe(
+            catchError((err) => {
+              console.error('Part search HTTP error:', err.status, err.message, err);
+              this.isSearchingParts = false;
+              return of([]);
+            })
+          );
         })
       )
       .subscribe({
         next: (parts) => {
+          console.log('Parts received:', parts, 'count:', parts.length);
           this.availableParts = parts;
           this.isSearchingParts = false;
         },

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { PartCatalogDTO, PartCatalogResponse } from '../../../shared/models/part-catalog';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
   PaginatedResponse,
@@ -127,9 +127,9 @@ export class PartCatalogService {
   }
 
   /**
-   * Search available parts by keyword, optionally filtered by phone.
-   * Uses the backend /search endpoint with name parameter.
-   * Results are filtered to available parts (quantity > 0) client-side if needed.
+   * Search available parts (quantity > 0) by keyword, optionally filtered by phone.
+   * Uses the dedicated /search/available endpoint that returns a plain array.
+   * Defensively handles both a plain array and a Spring Page wrapper ({ content: [...] }).
    */
   searchAvailableParts(keyword: string, phoneId?: number): Observable<PartCatalogResponse[]> {
     let params = new HttpParams();
@@ -139,6 +139,8 @@ export class PartCatalogService {
     if (phoneId) {
       params = params.set('phoneId', phoneId.toString());
     }
-    return this.http.get<PartCatalogResponse[]>(`${this.partCatalogUrl}/search`, { params });
+    return this.http.get<PartCatalogResponse[] | PagedPartsCatalog>(`${this.partCatalogUrl}/search/available`, { params }).pipe(
+      map(res => Array.isArray(res) ? res : res.content)
+    );
   }
 }
