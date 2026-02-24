@@ -27,19 +27,51 @@
               <span class="label-icon">📦</span>
               Repuesto
             </label>
-            <select
-              id="partCatalogId"
-              formControlName="partCatalogId"
-              class="form-select"
-              [disabled]="isSubmitting"
-              (change)="onPartSelected($event)">
-              <option value="" disabled>Selecciona un repuesto</option>
-              @for (part of partsCatalog; track part.id) {
-                <option [value]="part.id">
-                  {{ part.name }} (Stock: {{ part.quantity }})
-                </option>
+            <div class="part-dropdown" [class.disabled]="isSubmitting">
+              <div
+                class="form-input form-select part-dropdown-trigger"
+                [class.open]="partDropdownOpen"
+                [class.placeholder]="!form.get('partCatalogId')?.value"
+                (click)="togglePartDropdown()">
+                {{ selectedPartLabel }}
+              </div>
+              @if (partDropdownOpen) {
+                <div class="part-dropdown-menu">
+                  <div class="part-dropdown-search">
+                    <input
+                      #partSearchInput
+                      type="text"
+                      class="form-input part-search-input"
+                      placeholder="Buscar por nombre, tipo o dispositivo..."
+                      [(ngModel)]="partSearchTerm"
+                      [ngModelOptions]="{ standalone: true }"
+                      (click)="$event.stopPropagation()"
+                    />
+                  </div>
+                  <div class="part-dropdown-options">
+                    @for (part of filteredParts; track part.id) {
+                      <div
+                        class="part-dropdown-option"
+                        [class.selected]="form.get('partCatalogId')?.value === part.id"
+                        (click)="selectPart(part)">
+                        <span class="part-option-name">{{ part.name }}</span>
+                        @if (part.phoneBrand) {
+                          <span class="part-option-device">{{ part.phoneBrand }} {{ part.phoneModel }}</span>
+                        }
+                        <span class="part-option-stock" [class.low]="part.isLowStock">
+                          Stock: {{ part.quantity }}
+                        </span>
+                      </div>
+                    }
+                    @if (filteredParts.length === 0 && partSearchTerm) {
+                      <div class="part-dropdown-empty">
+                        No se encontraron repuestos
+                      </div>
+                    }
+                  </div>
+                </div>
               }
-            </select>
+            </div>
             @if (form.get('partCatalogId')?.invalid && form.get('partCatalogId')?.touched) {
               <div class="error-message">
                 <span class="error-icon">⚠️</span>

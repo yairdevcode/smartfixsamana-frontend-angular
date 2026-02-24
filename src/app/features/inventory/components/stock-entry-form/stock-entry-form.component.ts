@@ -1,6 +1,6 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PartCatalogService } from '../../../parts/services/parts-catalog.service';
@@ -17,6 +17,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     RouterModule,
     SpinnerComponent,
   ],
@@ -28,13 +29,63 @@ export class StockEntryFormComponent implements OnInit {
   private partCatalogService = inject(PartCatalogService);
   private movementService = inject(InventoryMovementService);
   private router = inject(Router);
-  private authService = inject(AuthService)
+  private authService = inject(AuthService);
+
+  @ViewChild('partSearchInput') partSearchInput!: ElementRef<HTMLInputElement>;
 
   form!: FormGroup;
   partsCatalog: PartCatalogResponse[] = [];
   isLoading = false;
   isSubmitting = false;
   selectedPart: PartCatalogResponse | null = null;
+
+  partDropdownOpen = false;
+  partSearchTerm = '';
+
+  get filteredParts(): PartCatalogResponse[] {
+    if (!this.partSearchTerm.trim()) return this.partsCatalog;
+    const term = this.partSearchTerm.toLowerCase();
+    return this.partsCatalog.filter(p =>
+      p.name.toLowerCase().includes(term) ||
+      (p.phoneBrand?.toLowerCase().includes(term) ?? false) ||
+      (p.phoneModel?.toLowerCase().includes(term) ?? false) ||
+      (p.partTypeName?.toLowerCase().includes(term) ?? false)
+    );
+  }
+
+  get selectedPartLabel(): string {
+    const partId = this.form.get('partCatalogId')?.value;
+    if (!partId) return '-- Selecciona un repuesto --';
+    const part = this.partsCatalog.find(p => p.id === +partId);
+    if (!part) return '-- Selecciona un repuesto --';
+    const device = part.phoneBrand ? ` - ${part.phoneBrand} ${part.phoneModel}` : '';
+    return `${part.name}${device} (Stock: ${part.quantity})`;
+  }
+
+  togglePartDropdown(): void {
+    if (this.isSubmitting) return;
+    this.partDropdownOpen = !this.partDropdownOpen;
+    if (this.partDropdownOpen) {
+      this.partSearchTerm = '';
+      setTimeout(() => this.partSearchInput?.nativeElement?.focus(), 0);
+    }
+  }
+
+  selectPart(part: PartCatalogResponse | null): void {
+    this.form.get('partCatalogId')?.setValue(part?.id ?? '');
+    this.form.get('partCatalogId')?.markAsTouched();
+    this.selectedPart = part;
+    this.partDropdownOpen = false;
+    this.partSearchTerm = '';
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.part-dropdown')) {
+      this.partDropdownOpen = false;
+    }
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -66,12 +117,6 @@ export class StockEntryFormComponent implements OnInit {
           Swal.fire('Error', 'No se pudo cargar el catálogo de repuestos.', 'error');
         }
       });
-  }
-
-  onPartSelected(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const partId = +target.value;
-    this.selectedPart = this.partsCatalog.find(p => p.id === partId) || null;
   }
 
   getNewQuantity(): number {

@@ -323,11 +323,13 @@
                         {{ repair.state }}
                       </span>
                     </td>
+                    @if (admin) {
                     <td class="td-actions">
                       <a [href]="'/dashboard/repairs/edit/' + repair.id" class="btn-view" title="Ver detalles">
                         👁️
                       </a>
                     </td>
+                  }
                   </tr>
                 }
               </tbody>
