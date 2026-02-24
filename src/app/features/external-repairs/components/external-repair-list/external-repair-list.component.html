@@ -1,0 +1,248 @@
+<div class="list-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">🏪</span>
+      Reparaciones Externas
+    </h2>
+
+    <div class="header-actions">
+      @if (admin) {
+        <button class="btn-primary" (click)="create()">
+          <span class="btn-icon">➕</span>
+          Nueva Reparaci&oacute;n
+        </button>
+      }
+
+      <button class="btn-export" (click)="exportExcel()">
+        <span class="btn-icon">📥</span>
+        Exportar Excel
+      </button>
+
+      @if (admin) {
+        <label class="btn-import">
+          <span class="btn-icon">📤</span>
+          Importar Excel
+          <input type="file" accept=".xlsx,.xls" (change)="onFileSelected($event)" hidden />
+        </label>
+      }
+
+      <a routerLink="settlements" class="btn-settlements">
+        <span class="btn-icon">💰</span>
+        Liquidaciones
+      </a>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-section">
+    <div class="filter-group">
+      <label class="filter-label">Estado</label>
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="filter-select">
+        <option value="">Todos</option>
+        <option value="REPARADO">Reparado</option>
+        <option value="ENTREGADO">Entregado</option>
+        <option value="PENDIENTE_RECOGER">Pendiente Recoger</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Desde</label>
+      <input type="date" [(ngModel)]="startDate" (change)="applyFilters()" class="filter-input" />
+    </div>
+    <div class="filter-group">
+      <label class="filter-label">Hasta</label>
+      <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="filter-input" />
+    </div>
+    @if (statusFilter || startDate || endDate) {
+      <button class="btn-clear-filters" (click)="clearFilters()">
+        Limpiar filtros
+      </button>
+    }
+  </div>
+
+  <!-- Import Preview Modal -->
+  @if (showImportPreview && importPreview) {
+    <div class="import-preview-overlay">
+      <div class="import-preview-modal">
+        <h3>Resultado de la comparaci&oacute;n</h3>
+
+        <div class="reconciliation-summary">
+          <div class="summary-card summary-entregadas">
+            <div class="summary-number">{{ importPreview.totalEntregadas }}</div>
+            <div class="summary-label">Entregadas</div>
+            <div class="summary-hint">No est&aacute;n en el Excel &rarr; ya fueron entregadas</div>
+          </div>
+          <div class="summary-card summary-pendientes">
+            <div class="summary-number">{{ importPreview.totalPendientesRecoger }}</div>
+            <div class="summary-label">Pendientes de Recoger</div>
+            <div class="summary-hint">A&uacute;n est&aacute;n en el Excel &rarr; cliente no ha recogido</div>
+          </div>
+        </div>
+
+        @if (importPreview.entregadas.length > 0) {
+          <div class="preview-section-block">
+            <h4 class="preview-section-title status-entregado-title">
+              Se marcar&aacute;n como ENTREGADO ({{ importPreview.entregadas.length }})
+            </h4>
+            <div class="import-preview-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Marca</th>
+                    <th>Soluci&oacute;n</th>
+                    <th>Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of importPreview.entregadas; track item.id) {
+                    <tr>
+                      <td>{{ item.clientName }}</td>
+                      <td>{{ item.phoneBrand }}</td>
+                      <td>{{ item.solution }}</td>
+                      <td class="td-number">{{ formatPrice(item.repairPrice) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+
+        @if (importPreview.pendientesRecoger.length > 0) {
+          <div class="preview-section-block">
+            <h4 class="preview-section-title status-pendiente-title">
+              Se marcar&aacute;n como PENDIENTE_RECOGER ({{ importPreview.pendientesRecoger.length }})
+            </h4>
+            <div class="import-preview-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Marca</th>
+                    <th>Soluci&oacute;n</th>
+                    <th>Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of importPreview.pendientesRecoger; track item.id) {
+                    <tr class="pendiente-recoger">
+                      <td>{{ item.clientName }}</td>
+                      <td>{{ item.phoneBrand }}</td>
+                      <td>{{ item.solution }}</td>
+                      <td class="td-number">{{ formatPrice(item.repairPrice) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+
+        <div class="import-preview-actions">
+          <button class="btn-cancel" (click)="cancelImport()" [disabled]="isImporting">Cancelar</button>
+          <button class="btn-primary" (click)="confirmImport()" [disabled]="isImporting">
+            @if (isImporting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+            }
+            Aplicar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="table-container">
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner
+          size="large"
+          message="Cargando reparaciones externas..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else if (repairs.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🏪</div>
+        <h3>No hay reparaciones externas</h3>
+        <p>Comienza registrando tu primera reparaci&oacute;n externa</p>
+        @if (admin) {
+          <button class="btn-primary" (click)="create()">
+            <span class="btn-icon">➕</span>
+            Nueva Reparaci&oacute;n
+          </button>
+        }
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="th-client">Cliente</th>
+            <th class="th-brand">Marca</th>
+            <th class="th-solution">Soluci&oacute;n</th>
+            <th class="th-price">Precio Rep.</th>
+            <th class="th-cost">Costo Repuesto</th>
+            <th class="th-profit">Ganancia Neta</th>
+            <th class="th-share">60%+repuesto</th>
+            <th class="th-status">Estado</th>
+            @if (admin) {
+              <th class="th-actions">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (repair of repairs; track repair.id) {
+            <tr [class.pendiente-recoger]="repair.status === 'PENDIENTE_RECOGER'">
+              <td class="td-client">{{ repair.clientName }}</td>
+              <td class="td-brand">{{ repair.phoneBrand }}</td>
+              <td class="td-solution">
+                <span class="solution-text" [title]="repair.solution">{{ repair.solution }}</span>
+              </td>
+              <td class="td-number">{{ formatPrice(repair.repairPrice) }}</td>
+              <td class="td-number">{{ formatPrice(repair.partCost) }}</td>
+              <td class="td-number td-profit">{{ formatPrice(repair.netProfit || 0) }}</td>
+              <td class="td-number td-share">{{ formatPrice(repair.myShare || 0) }}</td>
+              <td class="td-status">
+                <span class="status-badge" [ngClass]="'status-' + repair.status.toLowerCase().replace('_', '-')">
+                  {{ repair.status === 'PENDIENTE_RECOGER' ? 'Pend. Recoger' : repair.status === 'REPARADO' ? 'Reparado' : 'Entregado' }}
+                </span>
+              </td>
+              @if (admin) {
+                <td class="td-actions">
+                  <button class="btn-action btn-edit" (click)="update(repair.id!)" title="Editar" [disabled]="isDeleting">
+                    ✏️
+                  </button>
+                  <button class="btn-action btn-delete" (click)="delete(repair)" title="Eliminar" [disabled]="isDeleting">
+                    🗑️
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr class="totals-row">
+            <td colspan="3"><strong>TOTALES</strong></td>
+            <td class="td-number"><strong>{{ formatPrice(totalRepairPrice) }}</strong></td>
+            <td class="td-number"><strong>{{ formatPrice(totalPartCost) }}</strong></td>
+            <td class="td-number td-profit"><strong>{{ formatPrice(totalNetProfit) }}</strong></td>
+            <td class="td-number td-share"><strong>{{ formatPrice(totalMyShare) }}</strong></td>
+            <td></td>
+            @if (admin) {
+              <td></td>
+            }
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="table-footer">
+        <span class="total-count">Total: {{ repairs.length }} reparaciones en esta p&aacute;gina</span>
+      </div>
+    }
+  </div>
+
+  <app-pagination
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (pageChange)="goToPage($event)">
+  </app-pagination>
+</div>

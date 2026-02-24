@@ -72,6 +72,13 @@ export const routes: Routes = [
             (m) => m.inventoryRoutes
           ),
       },
+      {
+        path: 'external-repairs',
+        loadChildren: () =>
+          import('./features/external-repairs/external-repairs.routes').then(
+            (m) => m.externalRepairsRoutes
+          ),
+      },
     ],
   },
   {

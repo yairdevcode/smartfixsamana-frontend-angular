@@ -1,0 +1,233 @@
+<div class="form-container">
+  @if (isLoading) {
+    <div class="loading-overlay">
+      <app-spinner
+        size="large"
+        message="Cargando datos de la reparaci&oacute;n..."
+        color="primary">
+      </app-spinner>
+    </div>
+  } @else {
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-icon">🏪</div>
+        <h2 class="form-title">{{ isEditMode ? "Editar Reparaci&oacute;n Externa" : "Nueva Reparaci&oacute;n Externa" }}</h2>
+        <p class="form-subtitle">{{ isEditMode ? "Actualiza los detalles de la reparaci&oacute;n" : "Registra una nueva reparaci&oacute;n externa" }}</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="repair-form">
+        <!-- Client and Phone Info -->
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">👤</span>
+            Informaci&oacute;n del Cliente
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="clientName">
+                <span class="label-icon">👤</span>
+                Nombre del Cliente
+              </label>
+              <input
+                id="clientName"
+                type="text"
+                formControlName="clientName"
+                class="form-input"
+                placeholder="Nombre del cliente..."
+                [class.is-invalid]="form.get('clientName')?.invalid && form.get('clientName')?.touched"
+              />
+              @if (form.get('clientName')?.invalid && form.get('clientName')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  El nombre del cliente es requerido
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phoneBrand">
+                <span class="label-icon">📱</span>
+                Marca / Modelo
+              </label>
+              <input
+                id="phoneBrand"
+                type="text"
+                formControlName="phoneBrand"
+                class="form-input"
+                placeholder="Ej: Samsung A54, iPhone 15..."
+                [class.is-invalid]="form.get('phoneBrand')?.invalid && form.get('phoneBrand')?.touched"
+              />
+              @if (form.get('phoneBrand')?.invalid && form.get('phoneBrand')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  La marca es requerida
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Repair Details -->
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">🔧</span>
+            Detalles de la Reparaci&oacute;n
+          </h3>
+
+          <div class="form-group">
+            <label class="form-label" for="solution">
+              <span class="label-icon">✅</span>
+              Soluci&oacute;n / Trabajo Realizado
+            </label>
+            <textarea
+              id="solution"
+              formControlName="solution"
+              class="form-textarea"
+              placeholder="Describe la soluci&oacute;n o trabajo realizado..."
+              rows="3"
+            ></textarea>
+            @if (form.get('solution')?.invalid && form.get('solution')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                La soluci&oacute;n es requerida
+              </div>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="status">
+                <span class="label-icon">📊</span>
+                Estado
+              </label>
+              <select
+                id="status"
+                formControlName="status"
+                class="form-select">
+                @for (s of repairStatuses; track s.value) {
+                  <option [value]="s.value">{{ s.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="date">
+                <span class="label-icon">📅</span>
+                Fecha
+              </label>
+              <input
+                id="date"
+                type="date"
+                formControlName="date"
+                class="form-input"
+                [max]="todayDate"
+              />
+              @if (form.get('date')?.invalid && form.get('date')?.touched) {
+                <div class="error-message">
+                  <span class="error-icon">⚠️</span>
+                  La fecha es requerida
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="notes">
+              <span class="label-icon">📝</span>
+              Notas (opcional)
+            </label>
+            <textarea
+              id="notes"
+              formControlName="notes"
+              class="form-textarea"
+              placeholder="Notas adicionales..."
+              rows="2"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="info-section pricing-section">
+          <h3 class="section-title">
+            <span class="section-icon">💰</span>
+            Precios y Ganancias
+          </h3>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="repairPrice">
+                <span class="label-icon">💵</span>
+                Precio Reparaci&oacute;n
+              </label>
+              <input
+                id="repairPrice"
+                type="number"
+                formControlName="repairPrice"
+                class="form-input"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="partCost">
+                <span class="label-icon">🔩</span>
+                Costo Repuesto
+              </label>
+              <input
+                id="partCost"
+                type="number"
+                formControlName="partCost"
+                class="form-input"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+
+          <!-- Auto-calculated summary -->
+          <div class="cost-summary">
+            <div class="cost-summary-row">
+              <span class="cost-summary-label">Ganancia Neta:</span>
+              <span class="cost-summary-value" [class.negative]="netProfit < 0">{{ formatPrice(netProfit) }}</span>
+            </div>
+            <div class="cost-summary-row">
+              <span class="cost-summary-label">Mi Parte (60% + repuesto):</span>
+              <span class="cost-summary-value highlight-mine">{{ formatPrice(myShare) }}</span>
+            </div>
+            <div class="cost-summary-row">
+              <span class="cost-summary-label">Parte Tienda (40%):</span>
+              <span class="cost-summary-value highlight-store">{{ formatPrice(storeShare) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            class="btn-cancel"
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            <span class="btn-icon">❌</span>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn-submit"
+            [disabled]="form.invalid || isSubmitting">
+            @if (isSubmitting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+            } @else {
+              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
+              {{ isEditMode ? "Actualizar" : "Guardar" }}
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

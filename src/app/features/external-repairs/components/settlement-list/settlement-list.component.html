@@ -1,0 +1,114 @@
+<div class="list-container">
+  <div class="header-section">
+    <h2 class="page-title">
+      <span class="title-icon">💰</span>
+      Liquidaciones
+    </h2>
+
+    <div class="header-actions">
+      <a routerLink="/dashboard/external-repairs" class="btn-back">
+        <span class="btn-icon">⬅️</span>
+        Volver a Reparaciones
+      </a>
+
+      @if (admin) {
+        <button class="btn-primary" (click)="toggleCreateForm()">
+          <span class="btn-icon">{{ showCreateForm ? '✕' : '➕' }}</span>
+          {{ showCreateForm ? 'Cancelar' : 'Generar Liquidaci&oacute;n' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Create Settlement Form -->
+  @if (showCreateForm) {
+    <div class="create-form-section">
+      <h3 class="create-form-title">
+        <span class="section-icon">📋</span>
+        Nueva Liquidaci&oacute;n
+      </h3>
+      <p class="create-form-hint">Selecciona el rango de fechas para liquidar las reparaciones pendientes.</p>
+
+      <div class="create-form-row">
+        <div class="form-group">
+          <label class="form-label">Desde</label>
+          <input type="date" [(ngModel)]="newStartDate" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hasta</label>
+          <input type="date" [(ngModel)]="newEndDate" class="form-input" />
+        </div>
+        <button
+          class="btn-generate"
+          (click)="createSettlement()"
+          [disabled]="isCreating || !newStartDate || !newEndDate">
+          @if (isCreating) {
+            <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+          } @else {
+            <span class="btn-icon">✅</span>
+          }
+          Generar
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="table-container">
+    @if (isLoading) {
+      <div class="loading-container">
+        <app-spinner
+          size="large"
+          message="Cargando liquidaciones..."
+          color="primary">
+        </app-spinner>
+      </div>
+    } @else if (settlements.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">💰</div>
+        <h3>No hay liquidaciones</h3>
+        <p>Genera tu primera liquidaci&oacute;n seleccionando un rango de fechas</p>
+      </div>
+    } @else {
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Per&iacute;odo</th>
+            <th>Reparaciones</th>
+            <th>Total Reparaciones</th>
+            <th>Total Repuestos</th>
+            <th>Mi Parte</th>
+            <th>Parte Tienda</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (settlement of settlements; track settlement.id) {
+            <tr>
+              <td class="td-period">
+                <span class="date-badge">{{ settlement.startDate }}</span>
+                <span class="date-separator">→</span>
+                <span class="date-badge">{{ settlement.endDate }}</span>
+              </td>
+              <td class="td-count">{{ settlement.repairCount }}</td>
+              <td class="td-number">{{ formatPrice(settlement.totalRepairPrice) }}</td>
+              <td class="td-number">{{ formatPrice(settlement.totalPartCost) }}</td>
+              <td class="td-number td-mine">{{ formatPrice(settlement.totalMyShare) }}</td>
+              <td class="td-number td-store">{{ formatPrice(settlement.totalStoreShare) }}</td>
+              <td class="td-status">
+                <span class="status-badge" [ngClass]="'status-' + settlement.status.toLowerCase()">
+                  {{ settlement.status === 'LIQUIDADA' ? 'Liquidada' : 'Abierta' }}
+                </span>
+              </td>
+              <td class="td-actions">
+                <button class="btn-action btn-export" (click)="exportSettlement(settlement.id!)" title="Exportar Excel">
+                  📥
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

@@ -88,6 +88,12 @@
         <span class="nav-icon">📦</span>
         <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Inventario</span>
       </a>
+      <a routerLink="external-repairs"
+         routerLinkActive="active-link"
+         (click)="onMobileLinkClick()">
+        <span class="nav-icon">🏪</span>
+        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Rep. Externas</span>
+      </a>
     </nav>
 
     <div class="profile-section">
