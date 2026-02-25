@@ -19,6 +19,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage!: string;
   isLoading = false;
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -29,6 +30,10 @@ export class LoginComponent {
       username: ['', Validators.required],
       password: ['', Validators.required],
     });
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 
   login() {
@@ -45,10 +50,10 @@ export class LoginComponent {
           this.authService.setLoginData(response.token, response.username, response.admin);
           Swal.fire({
             icon: 'success',
-            title: 'Inicio de sesión exitoso',
+            title: 'Inicio de sesion exitoso',
             text: 'Bienvenido, ' + response.username,
           });
-          this.router.navigate(['/dashboard']); 
+          this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           this.errorMessage = 'Credenciales incorrectas';
@@ -56,5 +61,5 @@ export class LoginComponent {
         }
       });
   }
-  
+
 }

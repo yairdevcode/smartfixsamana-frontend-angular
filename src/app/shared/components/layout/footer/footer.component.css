@@ -8,14 +8,14 @@
     text-align: center;
     z-index: 1000;
   }
-  
+
   .footer-container {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
   }
-  
+
   .footer-link {
     color: #ffffff;
     margin: 0 15px;
@@ -23,15 +23,14 @@
     display: flex;
     align-items: center;
   }
-  
+
   .footer-icon {
     width: 24px;
     height: 24px;
     margin-right: 8px;
   }
-  
+
   .footer-text {
     margin-left: 20px;
     font-size: 14px;
   }
-  

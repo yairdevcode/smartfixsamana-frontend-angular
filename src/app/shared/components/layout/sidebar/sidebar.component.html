@@ -1,6 +1,6 @@
 <!-- Mobile Overlay -->
-<div class="mobile-overlay" 
-     [class.show]="isMobileMenuOpen" 
+<div class="mobile-overlay"
+     [class.show]="isMobileMenuOpen"
      (click)="closeMobileMenu()"></div>
 
 <!-- Mobile Header (visible only on mobile) -->
@@ -10,30 +10,36 @@
     <span class="hamburger-line"></span>
     <span class="hamburger-line"></span>
   </button>
-  <h2 class="mobile-app-title">Smartfix Samaná</h2>
-  <div class="mobile-user-info">
+  <h2 class="mobile-app-title">Smartfix Samana</h2>
+  <div class="mobile-header-actions">
+    <button class="theme-toggle-btn" (click)="toggleTheme()" [attr.aria-label]="themeService.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+      {{ themeService.isDark() ? '☀️' : '🌙' }}
+    </button>
     <span class="mobile-username">{{ username }}</span>
   </div>
 </header>
 
 <div [class.sidebar-collapsed]="isSidebarCollapsed">
   <!-- Sidebar -->
-  <aside class="sidebar" 
+  <aside class="sidebar"
          [class.collapsed]="isSidebarCollapsed"
          [class.mobile-open]="isMobileMenuOpen">
-    
+
     <!-- Desktop Header -->
     <div class="sidebar-header desktop-only">
       <button class="toggle-btn" (click)="toggleSidebar()">☰</button>
       @if (!isSidebarCollapsed) {
-        <h2 class="app-title">Smartfix Samaná</h2>
+        <h2 class="app-title">Smartfix Samana</h2>
+        <button class="theme-toggle-btn" (click)="toggleTheme()" [attr.aria-label]="themeService.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+          {{ themeService.isDark() ? '☀️' : '🌙' }}
+        </button>
       }
     </div>
 
     <!-- Mobile Header Inside Sidebar -->
     <div class="sidebar-header mobile-only">
       <div class="mobile-sidebar-header">
-        <h2 class="app-title">Smartfix Samaná</h2>
+        <h2 class="app-title">Smartfix Samana</h2>
         <button class="close-mobile-menu" (click)="closeMobileMenu()">✕</button>
       </div>
       <div class="mobile-user-profile">
@@ -46,25 +52,25 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="dashboard-home" 
+      <a routerLink="dashboard-home"
          routerLinkActive="active-link"
          (click)="onMobileLinkClick()">
         <span class="nav-icon">📊</span>
         <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Inicio</span>
       </a>
-      <a routerLink="customers" 
+      <a routerLink="customers"
          routerLinkActive="active-link"
          (click)="onMobileLinkClick()">
         <span class="nav-icon">👥</span>
         <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Clientes</span>
       </a>
-      <a routerLink="phones" 
+      <a routerLink="phones"
          routerLinkActive="active-link"
          (click)="onMobileLinkClick()">
         <span class="nav-icon">📱</span>
         <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Celulares</span>
       </a>
-      <a routerLink="repairs" 
+      <a routerLink="repairs"
          routerLinkActive="active-link"
          (click)="onMobileLinkClick()">
         <span class="nav-icon">🛠️</span>
@@ -111,7 +117,7 @@
         <div class="profile-dropdown" [class.show]="profileMenuOpen">
           <button class="dropdown-btn logout-btn" (click)="onLogout()">
             <span class="btn-icon">🔒</span>
-            <span class="btn-text" [class.d-none]="isSidebarCollapsed">Cerrar sesión</span>
+            <span class="btn-text" [class.d-none]="isSidebarCollapsed">Cerrar sesion</span>
           </button>
 
           @if (admin) {
@@ -134,12 +140,10 @@
           }
           <button class="mobile-action-btn logout-btn" (click)="onLogout()">
             <span class="btn-icon">🔒</span>
-            <span class="btn-text">Cerrar sesión</span>
+            <span class="btn-text">Cerrar sesion</span>
           </button>
         </div>
       </div>
     </div>
   </aside>
 </div>
-  
-

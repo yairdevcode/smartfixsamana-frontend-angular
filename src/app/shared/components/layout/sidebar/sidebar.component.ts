@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../../../../core/services/auth.service';
+import { ThemeService } from '../../../../core/services/theme.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -11,7 +12,11 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class SidebarComponent implements OnInit, OnDestroy {
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    public themeService: ThemeService
+  ) {}
 
   isSidebarCollapsed = false;
   profileMenuOpen = false;
@@ -33,12 +38,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private checkScreenSize() {
     this.isMobile = window.innerWidth <= 768;
-    
+
     // Close mobile menu when switching to desktop
     if (!this.isMobile && this.isMobileMenuOpen) {
       this.isMobileMenuOpen = false;
     }
-    
+
     // Reset sidebar collapse state based on screen size
     if (this.isMobile) {
       this.isSidebarCollapsed = false; // Always expanded on mobile when open
@@ -55,7 +60,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    
+
     // Prevent body scrolling when mobile menu is open
     if (this.isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -79,7 +84,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleProfileMenu() {
     this.profileMenuOpen = !this.profileMenuOpen;
   }
-  
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
+  }
+
   onLogout(): void {
     this.closeMobileMenu(); // Close mobile menu before logout
     this.authService.logout();

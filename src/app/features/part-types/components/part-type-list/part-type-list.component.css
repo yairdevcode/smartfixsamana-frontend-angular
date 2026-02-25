@@ -1,7 +1,8 @@
 .part-types-container {
   padding: 1.5rem;
-  background-color: #f8fafc;
+  background-color: var(--bg-primary);
   min-height: 100vh;
+  transition: background-color 0.3s ease;
 }
 
 .header-section {
@@ -9,12 +10,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  background: white;
+  background: var(--bg-secondary);
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-sm);
   flex-wrap: wrap;
   gap: 1rem;
+  border: 1px solid var(--border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .page-title {
@@ -22,7 +25,7 @@
   align-items: center;
   gap: 0.75rem;
   margin: 0;
-  color: #1e293b;
+  color: var(--text-primary);
   font-size: 1.75rem;
   font-weight: 700;
 }
@@ -46,25 +49,25 @@
 
 .search-input {
   padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--input-border);
   border-radius: 8px;
   font-size: 1rem;
   width: 250px;
   transition: all 0.3s ease;
-  background: white;
+  background: var(--input-bg);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #06b6d4;
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
 .search-icon {
   position: absolute;
   left: 0.75rem;
   font-size: 1.2rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .btn-primary {
@@ -72,7 +75,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 1.2rem;
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  background: var(--accent-gradient);
   color: white;
   border: none;
   border-radius: 8px;
@@ -80,13 +83,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 2px 4px var(--accent-shadow);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #0891b2, #0e7490);
+  background: var(--accent-gradient-hover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+  box-shadow: 0 4px 12px var(--accent-shadow);
 }
 
 .btn-icon {
@@ -94,10 +97,12 @@
 }
 
 .table-container {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
+  border: 1px solid var(--border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .loading-container {
@@ -113,22 +118,22 @@
 }
 
 .part-types-table th {
-  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+  background: var(--form-header-bg);
   padding: 1rem;
   text-align: left;
   font-weight: 700;
-  color: #1e293b;
-  border-bottom: 2px solid #06b6d4;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--accent);
 }
 
 .part-types-table td {
   padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  color: #334155;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
 }
 
 .part-types-table tbody tr:hover {
-  background-color: #f1f5f9;
+  background-color: var(--table-row-hover);
 }
 
 .th-id {
@@ -150,7 +155,7 @@
 
 .td-id {
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 .td-name {
@@ -161,15 +166,15 @@
   display: inline-flex;
   align-items: center;
   padding: 0.4rem 0.8rem;
-  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
-  color: #0891b2;
+  background: var(--form-header-bg);
+  color: var(--accent-hover);
   border-radius: 6px;
   font-weight: 600;
   font-size: 0.95rem;
 }
 
 .td-description {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -216,13 +221,13 @@
 
 .table-footer {
   padding: 1rem;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border);
   text-align: right;
 }
 
 .total-count {
-  color: #64748b;
+  color: var(--text-secondary);
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -238,13 +243,13 @@
 }
 
 .empty-state h3 {
-  color: #1e293b;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
 }
 
 .empty-state p {
-  color: #64748b;
+  color: var(--text-secondary);
   margin-bottom: 2rem;
   font-size: 1.1rem;
 }

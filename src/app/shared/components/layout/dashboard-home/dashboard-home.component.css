@@ -13,7 +13,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(248, 250, 252, 0.95);
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,10 +28,10 @@
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
 }
 
 /* Chart Loading */
@@ -40,17 +40,18 @@
   justify-content: center;
   align-items: center;
   min-height: 150px;
-  background: #f8fafc;
+  background: var(--bg-tertiary);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 }
 
 .main-content {
   flex-grow: 1;
   padding: 2rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: var(--bg-primary);
   overflow-y: auto;
   min-height: 100vh;
+  transition: background-color 0.3s ease;
 }
 
 /* Header del Dashboard */
@@ -60,12 +61,13 @@
   align-items: center;
   margin-bottom: 2.5rem;
   padding: 2rem;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
   position: relative;
   overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .dashboard-header::before {
@@ -89,10 +91,7 @@
   margin: 0 0 0.5rem 0;
   font-size: 2.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #1e293b, #475569);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 .title-icon {
@@ -107,7 +106,7 @@
 
 .dashboard-subtitle {
   margin: 0;
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 1.1rem;
   font-weight: 500;
 }
@@ -117,11 +116,11 @@
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  background: var(--bg-tertiary);
   border-radius: 12px;
-  color: #475569;
+  color: var(--text-secondary);
   font-weight: 600;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
 }
 
 .date-icon {
@@ -137,11 +136,11 @@
 }
 
 .summary-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -157,6 +156,7 @@
   transition: all 0.3s ease;
 }
 
+/* Keep decorative multi-color gradients as-is */
 .summary-card.customers::before {
   background: linear-gradient(90deg, #3b82f6, #1d4ed8);
 }
@@ -175,7 +175,7 @@
 
 .summary-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .card-header {
@@ -196,6 +196,7 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Keep decorative card icon gradients */
 .customers .card-icon {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
 }
@@ -214,7 +215,7 @@
 
 .card-info h3 {
   margin: 0 0 0.5rem 0;
-  color: #374151;
+  color: var(--text-secondary);
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -223,7 +224,7 @@
   margin: 0;
   font-size: 2.5rem;
   font-weight: 800;
-  color: #1e293b;
+  color: var(--text-primary);
 }
 
 .card-footer {
@@ -231,11 +232,11 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--border);
 }
 
 .status-text {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -248,16 +249,16 @@
 }
 
 .trend-indicator.positive {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--success-bg);
+  color: var(--success-text);
 }
 
 .trend-indicator.neutral {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
-/* Estadísticas Mensuales */
+/* Estadisticas Mensuales */
 .monthly-stats {
   margin-top: 3rem;
 }
@@ -268,10 +269,11 @@
   align-items: center;
   margin-bottom: 2rem;
   padding: 1.5rem 2rem;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .stats-title {
@@ -281,7 +283,7 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-primary);
 }
 
 .stats-icon {
@@ -293,18 +295,18 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  background: var(--bg-tertiary);
   border-radius: 10px;
-  color: #475569;
+  color: var(--text-secondary);
   font-weight: 600;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
 }
 
 .period-icon {
   font-size: 1.1rem;
 }
 
-/* Grid de Estadísticas */
+/* Grid de Estadisticas */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -312,17 +314,17 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-lg);
 }
 
 .stat-header {
@@ -331,12 +333,12 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border);
 }
 
 .stat-header h3 {
   margin: 0;
-  color: #374151;
+  color: var(--text-primary);
   font-size: 1.25rem;
   font-weight: 700;
 }
@@ -351,20 +353,20 @@
   gap: 1rem;
 }
 
-/* Estados de Reparación */
+/* Estados de Reparacion */
 .status-item {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: #f8fafc;
+  background: var(--bg-tertiary);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .status-item:hover {
-  background: #f1f5f9;
+  background: var(--bg-hover);
   transform: translateX(4px);
 }
 
@@ -396,12 +398,12 @@
 
 .status-label {
   flex: 1;
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .status-count {
-  color: #1e293b;
+  color: var(--text-primary);
   font-weight: 700;
   font-size: 1.1rem;
 }
@@ -412,14 +414,14 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: #f8fafc;
+  background: var(--bg-tertiary);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .device-item:hover {
-  background: #f1f5f9;
+  background: var(--bg-hover);
   transform: translateX(4px);
 }
 
@@ -441,45 +443,45 @@
 }
 
 .device-name {
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 1rem;
 }
 
 .device-count {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .device-progress {
   width: 100px;
   height: 6px;
-  background: #e2e8f0;
+  background: var(--border);
   border-radius: 3px;
   overflow: hidden;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #06b6d4, #0891b2);
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
   border-radius: 3px;
   transition: width 0.5s ease;
 }
 
-/* Métricas de Rendimiento */
+/* Metricas de Rendimiento */
 .metric-item {
   display: flex;
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: #f8fafc;
+  background: var(--bg-tertiary);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .metric-item:hover {
-  background: #f1f5f9;
+  background: var(--bg-hover);
   transform: translateX(4px);
 }
 
@@ -487,7 +489,7 @@
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  background: var(--bg-hover);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,13 +503,13 @@
 }
 
 .metric-label {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
 }
 
 .metric-value {
-  color: #1e293b;
+  color: var(--text-primary);
   font-size: 1.25rem;
   font-weight: 700;
 }
@@ -518,14 +520,14 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: #f8fafc;
+  background: var(--bg-tertiary);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .activity-item:hover {
-  background: #f1f5f9;
+  background: var(--bg-hover);
   transform: translateX(4px);
 }
 
@@ -539,6 +541,7 @@
   font-size: 1.2rem;
 }
 
+/* Keep decorative activity icon colors */
 .activity-icon.repair {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
 }
@@ -563,13 +566,13 @@
 }
 
 .activity-text {
-  color: #374151;
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 0.95rem;
 }
 
 .activity-time {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.8rem;
 }
 
@@ -580,7 +583,7 @@
   align-items: center;
   gap: 1rem;
   padding: 2rem;
-  color: #64748b;
+  color: var(--text-secondary);
   text-align: center;
 }
 
@@ -599,7 +602,7 @@
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
-  
+
   .summary-grid {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   }
@@ -610,7 +613,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
@@ -1085,10 +1088,11 @@
 .recent-repairs-section {
   margin-top: 2.5rem;
   padding: 2rem;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .section-header {
@@ -1097,7 +1101,7 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--border);
 }
 
 .section-title {
@@ -1106,7 +1110,7 @@
   gap: 0.75rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -1115,7 +1119,7 @@
 }
 
 .view-all-link {
-  color: #06b6d4;
+  color: var(--accent);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;
@@ -1125,7 +1129,7 @@
 }
 
 .view-all-link:hover {
-  background-color: #ecfeff;
+  background-color: var(--accent-light);
   transform: translateX(5px);
 }
 
@@ -1140,7 +1144,7 @@
 .table-wrapper {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 }
 
 .repairs-table {
@@ -1150,7 +1154,7 @@
 }
 
 .repairs-table thead {
-  background: linear-gradient(135deg, #0891b2, #0e7490);
+  background: var(--table-header-bg);
 }
 
 .repairs-table th {
@@ -1166,8 +1170,8 @@
 
 .repairs-table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  color: #334155;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
   font-size: 0.9rem;
 }
 
@@ -1176,7 +1180,7 @@
 }
 
 .repairs-table tbody tr:hover {
-  background-color: #f1f5f9;
+  background-color: var(--table-row-hover);
 }
 
 .repairs-table tbody tr:last-child td {
@@ -1216,7 +1220,7 @@
 
 .customer-name {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
 }
 
 /* Device Cell */
@@ -1224,15 +1228,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.device-icon {
-  font-size: 1.1rem;
-}
-
-.device-name {
-  font-weight: 500;
-  color: #334155;
 }
 
 /* Fault Cell */
@@ -1243,7 +1238,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 200px;
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 0.85rem;
   line-height: 1.4;
 }
@@ -1252,8 +1247,8 @@
 .date-badge {
   display: inline-block;
   padding: 0.25rem 0.5rem;
-  background: #f0f9ff;
-  color: #0369a1;
+  background: var(--info-bg);
+  color: var(--info-text);
   border-radius: 4px;
   font-size: 0.85rem;
   white-space: nowrap;
@@ -1282,8 +1277,8 @@
   align-items: center;
   justify-content: center;
   padding: 0.4rem 0.5rem;
-  background: #ecfeff;
-  color: #0891b2;
+  background: var(--accent-light);
+  color: var(--accent-hover);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -1293,7 +1288,7 @@
 }
 
 .btn-view:hover {
-  background: #06b6d4;
+  background: var(--accent);
   color: white;
   transform: scale(1.1);
 }
@@ -1302,11 +1297,12 @@
 .quick-actions-section {
   margin-top: 2.5rem;
   padding: 2rem;
-  background: white;
+  background: var(--bg-secondary);
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
   margin-bottom: 2rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .actions-grid {
@@ -1320,8 +1316,8 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border: 2px solid #e2e8f0;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
   border-radius: 12px;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -1330,9 +1326,9 @@
 
 .action-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.15);
-  border-color: #06b6d4;
-  background: linear-gradient(135deg, #ecfeff 0%, #ffffff 100%);
+  box-shadow: 0 10px 25px var(--accent-shadow);
+  border-color: var(--accent);
+  background: var(--accent-light);
 }
 
 .action-icon {
@@ -1353,13 +1349,13 @@
   margin: 0 0 0.25rem 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-primary);
 }
 
 .action-content p {
   margin: 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: var(--text-secondary);
 }
 
 /* Responsive Design for Recent Repairs Table */

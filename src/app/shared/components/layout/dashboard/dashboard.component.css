@@ -7,9 +7,9 @@
 .main-content {
   flex: 1;
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: var(--bg-primary);
   overflow-y: auto;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 /* Mobile adjustments */
