@@ -69,7 +69,7 @@
             <div class="alert-header">
               <div class="alert-icon">🔩</div>
               <div class="alert-info">
-                <h4 class="alert-name">{{ part.name }}</h4>
+                <h4 class="alert-name">{{ part.name }} {{ part.phoneBrand}} {{ part.phoneModel }}</h4>
                 <p class="alert-status">Stock crítico</p>
               </div>
             </div>
@@ -83,7 +83,7 @@
                 </div>
               </div>
               <div class="stock-numbers">
-                <span class="current-stock">{{ part.quantity }}</span>
+                <span class="current-stock">{{ part.quantity }} </span>
                 <span class="stock-separator">/</span>
                 <span class="min-stock">{{ part.minStock }}</span>
               </div>
