@@ -203,6 +203,10 @@ export class ExternalRepairListComponent implements OnInit {
     }).format(price);
   }
 
+alertMessage(){
+  Swal.fire("No tienes permiso para acceder a este recurso")
+}
+
   get admin(): boolean {
     return this.authService.isAdmin();
   }

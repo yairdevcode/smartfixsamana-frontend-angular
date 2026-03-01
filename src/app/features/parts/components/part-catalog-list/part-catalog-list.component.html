@@ -80,9 +80,7 @@
             <th class="th-purchase">P. Compra</th>
             <th class="th-sale">P. Venta</th>
             <th class="th-status">Estado</th>
-            @if (admin) {
-              <th class="th-actions">Acciones</th>
-            }
+            <th class="th-actions">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -105,8 +103,10 @@
                 </span>
               </td>
               <td class="td-min">{{ item.minStock }}</td>
+              @if (admin) {
               <td class="td-purchase">{{ formatPrice(item.purchasePrice) }}</td>
               <td class="td-sale">{{ formatPrice(item.salePrice) }}</td>
+              
               <td class="td-status">
                 @if (item.quantity === 0) {
                   <span class="status-badge critical">Sin Stock</span>
@@ -116,6 +116,7 @@
                   <span class="status-badge healthy">Disponible</span>
                 }
               </td>
+            }
               @if (admin) {
                 <td class="td-actions">
                   <button class="btn-action btn-edit" (click)="update(item.id!)" title="Editar" [disabled]="isDeleting">

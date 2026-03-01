@@ -12,11 +12,17 @@
           Nueva Reparaci&oacute;n
         </button>
       }
-
+      @if (admin) {
       <button class="btn-export" (click)="exportExcel()">
         <span class="btn-icon">📥</span>
         Exportar Excel
       </button>
+    }@else {
+      <button class="btn-export" (click)="alertMessage()">
+        <span class="btn-icon">📥</span>
+        Exportar Excel
+      </button>
+    }
 
       @if (admin) {
         <label class="btn-import">
@@ -24,12 +30,23 @@
           Importar Excel
           <input type="file" accept=".xlsx,.xls" (change)="onFileSelected($event)" hidden />
         </label>
+      }@else {
+        <button class="btn-import" (click)="alertMessage()">
+          <span class="btn-icon">📤</span>
+          Importar Excel
+        </button>
       }
-
+      @if (admin) {
       <a routerLink="settlements" class="btn-settlements">
         <span class="btn-icon">💰</span>
         Liquidaciones
       </a>
+    }@else {
+      <button class="btn-settlements" (click)="alertMessage()">
+        <span class="btn-icon">💰</span>
+        Liquidaciones
+      </button>
+    }
     </div>
   </div>
 
@@ -184,9 +201,7 @@
             <th class="th-profit">Ganancia Neta</th>
             <th class="th-share">60%+repuesto</th>
             <th class="th-status">Estado</th>
-            @if (admin) {
-              <th class="th-actions">Acciones</th>
-            }
+            <th class="th-actions">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -197,6 +212,7 @@
               <td class="td-solution">
                 <span class="solution-text" [title]="repair.solution">{{ repair.solution }}</span>
               </td>
+              @if (admin) {
               <td class="td-number">{{ formatPrice(repair.repairPrice) }}</td>
               <td class="td-number">{{ formatPrice(repair.partCost) }}</td>
               <td class="td-number td-profit">{{ formatPrice(repair.netProfit || 0) }}</td>
@@ -206,8 +222,7 @@
                   {{ repair.status === 'PENDIENTE_RECOGER' ? 'Pend. Recoger' : repair.status === 'REPARADO' ? 'Reparado' : 'Entregado' }}
                 </span>
               </td>
-              @if (admin) {
-                <td class="td-actions">
+              <td class="td-actions">
                   <button class="btn-action btn-edit" (click)="update(repair.id!)" title="Editar" [disabled]="isDeleting">
                     ✏️
                   </button>
@@ -217,19 +232,21 @@
                 </td>
               }
             </tr>
+          
           }
         </tbody>
         <tfoot>
           <tr class="totals-row">
+            @if (admin) {
             <td colspan="3"><strong>TOTALES</strong></td>
             <td class="td-number"><strong>{{ formatPrice(totalRepairPrice) }}</strong></td>
             <td class="td-number"><strong>{{ formatPrice(totalPartCost) }}</strong></td>
             <td class="td-number td-profit"><strong>{{ formatPrice(totalNetProfit) }}</strong></td>
             <td class="td-number td-share"><strong>{{ formatPrice(totalMyShare) }}</strong></td>
             <td></td>
-            @if (admin) {
+            
               <td></td>
-            }
+            }@else {<td colspan="3"><strong>TOTALES</strong></td>}
           </tr>
         </tfoot>
       </table>
