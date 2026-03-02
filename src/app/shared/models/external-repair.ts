@@ -30,6 +30,8 @@ export interface ImportReconciliationResponse {
   pendientesRecoger: ExternalRepair[];
   totalEntregadas: number;
   totalPendientesRecoger: number;
+  entregadasNuevas: number;
+  entregadasPendientesAnteriores: number;
 }
 
 export interface Settlement {
@@ -43,4 +45,5 @@ export interface Settlement {
   status: 'ABIERTA' | 'LIQUIDADA';
   createdAt?: string;
   repairCount?: number;
+  warning?: string;
 }

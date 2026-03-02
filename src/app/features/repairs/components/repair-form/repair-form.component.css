@@ -91,9 +91,9 @@
 .preview-section {
   margin-bottom: 1.5rem;
   padding: 1.25rem;
-  background: linear-gradient(135deg, #f0fdff, #cffafe);
+  background: var(--bg-primary);
   border-radius: 10px;
-  border: 1px solid #67e8f9;
+  border: 1px solid var(--border);
   position: relative;
 }
 
@@ -144,7 +144,7 @@
 .device-info:hover,
 .status-info:hover {
   border-color: var(--accent);
-  background: #f0fdff;
+  background: var(--bg-hover);
   transform: translateY(-2px);
 }
 
@@ -163,7 +163,7 @@
 
 .preview-details h4 {
   margin: 0 0 0.25rem 0;
-  color: #0e7490;
+  color: var(--accent);
   font-size: 1rem;
   font-weight: 700;
 }
@@ -241,6 +241,7 @@
   font-size: 1rem;
   transition: all 0.3s ease;
   background: var(--input-bg);
+  color: var(--text-primary);
   box-sizing: border-box;
 }
 
@@ -441,16 +442,16 @@
 
 /* ===== Parts Management Section ===== */
 .parts-section {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe) !important;
-  border-color: #7dd3fc !important;
+  background: var(--bg-primary) !important;
+  border-color: var(--accent) !important;
 }
 
 .parts-section::before {
-  background: linear-gradient(90deg, #0ea5e9, #0284c7) !important;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover)) !important;
 }
 
 .parts-section .section-title {
-  color: #0369a1 !important;
+  color: var(--text-primary) !important;
 }
 
 .parts-loading {
@@ -489,16 +490,20 @@
   letter-spacing: 0.5px;
 }
 
+.parts-table tbody tr {
+  background: var(--bg-secondary);
+}
+
 .parts-table tbody tr:hover {
-  background: #f0f9ff;
+  background: var(--table-row-hover);
 }
 
 .parts-table tbody tr:nth-child(even) {
-  background: var(--bg-primary);
+  background: var(--bg-tertiary);
 }
 
 .parts-table tbody tr:nth-child(even):hover {
-  background: #f0f9ff;
+  background: var(--table-row-hover);
 }
 
 .part-name {
@@ -530,7 +535,7 @@
 
 .part-subtotal {
   font-weight: 700;
-  color: #0369a1;
+  color: var(--accent);
 }
 
 .part-actions {
@@ -633,7 +638,7 @@
   align-items: center;
   gap: 0.5rem;
   margin: 0 0 1rem 0;
-  color: #0369a1;
+  color: var(--accent);
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -672,6 +677,7 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   margin-bottom: 1rem;
+  background: var(--bg-secondary);
 }
 
 .search-result-item {
@@ -682,6 +688,7 @@
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.2s ease;
+  background: var(--bg-secondary);
 }
 
 .search-result-item:last-child {
@@ -689,7 +696,7 @@
 }
 
 .search-result-item:hover {
-  background: #f0f9ff;
+  background: var(--bg-hover);
 }
 
 .result-info {
@@ -731,14 +738,14 @@
 
 .result-price {
   font-weight: 700;
-  color: #0369a1;
+  color: var(--accent);
   font-family: monospace;
 }
 
 /* Selected Part Form */
 .selected-part-form {
-  background: #f0f9ff;
-  border: 2px solid #7dd3fc;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--accent);
   border-radius: 10px;
   padding: 1.25rem;
 }
@@ -749,13 +756,13 @@
   gap: 0.25rem;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #bae6fd;
+  border-bottom: 1px solid var(--border);
 }
 
 .selected-part-name {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #0369a1;
+  color: var(--accent);
 }
 
 .selected-part-phone {
@@ -765,7 +772,7 @@
 
 .selected-part-stock {
   font-size: 0.85rem;
-  color: #16a34a;
+  color: var(--success);
   font-weight: 600;
 }
 
@@ -790,10 +797,12 @@
 
 .part-form-input {
   padding: 0.65rem 0.9rem;
-  border: 2px solid #bae6fd;
+  border: 2px solid var(--input-border);
   border-radius: 6px;
   font-size: 1rem;
   transition: all 0.3s ease;
+  background: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .part-form-input:focus {
@@ -851,8 +860,8 @@
 
 /* ===== Cost Summary Section ===== */
 .cost-section {
-  background: linear-gradient(135deg, #f0fdff, #cffafe) !important;
-  border-color: #67e8f9 !important;
+  background: var(--bg-primary) !important;
+  border-color: var(--accent) !important;
 }
 
 .cost-section::before {
@@ -860,7 +869,7 @@
 }
 
 .cost-section .section-title {
-  color: #0e7490 !important;
+  color: var(--text-primary) !important;
 }
 
 .cost-row {
@@ -917,7 +926,7 @@
   background: var(--bg-secondary);
   border-radius: 10px;
   padding: 1rem;
-  border: 2px solid #67e8f9;
+  border: 2px solid var(--accent);
 }
 
 .cost-summary-row {
@@ -925,7 +934,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #cffafe;
+  border-bottom: 1px solid var(--border);
 }
 
 .cost-summary-row:last-child {
@@ -944,7 +953,7 @@
 }
 
 .cost-summary-row.total .cost-summary-label {
-  color: #0e7490;
+  color: var(--accent);
   font-weight: 700;
   font-size: 1.1rem;
 }

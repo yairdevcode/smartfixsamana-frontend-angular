@@ -464,13 +464,13 @@
 }
 
 .summary-entregadas {
-  background: #dbeafe;
-  border: 2px solid #3b82f6;
+  background: var(--info-bg);
+  border: 2px solid var(--info);
 }
 
 .summary-pendientes {
-  background: #fef3c7;
-  border: 2px solid #fbbf24;
+  background: var(--warning-bg);
+  border: 2px solid var(--warning);
 }
 
 .summary-number {
@@ -481,11 +481,11 @@
 }
 
 .summary-entregadas .summary-number {
-  color: #1e40af;
+  color: var(--info-text);
 }
 
 .summary-pendientes .summary-number {
-  color: #92400e;
+  color: var(--warning-text);
 }
 
 .summary-label {
@@ -495,11 +495,11 @@
 }
 
 .summary-entregadas .summary-label {
-  color: #1e40af;
+  color: var(--info-text);
 }
 
 .summary-pendientes .summary-label {
-  color: #92400e;
+  color: var(--warning-text);
 }
 
 .summary-hint {
@@ -520,15 +520,15 @@
 }
 
 .status-entregado-title {
-  background: #dbeafe;
-  color: #1e40af;
-  border-left: 4px solid #3b82f6;
+  background: var(--info-bg);
+  color: var(--info-text);
+  border-left: 4px solid var(--info);
 }
 
 .status-pendiente-title {
-  background: #fef3c7;
-  color: #92400e;
-  border-left: 4px solid #fbbf24;
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-left: 4px solid var(--warning);
 }
 
 /* Responsive */

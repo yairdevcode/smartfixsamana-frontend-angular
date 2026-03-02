@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { SettlementService } from '../../services/settlement.service';
-import { Settlement } from '../../../../shared/models/external-repair';
+import { Settlement, ImportReconciliationResponse } from '../../../../shared/models/external-repair';
 import { AuthService } from '../../../../core/services/auth.service';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import Swal from 'sweetalert2';
@@ -28,6 +28,13 @@ export class SettlementListComponent implements OnInit {
   newStartDate = '';
   newEndDate = '';
   showCreateForm = false;
+
+  // Import reconciliation
+  importPreview: ImportReconciliationResponse | null = null;
+  showImportPreview = false;
+  isImporting = false;
+  importFile: File | null = null;
+  importSettlementId: number | null = null;
 
   ngOnInit(): void {
     this.loadSettlements();
@@ -70,8 +77,10 @@ export class SettlementListComponent implements OnInit {
           .pipe(finalize(() => this.isCreating = false))
           .subscribe({
             next: (settlement) => {
-              Swal.fire('Liquidaci\u00f3n creada',
-                `Se liquidaron ${settlement.repairCount} reparaciones.`, 'success');
+              const msg = settlement.warning
+                ? `${settlement.warning}\n\nSe liquidaron ${settlement.repairCount} reparaciones.`
+                : `Se liquidaron ${settlement.repairCount} reparaciones.`;
+              Swal.fire('Liquidaci\u00f3n creada', msg, settlement.warning ? 'warning' : 'success');
               this.showCreateForm = false;
               this.newStartDate = '';
               this.newEndDate = '';
@@ -95,6 +104,65 @@ export class SettlementListComponent implements OnInit {
       a.click();
       window.URL.revokeObjectURL(url);
     });
+  }
+
+  onImportFileSelected(event: Event, settlementId: number): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    this.importFile = file;
+    this.importSettlementId = settlementId;
+
+    this.isImporting = true;
+    this.settlementService.importExcel(settlementId, file)
+      .pipe(finalize(() => this.isImporting = false))
+      .subscribe({
+        next: (preview) => {
+          this.importPreview = preview;
+          this.showImportPreview = true;
+        },
+        error: () => {
+          Swal.fire('Error', 'No se pudo leer el archivo Excel.', 'error');
+        }
+      });
+    input.value = '';
+  }
+
+  confirmImport(): void {
+    if (!this.importFile || !this.importSettlementId) return;
+
+    this.isImporting = true;
+    this.settlementService.confirmImport(this.importSettlementId, this.importFile)
+      .pipe(finalize(() => this.isImporting = false))
+      .subscribe({
+        next: (result) => {
+          const nuevas = result.entregadasNuevas || 0;
+          const anteriores = result.entregadasPendientesAnteriores || 0;
+          const pendientes = result.totalPendientesRecoger;
+          let msg = `${result.totalEntregadas} reparaciones entregadas`;
+          if (nuevas > 0 || anteriores > 0) {
+            msg += ` (${nuevas} nuevas + ${anteriores} pendientes anteriores)`;
+          }
+          msg += `, ${pendientes} siguen pendientes de recoger.`;
+          Swal.fire('Importaci\u00f3n aplicada', msg, 'success');
+          this.showImportPreview = false;
+          this.importPreview = null;
+          this.importFile = null;
+          this.importSettlementId = null;
+          this.loadSettlements();
+        },
+        error: () => {
+          Swal.fire('Error', 'No se pudo aplicar la importaci\u00f3n.', 'error');
+        }
+      });
+  }
+
+  cancelImport(): void {
+    this.showImportPreview = false;
+    this.importPreview = null;
+    this.importFile = null;
+    this.importSettlementId = null;
   }
 
   formatPrice(price: number): string {

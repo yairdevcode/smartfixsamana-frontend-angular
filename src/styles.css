@@ -426,6 +426,31 @@ table {
   }
 }
 
+/* Global input styling - ensure text is visible in all themes */
+input,
+select,
+textarea {
+  color: var(--text-primary);
+  background-color: var(--input-bg);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--input-placeholder, #9CA3AF);
+}
+
+select option {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+/* Dark mode: use dark color-scheme for date inputs and scrollbars */
+.theme-dark input[type="date"],
+.theme-dark input[type="datetime-local"],
+.theme-dark input[type="time"] {
+  color-scheme: dark;
+}
+
 /* Responsive Form Elements */
 .form-control {
   width: 100%;

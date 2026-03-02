@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 
 import { InactivityService } from './core/services/inactivity.service';
 import { AuthService } from './core/services/auth.service';
+import { ThemeService } from './core/services/theme.service';
 import { environment } from '../environments/environment';
 
 @Component({
@@ -20,6 +21,7 @@ export class AppComponent {
   private updates = inject(SwUpdate);
   private inactivityService = inject(InactivityService);
   private authService = inject(AuthService);
+  private themeService = inject(ThemeService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 

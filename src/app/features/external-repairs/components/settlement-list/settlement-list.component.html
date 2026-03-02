@@ -53,6 +53,103 @@
     </div>
   }
 
+  <!-- Import Preview Modal -->
+  @if (showImportPreview && importPreview) {
+    <div class="import-preview-overlay">
+      <div class="import-preview-modal">
+        <h3>Resultado de la comparaci&oacute;n</h3>
+
+        <div class="reconciliation-summary">
+          <div class="summary-card summary-entregadas">
+            <div class="summary-number">{{ importPreview.totalEntregadas }}</div>
+            <div class="summary-label">Entregadas</div>
+            <div class="summary-hint">No est&aacute;n en el Excel &rarr; ya fueron entregadas</div>
+            @if (importPreview.entregadasNuevas > 0 || importPreview.entregadasPendientesAnteriores > 0) {
+              <div class="summary-breakdown">
+                {{ importPreview.entregadasNuevas }} nuevas + {{ importPreview.entregadasPendientesAnteriores }} pendientes anteriores
+              </div>
+            }
+          </div>
+          <div class="summary-card summary-pendientes">
+            <div class="summary-number">{{ importPreview.totalPendientesRecoger }}</div>
+            <div class="summary-label">Pendientes de Recoger</div>
+            <div class="summary-hint">A&uacute;n est&aacute;n en el Excel &rarr; cliente no ha recogido</div>
+          </div>
+        </div>
+
+        @if (importPreview.entregadas.length > 0) {
+          <div class="preview-section-block">
+            <h4 class="preview-section-title status-entregado-title">
+              Se marcar&aacute;n como ENTREGADO ({{ importPreview.entregadas.length }})
+            </h4>
+            <div class="import-preview-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Marca</th>
+                    <th>Soluci&oacute;n</th>
+                    <th>Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of importPreview.entregadas; track item.id) {
+                    <tr>
+                      <td>{{ item.clientName }}</td>
+                      <td>{{ item.phoneBrand }}</td>
+                      <td>{{ item.solution }}</td>
+                      <td class="td-number">{{ formatPrice(item.repairPrice) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+
+        @if (importPreview.pendientesRecoger.length > 0) {
+          <div class="preview-section-block">
+            <h4 class="preview-section-title status-pendiente-title">
+              Se marcar&aacute;n como PENDIENTE_RECOGER ({{ importPreview.pendientesRecoger.length }})
+            </h4>
+            <div class="import-preview-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Marca</th>
+                    <th>Soluci&oacute;n</th>
+                    <th>Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of importPreview.pendientesRecoger; track item.id) {
+                    <tr class="pendiente-recoger">
+                      <td>{{ item.clientName }}</td>
+                      <td>{{ item.phoneBrand }}</td>
+                      <td>{{ item.solution }}</td>
+                      <td class="td-number">{{ formatPrice(item.repairPrice) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+
+        <div class="import-preview-actions">
+          <button class="btn-cancel" (click)="cancelImport()" [disabled]="isImporting">Cancelar</button>
+          <button class="btn-primary" (click)="confirmImport()" [disabled]="isImporting">
+            @if (isImporting) {
+              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+            }
+            Aplicar Cambios
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
   <div class="table-container">
     @if (isLoading) {
       <div class="loading-container">
@@ -104,6 +201,13 @@
                 <button class="btn-action btn-export" (click)="exportSettlement(settlement.id!)" title="Exportar Excel">
                   📥
                 </button>
+                @if (admin) {
+                  <label class="btn-action btn-import-label" title="Importar Excel">
+                    📤
+                    <input type="file" accept=".xlsx,.xls"
+                      (change)="onImportFileSelected($event, settlement.id!)" hidden />
+                  </label>
+                }
               </td>
             </tr>
           }

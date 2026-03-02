@@ -160,8 +160,14 @@ export class ExternalRepairListComponent implements OnInit {
       .pipe(finalize(() => this.isImporting = false))
       .subscribe({
         next: (result) => {
-          Swal.fire('Importaci\u00f3n aplicada',
-            `${result.totalEntregadas} entregadas, ${result.totalPendientesRecoger} pendientes de recoger.`, 'success');
+          const nuevas = result.entregadasNuevas || 0;
+          const anteriores = result.entregadasPendientesAnteriores || 0;
+          let msg = `${result.totalEntregadas} reparaciones entregadas`;
+          if (nuevas > 0 || anteriores > 0) {
+            msg += ` (${nuevas} nuevas + ${anteriores} pendientes anteriores)`;
+          }
+          msg += `, ${result.totalPendientesRecoger} pendientes de recoger.`;
+          Swal.fire('Importaci\u00f3n aplicada', msg, 'success');
           this.showImportPreview = false;
           this.importPreview = null;
           this.importFile = null;
