@@ -102,8 +102,8 @@
                   {{ item.quantity }}
                 </span>
               </td>
-              <td class="td-min">{{ item.minStock }}</td>
               @if (admin) {
+              <td class="td-min">{{ item.minStock }}</td>
               <td class="td-purchase">{{ formatPrice(item.purchasePrice) }}</td>
               <td class="td-sale">{{ formatPrice(item.salePrice) }}</td>
               
