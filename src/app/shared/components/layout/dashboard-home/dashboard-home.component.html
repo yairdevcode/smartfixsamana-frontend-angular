@@ -299,32 +299,32 @@
               <tbody>
                 @for (repair of recentRepairs; track repair.id) {
                   <tr>
-                    <td class="td-customer">
+                    <td class="td-customer" data-label="Cliente">
                       <div class="customer-cell">
                         <span class="customer-avatar">👤</span>
                         <span class="customer-name">{{ repair.customer.name }} {{ repair.customer.lastname }}</span>
                       </div>
                     </td>
-                    <td class="td-device">
+                    <td class="td-device" data-label="Dispositivo">
                       <div class="device-cell">
                         <span class="device-icon">📱</span>
                         <span class="device-name">{{ repair.phone.brand }} {{ repair.phone.model }}</span>
                       </div>
                     </td>
-                    <td class="td-fault">
+                    <td class="td-fault" data-label="Falla">
                       <span class="fault-text" [title]="repair.fault">{{ repair.fault }}</span>
                     </td>
-                    <td class="td-date">
+                    <td class="td-date" data-label="Fecha">
                       <span class="date-badge">{{ formatDate(repair.date) }}</span>
                     </td>
-                    <td class="td-status">
+                    <td class="td-status" data-label="Estado">
                       <span class="status-badge" [style.background-color]="getStateColor(repair.state)">
                         <span class="state-icon">{{ getStateIcon(repair.state) }}</span>
                         {{ repair.state }}
                       </span>
                     </td>
                     @if (admin) {
-                    <td class="td-actions">
+                    <td class="td-actions" data-label="">
                       <a [href]="'/dashboard/repairs/edit/' + repair.id" class="btn-view" title="Ver detalles">
                         👁️
                       </a>
