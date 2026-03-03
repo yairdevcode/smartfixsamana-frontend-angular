@@ -413,13 +413,13 @@
 }
 
 .part-dropdown-option:hover {
-  background: #f0fdfa;
+  background: var(--bg-hover);
 }
 
 .part-dropdown-option.selected {
-  background: #e0f7fa;
+  background: var(--accent-light);
   font-weight: 600;
-  color: var(--accent-hover);
+  color: var(--accent);
 }
 
 .part-option-name {

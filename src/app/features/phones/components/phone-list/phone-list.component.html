@@ -66,18 +66,18 @@
         <tbody>
           @for (phone of phones; track phone.id) {
             <tr>
-              <td class="td-id">{{ phone.id }}</td>
-              <td class="td-brand">
+              <td class="td-id" data-label="ID">{{ phone.id }}</td>
+              <td class="td-brand" data-label="Marca">
                 <div class="brand-info">
                   <span class="phone-icon">📱</span>
                   <span class="brand-name">{{ phone.brand }}</span>
                 </div>
               </td>
-              <td class="td-model">
+              <td class="td-model" data-label="Modelo">
                 <span class="model-badge">{{ phone.model }}</span>
               </td>
               @if (admin) {
-                <td class="td-actions">
+                <td class="td-actions" data-label="">
                   <button class="btn-action btn-edit" (click)="update(phone.id!)" title="Editar" [disabled]="isDeleting">
                     ✏️
                   </button>

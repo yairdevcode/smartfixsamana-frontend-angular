@@ -86,28 +86,28 @@
         <tbody>
           @for (item of partsCatalog; track item.id) {
             <tr [class.row-warning]="isLowStock(item)" [class.row-critical]="item.quantity === 0">
-              <td class="td-id">{{ item.id }}</td>
-              <td class="td-type">
+              <td class="td-id" data-label="ID">{{ item.id }}</td>
+              <td class="td-type" data-label="Tipo">
                 <span class="type-badge">{{ item.partTypeName || item.name }}</span>
               </td>
-              <td class="td-device">
+              <td class="td-device" data-label="Dispositivo">
                 @if (item.phoneId) {
                   <span class="device-badge">📱 {{ item.phoneBrand }} {{ item.phoneModel }}</span>
                 } @else {
                   <span class="device-universal">Universal</span>
                 }
               </td>
-              <td class="td-stock">
+              <td class="td-stock" data-label="Stock">
                 <span class="stock-value" [class.low]="isLowStock(item)" [class.critical]="item.quantity === 0">
                   {{ item.quantity }}
                 </span>
               </td>
               @if (admin) {
-              <td class="td-min">{{ item.minStock }}</td>
-              <td class="td-purchase">{{ formatPrice(item.purchasePrice) }}</td>
-              <td class="td-sale">{{ formatPrice(item.salePrice) }}</td>
-              
-              <td class="td-status">
+              <td class="td-min" data-label="Mín.">{{ item.minStock }}</td>
+              <td class="td-purchase" data-label="P. Compra">{{ formatPrice(item.purchasePrice) }}</td>
+              <td class="td-sale" data-label="P. Venta">{{ formatPrice(item.salePrice) }}</td>
+
+              <td class="td-status" data-label="Estado">
                 @if (item.quantity === 0) {
                   <span class="status-badge critical">Sin Stock</span>
                 } @else if (isLowStock(item)) {
@@ -118,7 +118,7 @@
               </td>
             }
               @if (admin) {
-                <td class="td-actions">
+                <td class="td-actions" data-label="">
                   <button class="btn-action btn-edit" (click)="update(item.id!)" title="Editar" [disabled]="isDeleting">
                     ✏️
                   </button>

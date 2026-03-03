@@ -289,7 +289,7 @@
 }
 
 .quantity-value.positive {
-  color: #10b981;
+  color: var(--success-text);
 }
 
 .quantity-value.negative {

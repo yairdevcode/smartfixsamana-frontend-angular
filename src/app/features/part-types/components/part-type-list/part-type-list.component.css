@@ -167,7 +167,7 @@
   align-items: center;
   padding: 0.4rem 0.8rem;
   background: var(--form-header-bg);
-  color: var(--accent-hover);
+  color: #ffffff;
   border-radius: 6px;
   font-weight: 600;
   font-size: 0.95rem;
@@ -274,26 +274,51 @@
     width: 100%;
   }
 
-  .th-description {
-    display: none;
+  .part-types-table thead { display: none; }
+  .part-types-table,
+  .part-types-table tbody { display: block; width: 100%; }
+  .part-types-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
   }
-
-  .td-description {
-    display: none;
+  .part-types-table tbody tr:hover {
+    background: var(--bg-secondary);
   }
-
-  .part-types-table th,
   .part-types-table td {
-    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
   }
+  .part-types-table td:last-child { border-bottom: none; }
+  .part-types-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-right: 1rem;
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .part-types-table td.td-actions {
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    border-bottom: none;
+  }
+  .part-types-table td.td-actions::before { display: none; }
 }
 
 @media (max-width: 480px) {
   .page-title {
     font-size: 1.5rem;
-  }
-
-  .th-id {
-    width: 60px;
   }
 }

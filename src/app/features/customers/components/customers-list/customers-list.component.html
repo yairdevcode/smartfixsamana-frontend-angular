@@ -67,17 +67,17 @@
         <tbody>
           @for (customer of customers; track customer.id) {
             <tr>
-              <td class="td-id">{{ customer.id }}</td>
-              <td class="td-name">
+              <td class="td-id" data-label="ID">{{ customer.id }}</td>
+              <td class="td-name" data-label="Nombre">
                 <div class="customer-info">
                   <span class="customer-avatar">👤</span>
                   <span class="customer-name">{{ customer.name }} {{ customer.lastname }}</span>
                 </div>
               </td>
-              <td class="td-phone">
+              <td class="td-phone" data-label="Teléfono">
                 <span class="phone-badge">📞 {{ customer.phone }}</span>
               </td>
-              <td class="td-email">
+              <td class="td-email" data-label="Email">
                 @if (customer.email) {
                   <span class="email-badge">✉️ {{ customer.email }}</span>
                 } @else {
@@ -85,7 +85,7 @@
                 }
               </td>
               @if (admin) {
-                <td class="td-actions">
+                <td class="td-actions" data-label="">
                   <button class="btn-action btn-edit" (click)="update(customer.id!)" title="Editar" [disabled]="isDeleting">
                     ✏️
                   </button>

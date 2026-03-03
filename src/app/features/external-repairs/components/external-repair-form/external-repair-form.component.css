@@ -82,12 +82,12 @@
 }
 
 .pricing-section {
-  background: #243447 !important;
-  border-color: #4ECDC4 !important;
+  background: var(--bg-primary) !important;
+  border-color: var(--accent) !important;
 }
 
 .pricing-section::before {
-  background: linear-gradient(90deg, #4ECDC4, #38b2ac) !important;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover)) !important;
 }
 
 .section-title {
@@ -227,10 +227,10 @@
 
 /* Cost Summary */
 .cost-summary {
-  background: #2a3f55;
+  background: var(--bg-secondary);
   border-radius: 10px;
   padding: 1rem;
-  border: 2px solid #4ECDC4;
+  border: 2px solid var(--accent);
   margin-top: 1rem;
 }
 
@@ -247,7 +247,7 @@
 }
 
 .cost-summary-label {
-  color: #FFFFFF;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -263,7 +263,7 @@
 }
 
 .cost-summary-value.highlight-mine {
-  color: var(--accent-hover);
+  color: var(--accent);
   font-size: 1.2rem;
 }
 

@@ -207,22 +207,22 @@
         <tbody>
           @for (repair of repairs; track repair.id) {
             <tr [class.pendiente-recoger]="repair.status === 'PENDIENTE_RECOGER'">
-              <td class="td-client">{{ repair.clientName }}</td>
-              <td class="td-brand">{{ repair.phoneBrand }}</td>
-              <td class="td-solution">
+              <td class="td-client" data-label="Cliente">{{ repair.clientName }}</td>
+              <td class="td-brand" data-label="Marca">{{ repair.phoneBrand }}</td>
+              <td class="td-solution" data-label="Solución">
                 <span class="solution-text" [title]="repair.solution">{{ repair.solution }}</span>
               </td>
               @if (admin) {
-              <td class="td-number">{{ formatPrice(repair.repairPrice) }}</td>
-              <td class="td-number">{{ formatPrice(repair.partCost) }}</td>
-              <td class="td-number td-profit">{{ formatPrice(repair.netProfit || 0) }}</td>
-              <td class="td-number td-share">{{ formatPrice(repair.myShare || 0) }}</td>
-              <td class="td-status">
+              <td class="td-number" data-label="Precio Rep.">{{ formatPrice(repair.repairPrice) }}</td>
+              <td class="td-number td-cost" data-label="Costo Repuesto">{{ formatPrice(repair.partCost) }}</td>
+              <td class="td-number td-profit" data-label="Ganancia Neta">{{ formatPrice(repair.netProfit || 0) }}</td>
+              <td class="td-number td-share" data-label="60%+repuesto">{{ formatPrice(repair.myShare || 0) }}</td>
+              <td class="td-status" data-label="Estado">
                 <span class="status-badge" [ngClass]="'status-' + repair.status.toLowerCase().replace('_', '-')">
                   {{ repair.status === 'PENDIENTE_RECOGER' ? 'Pend. Recoger' : repair.status === 'REPARADO' ? 'Reparado' : 'Entregado' }}
                 </span>
               </td>
-              <td class="td-actions">
+              <td class="td-actions" data-label="">
                   <button class="btn-action btn-edit" (click)="update(repair.id!)" title="Editar" [disabled]="isDeleting">
                     ✏️
                   </button>
@@ -238,15 +238,15 @@
         <tfoot>
           <tr class="totals-row">
             @if (admin) {
-            <td colspan="3"><strong>TOTALES</strong></td>
-            <td class="td-number"><strong>{{ formatPrice(totalRepairPrice) }}</strong></td>
-            <td class="td-number"><strong>{{ formatPrice(totalPartCost) }}</strong></td>
-            <td class="td-number td-profit"><strong>{{ formatPrice(totalNetProfit) }}</strong></td>
-            <td class="td-number td-share"><strong>{{ formatPrice(totalMyShare) }}</strong></td>
-            <td></td>
-            
-              <td></td>
-            }@else {<td colspan="3"><strong>TOTALES</strong></td>}
+            <td colspan="3" data-label=""><strong>TOTALES</strong></td>
+            <td class="td-number" data-label="Precio Rep."><strong>{{ formatPrice(totalRepairPrice) }}</strong></td>
+            <td class="td-number td-cost" data-label="Costo Repuesto"><strong>{{ formatPrice(totalPartCost) }}</strong></td>
+            <td class="td-number td-profit" data-label="Ganancia Neta"><strong>{{ formatPrice(totalNetProfit) }}</strong></td>
+            <td class="td-number td-share" data-label="60%+repuesto"><strong>{{ formatPrice(totalMyShare) }}</strong></td>
+            <td data-label=""></td>
+
+              <td data-label=""></td>
+            }@else {<td colspan="3" data-label=""><strong>TOTALES</strong></td>}
           </tr>
         </tfoot>
       </table>

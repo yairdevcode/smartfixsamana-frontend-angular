@@ -411,13 +411,13 @@
 }
 
 .phone-dropdown-option:hover {
-  background: #f0fdfa;
+  background: var(--bg-hover);
 }
 
 .phone-dropdown-option.selected {
-  background: #e0f7fa;
+  background: var(--accent-light);
   font-weight: 600;
-  color: var(--accent-hover);
+  color: var(--accent);
 }
 
 .phone-dropdown-empty {

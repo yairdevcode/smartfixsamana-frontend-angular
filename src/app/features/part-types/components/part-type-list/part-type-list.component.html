@@ -62,13 +62,13 @@
         <tbody>
           @for (partType of filteredPartTypes; track partType.id) {
             <tr>
-              <td class="td-id">{{ partType.id }}</td>
-              <td class="td-name">
+              <td class="td-id" data-label="ID">{{ partType.id }}</td>
+              <td class="td-name" data-label="Nombre">
                 <span class="type-badge">{{ partType.name }}</span>
               </td>
-              <td class="td-description">{{ partType.description || '-' }}</td>
+              <td class="td-description" data-label="Descripción">{{ partType.description || '-' }}</td>
               @if (admin) {
-                <td class="td-actions">
+                <td class="td-actions" data-label="">
                   <button
                     class="btn-edit"
                     (click)="update(partType.id)"
