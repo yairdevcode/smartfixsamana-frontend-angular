@@ -25,18 +25,6 @@
     }
 
       @if (admin) {
-        <label class="btn-import">
-          <span class="btn-icon">📤</span>
-          Importar Excel
-          <input type="file" accept=".xlsx,.xls" (change)="onFileSelected($event)" hidden />
-        </label>
-      }@else {
-        <button class="btn-import" (click)="alertMessage()">
-          <span class="btn-icon">📤</span>
-          Importar Excel
-        </button>
-      }
-      @if (admin) {
       <a routerLink="settlements" class="btn-settlements">
         <span class="btn-icon">💰</span>
         Liquidaciones

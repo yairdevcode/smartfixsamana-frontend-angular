@@ -8,7 +8,7 @@ import { provideServiceWorker } from '@angular/service-worker';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 
-registerLocaleData(localeEs);
+registerLocaleData(localeEs, 'es-CO');
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +18,6 @@ export const appConfig: ApplicationConfig = {
         enabled: !isDevMode(),
         registrationStrategy: 'registerWhenStable:30000'
     }),
-    { provide: LOCALE_ID, useValue: 'es' }
+    { provide: LOCALE_ID, useValue: 'es-CO' }
 ]
 };
