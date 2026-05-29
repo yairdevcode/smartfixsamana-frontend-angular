@@ -79,6 +79,13 @@ export const routes: Routes = [
             (m) => m.externalRepairsRoutes
           ),
       },
+      {
+        path: 'earnings',
+        loadChildren: () =>
+          import('./features/earnings/earnings.routes').then(
+            (m) => m.earningsRoutes
+          ),
+      },
     ],
   },
   {

@@ -65,9 +65,6 @@ export class RepairFormComponent implements OnInit {
   partQuantity = 1;
   partPrice: number | null = null;
 
-  // Labor cost
-  laborCost: number = 0;
-  isUpdatingLaborCost = false;
 
   // Estados de reparación disponibles
   repairStates = [
@@ -85,6 +82,7 @@ export class RepairFormComponent implements OnInit {
       fault: ['', Validators.required],
       state: ['', Validators.required],
       date: ['', Validators.required],
+      laborCost: [0, [Validators.min(0)]],
     });
 
     // Setup part search
@@ -174,7 +172,6 @@ export class RepairFormComponent implements OnInit {
             // Set selected items for autocomplete display
             this.selectedCustomer = repair.customer;
             this.selectedPhone = repair.phone;
-            this.laborCost = repair.laborCost || 0;
 
             this.form.patchValue({
               customerId: repair.customer.id,
@@ -182,6 +179,7 @@ export class RepairFormComponent implements OnInit {
               fault: repair.fault,
               state: repair.state,
               date: repair.date,
+              laborCost: repair.laborCost || 0,
             });
 
             // Load parts for this repair
@@ -296,35 +294,13 @@ export class RepairFormComponent implements OnInit {
     });
   }
 
-  updateLaborCost(): void {
-    if (!this.repairId) return;
-
-    this.isUpdatingLaborCost = true;
-    this.repairService.updateLaborCost(this.repairId, this.laborCost)
-      .pipe(finalize(() => this.isUpdatingLaborCost = false))
-      .subscribe({
-        next: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Actualizado',
-            text: 'El costo de mano de obra ha sido actualizado.',
-            timer: 2000,
-            showConfirmButton: false
-          });
-        },
-        error: () => {
-          Swal.fire('Error', 'No se pudo actualizar el costo de mano de obra.', 'error');
-        }
-      });
-  }
-
   // Cost calculations
   get totalPartsCost(): number {
     return this.repairParts.reduce((sum, part) => sum + (part.priceCharged * part.quantity), 0);
   }
 
   get totalCost(): number {
-    return this.totalPartsCost + (this.laborCost || 0);
+    return this.totalPartsCost + (this.form.get('laborCost')?.value || 0);
   }
 
   formatPrice(price: number): string {

@@ -185,6 +185,29 @@
               }
             </div>
           </div>
+
+          <div class="form-group">
+            <label class="form-label" for="laborCost">
+              <span class="label-icon">💰</span>
+              Mano de Obra
+            </label>
+            <input
+              id="laborCost"
+              type="number"
+              formControlName="laborCost"
+              class="form-input"
+              min="0"
+              step="0.01"
+              placeholder="0"
+              [disabled]="isSubmitting"
+            />
+            @if (form.get('laborCost')?.invalid && form.get('laborCost')?.touched) {
+              <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                El costo de mano de obra no puede ser negativo
+              </div>
+            }
+          </div>
         </div>
 
         <!-- Parts Management Section (Edit Mode Only) -->
@@ -375,34 +398,6 @@
               Resumen de Costos
             </h3>
 
-            <div class="cost-row">
-              <div class="cost-item">
-                <label class="cost-label">Mano de Obra</label>
-                <div class="labor-cost-input">
-                  <input
-                    type="number"
-                    [(ngModel)]="laborCost"
-                    [ngModelOptions]="{standalone: true}"
-                    min="0"
-                    step="0.01"
-                    class="form-input labor-input"
-                    [disabled]="isUpdatingLaborCost"
-                  />
-                  <button
-                    type="button"
-                    class="btn-update-labor"
-                    (click)="updateLaborCost()"
-                    [disabled]="isUpdatingLaborCost">
-                    @if (isUpdatingLaborCost) {
-                      <app-spinner size="small" [showMessage]="false"></app-spinner>
-                    } @else {
-                      💾
-                    }
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <div class="cost-summary">
               <div class="cost-summary-row">
                 <span class="cost-summary-label">Total Repuestos:</span>
@@ -410,7 +405,7 @@
               </div>
               <div class="cost-summary-row">
                 <span class="cost-summary-label">Mano de Obra:</span>
-                <span class="cost-summary-value">{{ formatPrice(laborCost || 0) }}</span>
+                <span class="cost-summary-value">{{ formatPrice(form.get('laborCost')?.value || 0) }}</span>
               </div>
               <div class="cost-summary-row total">
                 <span class="cost-summary-label">TOTAL:</span>

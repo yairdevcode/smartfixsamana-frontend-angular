@@ -1,0 +1,151 @@
+<!-- Header -->
+<div class="earnings-header">
+  <div class="header-content">
+    <h1 class="earnings-title">
+      <span class="title-icon">💰</span>
+      Resumen de Ganancias
+    </h1>
+    <p class="earnings-subtitle">Visualiza tus ganancias de reparaciones propias y externas</p>
+  </div>
+</div>
+
+@if (isLoading) {
+  <div class="loading-container">
+    <app-spinner message="Cargando ganancias..."></app-spinner>
+  </div>
+} @else if (summary) {
+  <!-- Summary Cards Grid -->
+  <div class="summary-grid">
+
+    <!-- Hoy -->
+    <div class="earnings-card today">
+      <div class="card-top-bar"></div>
+      <div class="card-header">
+        <div class="card-icon-wrapper today-icon">📅</div>
+        <div class="card-title-section">
+          <h3>Hoy</h3>
+          <span class="card-date">{{ summary.today.date }}</span>
+        </div>
+      </div>
+      <div class="card-total">{{ formatPrice(summary.today.total) }}</div>
+      <div class="card-breakdown">
+        <div class="breakdown-row">
+          <span class="breakdown-label">🛠️ Reparaciones propias:</span>
+          <span class="breakdown-value">{{ formatPrice(summary.today.ownRepairsTotal) }}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">🏪 Rep. externas (60%):</span>
+          <span class="breakdown-value">{{ formatPrice(summary.today.externalRepairsMyShare) }}</span>
+        </div>
+      </div>
+      <div class="card-counts">
+        <span class="count-badge own">{{ summary.today.ownRepairsCount }} propias</span>
+        <span class="count-badge external">{{ summary.today.externalRepairsCount }} externas</span>
+      </div>
+    </div>
+
+    <!-- Últimos 30 días -->
+    <div class="earnings-card last30">
+      <div class="card-top-bar"></div>
+      <div class="card-header">
+        <div class="card-icon-wrapper last30-icon">📆</div>
+        <div class="card-title-section">
+          <h3>Último mes (30 días)</h3>
+          <span class="card-date">{{ summary.last30Days.startDate }} — {{ summary.last30Days.endDate }}</span>
+        </div>
+      </div>
+      <div class="card-total">{{ formatPrice(summary.last30Days.total) }}</div>
+      <div class="card-breakdown">
+        <div class="breakdown-row">
+          <span class="breakdown-label">🛠️ Reparaciones propias:</span>
+          <span class="breakdown-value">{{ formatPrice(summary.last30Days.ownRepairsTotal) }}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">🏪 Rep. externas (60%):</span>
+          <span class="breakdown-value">{{ formatPrice(summary.last30Days.externalRepairsMyShare) }}</span>
+        </div>
+      </div>
+      <div class="card-counts">
+        <span class="count-badge own">{{ summary.last30Days.ownRepairsCount }} propias</span>
+        <span class="count-badge external">{{ summary.last30Days.externalRepairsCount }} externas</span>
+      </div>
+    </div>
+
+    <!-- Mes actual -->
+    <div class="earnings-card current-month">
+      <div class="card-top-bar"></div>
+      <div class="card-header">
+        <div class="card-icon-wrapper month-icon">🗓️</div>
+        <div class="card-title-section">
+          <h3>Mes actual</h3>
+          <span class="card-date">{{ summary.currentMonth.startDate }} — {{ summary.currentMonth.endDate }}</span>
+        </div>
+      </div>
+      <div class="card-total">{{ formatPrice(summary.currentMonth.total) }}</div>
+      <div class="card-breakdown">
+        <div class="breakdown-row">
+          <span class="breakdown-label">🛠️ Reparaciones propias:</span>
+          <span class="breakdown-value">{{ formatPrice(summary.currentMonth.ownRepairsTotal) }}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">🏪 Rep. externas (60%):</span>
+          <span class="breakdown-value">{{ formatPrice(summary.currentMonth.externalRepairsMyShare) }}</span>
+        </div>
+      </div>
+      <div class="card-counts">
+        <span class="count-badge own">{{ summary.currentMonth.ownRepairsCount }} propias</span>
+        <span class="count-badge external">{{ summary.currentMonth.externalRepairsCount }} externas</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Custom Date Query -->
+  <div class="custom-date-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="section-icon">🔍</span>
+        Consultar por fecha
+      </h2>
+    </div>
+    <div class="date-picker-row">
+      <input type="date"
+             class="date-input"
+             [(ngModel)]="selectedDate"
+             (change)="onDateChange()" />
+      <button class="btn-search" (click)="onDateChange()">Consultar</button>
+    </div>
+
+    @if (isLoadingCustomDay) {
+      <div class="custom-day-loading">
+        <app-spinner size="small" message="Consultando..."></app-spinner>
+      </div>
+    } @else if (customDayEarnings) {
+      <div class="earnings-card custom-day">
+        <div class="card-top-bar"></div>
+        <div class="card-header">
+          <div class="card-icon-wrapper custom-icon">📊</div>
+          <div class="card-title-section">
+            <h3>Ganancias del día</h3>
+            <span class="card-date">{{ customDayEarnings.date }}</span>
+          </div>
+        </div>
+        <div class="card-total">{{ formatPrice(customDayEarnings.total) }}</div>
+        <div class="card-breakdown">
+          <div class="breakdown-row">
+            <span class="breakdown-label">🛠️ Reparaciones propias:</span>
+            <span class="breakdown-value">{{ formatPrice(customDayEarnings.ownRepairsTotal) }}</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">🏪 Rep. externas (60%):</span>
+            <span class="breakdown-value">{{ formatPrice(customDayEarnings.externalRepairsMyShare) }}</span>
+          </div>
+        </div>
+        <div class="card-counts">
+          <span class="count-badge own">{{ customDayEarnings.ownRepairsCount }} propias</span>
+          <span class="count-badge external">{{ customDayEarnings.externalRepairsCount }} externas</span>
+        </div>
+      </div>
+    }
+  </div>
+}
