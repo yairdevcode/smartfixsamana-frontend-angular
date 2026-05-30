@@ -3,16 +3,21 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { EarningsService } from '../../services/earnings.service';
-import { DailyEarnings, EarningsSummary } from '../../../../shared/models/earnings';
+import {
+  DailyEarnings,
+  EarningsSummary,
+} from '../../../../shared/models/earnings';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-earnings-summary',
   standalone: true,
   imports: [CommonModule, FormsModule, SpinnerComponent],
   templateUrl: './earnings-summary.component.html',
-  styleUrl: './earnings-summary.component.css'
+  styleUrl: './earnings-summary.component.css',
 })
 export class EarningsSummaryComponent implements OnInit {
+  private authService = inject(AuthService);
 
   private earningsService = inject(EarningsService);
 
@@ -32,7 +37,7 @@ export class EarningsSummaryComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -47,14 +52,17 @@ export class EarningsSummaryComponent implements OnInit {
       },
       error: () => {
         this.isLoadingCustomDay = false;
-      }
+      },
     });
   }
 
   formatPrice(price: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: 'COP'
+      currency: 'COP',
     }).format(price);
+  }
+  get admin(): boolean {
+    return this.authService.isAdmin();
   }
 }
