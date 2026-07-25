@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { PartCatalogService } from '../../../parts/services/parts-catalog.service';
 import { InventoryMovementService } from '../../services/inventory-movement.service';
@@ -29,6 +29,7 @@ export class StockEntryFormComponent implements OnInit {
   private partCatalogService = inject(PartCatalogService);
   private movementService = inject(InventoryMovementService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
 
   @ViewChild('partSearchInput') partSearchInput!: ElementRef<HTMLInputElement>;
@@ -104,19 +105,38 @@ export class StockEntryFormComponent implements OnInit {
 
   private loadPartsCatalog(): void {
     this.isLoading = true;
-    console.log('Loading parts catalog...');
     this.partCatalogService.getPartsCatalog()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
         next: (parts) => {
-          console.log('Parts catalog loaded:', parts);
           this.partsCatalog = parts || [];
+          this.preselectPartFromQueryParams();
         },
         error: (err) => {
           console.error('Error loading parts catalog:', err);
           Swal.fire('Error', 'No se pudo cargar el catálogo de repuestos.', 'error');
         }
       });
+  }
+
+  /**
+   * Preselects the part sent as ?partId= (used by the "Reabastecer" shortcut in the
+   * low stock alerts). Must run after partsCatalog is populated, otherwise the
+   * selected label and the stock panel cannot resolve the part.
+   */
+  private preselectPartFromQueryParams(): void {
+    const rawPartId = this.route.snapshot.queryParamMap.get('partId');
+    if (!rawPartId) return;
+
+    const partId = Number(rawPartId);
+    if (Number.isNaN(partId)) return;
+
+    const part = this.partsCatalog.find(p => p.id === partId);
+    if (!part) return;
+
+    this.selectPart(part);
+    this.form.get('movementType')?.setValue('IN');
+    this.form.get('reason')?.setValue('Reabastecimiento de stock');
   }
 
   getNewQuantity(): number {

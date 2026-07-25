@@ -219,6 +219,7 @@
 /* Column widths */
 .th-id { width: 60px; }
 .th-type { min-width: 150px; }
+.th-description { min-width: 180px; }
 .th-device { min-width: 150px; }
 .th-stock { width: 80px; text-align: center; }
 .th-min { width: 60px; text-align: center; }
@@ -230,6 +231,19 @@
 .td-id {
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+.td-description {
+  max-width: 260px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.description-empty {
+  color: var(--text-muted);
 }
 
 .td-stock, .td-min {
@@ -473,6 +487,16 @@
   .data-table td.td-actions::before { display: none; }
 
   .td-purchase, .td-sale {
+    text-align: right;
+  }
+
+  /* Let the description wrap on the mobile card instead of truncating */
+  .data-table td.td-description {
+    align-items: flex-start;
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
     text-align: right;
   }
 }
