@@ -74,13 +74,16 @@
           <tr>
             <th class="th-id">ID</th>
             <th class="th-type">Tipo</th>
+            <th class="th-description">Descripción</th>
             <th class="th-device">Dispositivo</th>
             <th class="th-stock">Stock</th>
-            <th class="th-min">Mín.</th>
-            <th class="th-purchase">P. Compra</th>
-            <th class="th-sale">P. Venta</th>
-            <th class="th-status">Estado</th>
-            <th class="th-actions">Acciones</th>
+            @if (admin) {
+              <th class="th-min">Mín.</th>
+              <th class="th-purchase">P. Compra</th>
+              <th class="th-sale">P. Venta</th>
+              <th class="th-status">Estado</th>
+              <th class="th-actions">Acciones</th>
+            }
           </tr>
         </thead>
         <tbody>
@@ -89,6 +92,13 @@
               <td class="td-id" data-label="ID">{{ item.id }}</td>
               <td class="td-type" data-label="Tipo">
                 <span class="type-badge">{{ item.partTypeName || item.name }}</span>
+              </td>
+              <td class="td-description" data-label="Descripción" [title]="item.description || ''">
+                @if (item.description) {
+                  {{ item.description }}
+                } @else {
+                  <span class="description-empty">-</span>
+                }
               </td>
               <td class="td-device" data-label="Dispositivo">
                 @if (item.phoneId) {
