@@ -46,6 +46,12 @@ export class InventoryDashboardComponent implements OnInit {
     this.router.navigate(['/dashboard/inventory/stock-entry']);
   }
 
+  restock(part: PartCatalogResponse): void {
+    this.router.navigate(['/dashboard/inventory/stock-entry'], {
+      queryParams: { partId: part.id }
+    });
+  }
+
   navigateToMovements(): void {
     this.router.navigate(['/dashboard/inventory/movements']);
   }
