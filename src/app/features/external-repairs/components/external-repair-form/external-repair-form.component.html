@@ -147,6 +147,122 @@
           </div>
         </div>
 
+        <!-- Inventory Part Section -->
+        <div class="info-section">
+          <h3 class="section-title">
+            <span class="section-icon">🔩</span>
+            Repuesto del Inventario
+          </h3>
+
+          <p class="section-hint">
+            Selecciona un repuesto del cat&aacute;logo para descontarlo del stock autom&aacute;ticamente.
+            Si no usaste un repuesto del inventario, deja esta secci&oacute;n vac&iacute;a y escribe el costo manualmente.
+          </p>
+
+          <button
+            type="button"
+            class="btn-add-part"
+            (click)="togglePartSelector()">
+            <span class="btn-icon">{{ showPartSelector ? '✕' : '🔍' }}</span>
+            {{ showPartSelector ? 'Ocultar buscador' : 'Seleccionar Repuesto' }}
+          </button>
+
+          @if (showPartSelector) {
+            <div class="part-selector-panel">
+              @if (!selectedPart) {
+                <h4 class="selector-title">
+                  <span class="selector-icon">🔍</span>
+                  Buscar Repuesto
+                </h4>
+
+                <div class="part-search-container">
+                  <input
+                    type="text"
+                    [formControl]="partSearchControl"
+                    class="part-search-input"
+                    placeholder="Escriba para buscar repuestos..."
+                  />
+                  @if (isSearchingParts) {
+                    <app-spinner size="small" [showMessage]="false"></app-spinner>
+                  }
+                </div>
+
+                @if (availableParts.length > 0) {
+                  <div class="search-results">
+                    @for (part of availableParts; track part.id) {
+                      <div class="search-result-item" (click)="selectPart(part)">
+                        <div class="result-info">
+                          <span class="result-name">{{ part.name }}</span>
+                          @if (part.phoneId) {
+                            <span class="result-phone">📱 {{ part.phoneBrand }} {{ part.phoneModel }}</span>
+                          }
+                        </div>
+                        <div class="result-meta">
+                          <span class="result-stock" [class.low]="part.isLowStock">
+                            {{ part.quantity }} disp.
+                          </span>
+                          <span class="result-price">Costo: {{ formatPrice(part.purchasePrice || 0) }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              } @else {
+                <div class="selected-part-form">
+                  <div class="selected-part-info">
+                    <span class="selected-part-name">{{ selectedPart.name }}</span>
+                    @if (selectedPart.phoneId) {
+                      <span class="selected-part-phone">📱 {{ selectedPart.phoneBrand }} {{ selectedPart.phoneModel }}</span>
+                    }
+                    <span class="selected-part-stock">Disponible: {{ selectedPart.quantity }} unidades</span>
+                  </div>
+
+                  <div class="part-form-row">
+                    <div class="part-form-group">
+                      <label>Cantidad</label>
+                      <input
+                        type="number"
+                        [(ngModel)]="partQuantity"
+                        [ngModelOptions]="{standalone: true}"
+                        (ngModelChange)="onPartQuantityChange()"
+                        min="1"
+                        [max]="selectedPart.quantity"
+                        class="part-form-input"
+                      />
+                    </div>
+                    <div class="part-form-group">
+                      <label>Costo del Repuesto</label>
+                      <input
+                        type="text"
+                        [value]="formatPrice(form.get('partCost')?.value || 0)"
+                        class="part-form-input"
+                        readonly
+                      />
+                    </div>
+                  </div>
+
+                  @if (isPartQuantityInvalid) {
+                    <div class="error-message">
+                      <span class="error-icon">⚠️</span>
+                      Solo hay {{ selectedPart.quantity }} unidades disponibles de este repuesto
+                    </div>
+                  }
+
+                  <div class="part-form-actions">
+                    <button
+                      type="button"
+                      class="btn-cancel-part"
+                      (click)="clearSelectedPart()">
+                      <span class="btn-icon">🔄</span>
+                      Cambiar repuesto
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
         <!-- Pricing Section -->
         <div class="info-section pricing-section">
           <h3 class="section-title">
@@ -217,7 +333,7 @@
           <button
             type="submit"
             class="btn-submit"
-            [disabled]="form.invalid || isSubmitting">
+            [disabled]="form.invalid || isSubmitting || isPartQuantityInvalid">
             @if (isSubmitting) {
               <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
               {{ isEditMode ? "Actualizando..." : "Guardando..." }}

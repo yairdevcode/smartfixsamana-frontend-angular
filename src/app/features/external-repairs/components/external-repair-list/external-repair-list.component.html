@@ -202,7 +202,14 @@
               </td>
               @if (admin) {
               <td class="td-number" data-label="Precio Rep.">{{ formatPrice(repair.repairPrice) }}</td>
-              <td class="td-number td-cost" data-label="Costo Repuesto">{{ formatPrice(repair.partCost) }}</td>
+              <td class="td-number td-cost" data-label="Costo Repuesto">
+                {{ formatPrice(repair.partCost) }}
+                @if (repair.partCatalogName) {
+                  <span class="part-badge" [title]="repair.partCatalogName + ' x' + (repair.partQuantity || 1)">
+                    🔩 {{ repair.partCatalogName }}
+                  </span>
+                }
+              </td>
               <td class="td-number td-profit" data-label="Ganancia Neta">{{ formatPrice(repair.netProfit || 0) }}</td>
               <td class="td-number td-share" data-label="60%+repuesto">{{ formatPrice(repair.myShare || 0) }}</td>
               <td class="td-status" data-label="Estado">

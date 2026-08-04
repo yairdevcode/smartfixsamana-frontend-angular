@@ -1,3 +1,4 @@
+import { ExternalRepair } from './external-repair';
 import { PartCatalog } from './part-catalog';
 import { Repair } from './repair';
 
@@ -9,6 +10,8 @@ export type MovementType =
   | 'SALE'
   | 'REPAIR_USE'
   | 'REPAIR_RETURN'
+  | 'EXTERNAL_REPAIR_USE'
+  | 'EXTERNAL_REPAIR_RETURN'
   | 'ADJUSTMENT'
   | 'DAMAGE';
 
@@ -19,6 +22,7 @@ export interface InventoryMovement {
   id: number;
   partCatalog: PartCatalog;
   repair?: Repair;
+  externalRepair?: ExternalRepair;
   movementType: MovementType;
   quantity: number;
   reason?: string;
@@ -41,14 +45,16 @@ export interface InventoryMovementDTO {
  * Helper to determine if a movement type increases stock
  */
 export function isStockIncrease(type: MovementType): boolean {
-  return type === 'PURCHASE' || type === 'REPAIR_RETURN' || type === 'ADJUSTMENT';
+  return type === 'PURCHASE' || type === 'REPAIR_RETURN' ||
+    type === 'EXTERNAL_REPAIR_RETURN' || type === 'ADJUSTMENT';
 }
 
 /**
  * Helper to determine if a movement type decreases stock
  */
 export function isStockDecrease(type: MovementType): boolean {
-  return type === 'SALE' || type === 'REPAIR_USE' || type === 'DAMAGE';
+  return type === 'SALE' || type === 'REPAIR_USE' ||
+    type === 'EXTERNAL_REPAIR_USE' || type === 'DAMAGE';
 }
 
 /**
@@ -59,6 +65,8 @@ export const MOVEMENT_TYPE_LABELS: Record<MovementType, string> = {
   SALE: 'Venta',
   REPAIR_USE: 'Uso en Reparacion',
   REPAIR_RETURN: 'Devolucion de Reparacion',
+  EXTERNAL_REPAIR_USE: 'Uso en Reparacion Externa',
+  EXTERNAL_REPAIR_RETURN: 'Devolucion de Reparacion Externa',
   ADJUSTMENT: 'Ajuste',
   DAMAGE: 'Dano/Perdida'
 };
@@ -71,6 +79,8 @@ export const MOVEMENT_TYPE_CLASSES: Record<MovementType, string> = {
   SALE: 'bg-blue-100 text-blue-800',
   REPAIR_USE: 'bg-orange-100 text-orange-800',
   REPAIR_RETURN: 'bg-purple-100 text-purple-800',
+  EXTERNAL_REPAIR_USE: 'bg-amber-100 text-amber-800',
+  EXTERNAL_REPAIR_RETURN: 'bg-indigo-100 text-indigo-800',
   ADJUSTMENT: 'bg-gray-100 text-gray-800',
   DAMAGE: 'bg-red-100 text-red-800'
 };
