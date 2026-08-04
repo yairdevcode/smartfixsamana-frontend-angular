@@ -9,6 +9,9 @@ export interface ExternalRepair {
   date: string;
   notes?: string;
   settlementId?: number;
+  partCatalogId?: number;
+  partCatalogName?: string;
+  partQuantity?: number;
   netProfit?: number;
   myShare?: number;
   storeShare?: number;
@@ -23,6 +26,8 @@ export interface ExternalRepairDTO {
   status: 'REPARADO' | 'ENTREGADO' | 'PENDIENTE_RECOGER';
   date: string;
   notes?: string;
+  partCatalogId?: number | null;
+  partQuantity?: number | null;
 }
 
 export interface ImportReconciliationResponse {
