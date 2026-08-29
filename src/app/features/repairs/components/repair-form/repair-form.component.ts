@@ -97,7 +97,6 @@ export class RepairFormComponent implements OnInit {
           }
           this.isSearchingParts = true;
           const phoneId = this.selectedPhone?.id;
-          console.log('Searching for:', keyword, 'phoneId:', phoneId);
           return this.partCatalogService.searchAvailableParts(keyword, phoneId).pipe(
             catchError((err) => {
               console.error('Part search HTTP error:', err.status, err.message, err);
@@ -109,7 +108,6 @@ export class RepairFormComponent implements OnInit {
       )
       .subscribe({
         next: (parts) => {
-          console.log('Parts received:', parts, 'count:', parts.length);
           this.availableParts = parts;
           this.isSearchingParts = false;
         },
