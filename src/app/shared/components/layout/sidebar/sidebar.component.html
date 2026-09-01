@@ -5,11 +5,6 @@
 
 <!-- Mobile Header (visible only on mobile) -->
 <header class="mobile-header">
-  <button class="mobile-menu-btn" (click)="toggleMobileMenu()">
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-    <span class="hamburger-line"></span>
-  </button>
   <h2 class="mobile-app-title">Smartfix Samana</h2>
   <div class="mobile-header-actions">
     <button class="theme-toggle-btn" (click)="toggleTheme()" [attr.aria-label]="themeService.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
@@ -18,6 +13,17 @@
     <span class="mobile-username">{{ username }}</span>
   </div>
 </header>
+
+<!-- Floating menu button (mobile only, bottom-right for thumb reach) -->
+<button class="mobile-menu-fab"
+        [class.fab-hidden]="isMobileMenuOpen"
+        (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="isMobileMenuOpen"
+        aria-label="Abrir menú">
+  <span class="hamburger-line"></span>
+  <span class="hamburger-line"></span>
+  <span class="hamburger-line"></span>
+</button>
 
 <div [class.sidebar-collapsed]="isSidebarCollapsed">
   <!-- Sidebar -->
