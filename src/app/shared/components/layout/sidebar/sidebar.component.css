@@ -41,30 +41,43 @@
   border-bottom: 1px solid #334155;
 }
 
-.mobile-menu-btn {
-  background: none;
+.mobile-menu-fab {
+  display: none; /* enabled inside the ≤768px media query */
+  position: fixed;
+  right: 1.25rem;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  width: 56px;
+  height: 56px;
   border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22d3ee, var(--accent, #06b6d4));
   color: white;
   cursor: pointer;
-  padding: 0.5rem;
-  display: flex;
+  z-index: 1000;
   flex-direction: column;
-  gap: 4px;
-  width: 40px;
-  height: 40px;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  gap: 5px;
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.35), 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s ease;
 }
 
-.mobile-menu-btn:hover {
-  background: rgba(6, 182, 212, 0.2);
+.mobile-menu-fab:active {
+  transform: scale(0.92);
+}
+
+/* Hidden while the drawer is open: the drawer already has its own ✕ and the
+   tap-outside overlay, and the drawer is full-width below 480px. */
+.mobile-menu-fab.fab-hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.8);
+  pointer-events: none;
 }
 
 .hamburger-line {
-  width: 20px;
-  height: 2px;
+  width: 22px;
+  height: 2.5px;
   background: white;
   border-radius: 1px;
   transition: all 0.3s ease;
@@ -552,6 +565,10 @@
     display: flex;
   }
 
+  .mobile-menu-fab {
+    display: flex;
+  }
+
   /* Hide desktop elements */
   .desktop-only {
     display: none;
@@ -657,6 +674,13 @@
 @media (max-width: 768px) and (orientation: landscape) {
   .sidebar {
     width: 260px;
+  }
+
+  .mobile-menu-fab {
+    width: 48px;
+    height: 48px;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    right: 0.75rem;
   }
 
   .mobile-header {
