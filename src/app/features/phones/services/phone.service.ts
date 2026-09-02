@@ -33,11 +33,14 @@ export class PhoneService {
       responseType: 'text',
     });
   }
-   getPhonesPage(page: number, keyword: string = ''): Observable<any> {
-      const params = new HttpParams()
+   getPhonesPage(page: number, keyword: string = '', size?: number): Observable<any> {
+      let params = new HttpParams()
         .set('page', page.toString())
         .set('keyword', keyword.trim());
-  
+
+      // /phones/search defaults to size=4 server-side, too few for a picker.
+      if (size != null) params = params.set('size', size.toString());
+
       return this.http.get<any>(`${this.phoneUrl}/search`, { params });
     }
 }

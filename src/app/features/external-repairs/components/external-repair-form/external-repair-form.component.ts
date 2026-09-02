@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
   FormControl,
@@ -11,7 +12,9 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { ExternalRepairService } from '../../services/external-repair.service';
 import { PartCatalogService } from '../../../parts/services/parts-catalog.service';
+import { PhoneService } from '../../../phones/services/phone.service';
 import { PartCatalogResponse } from '../../../../shared/models/part-catalog';
+import { Phone } from '../../../../shared/models/phone';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { catchError, debounceTime, distinctUntilChanged, finalize, of, switchMap } from 'rxjs';
 import Swal from 'sweetalert2';
@@ -29,6 +32,9 @@ export class ExternalRepairFormComponent implements OnInit {
   private router = inject(Router);
   private externalRepairService = inject(ExternalRepairService);
   private partCatalogService = inject(PartCatalogService);
+  private phoneService = inject(PhoneService);
+
+  private destroyRef = inject(DestroyRef);
 
   form!: FormGroup;
   repairId!: number;
@@ -43,6 +49,12 @@ export class ExternalRepairFormComponent implements OnInit {
   showPartSelector = false;
   selectedPart: PartCatalogResponse | null = null;
   partQuantity = 1;
+
+  // Phone suggestions for the free-text "Marca / Modelo" field
+  phoneSuggestions: Phone[] = [];
+  isSearchingPhones = false;
+  showPhoneSuggestions = false;
+  private isPhoneFieldFocused = false;
 
   repairStatuses = [
     { value: 'REPARADO', label: 'Reparado' },
@@ -95,6 +107,37 @@ export class ExternalRepairFormComponent implements OnInit {
         }
       });
 
+    // Suggestions only: phoneBrand stays free text, since the partner store sends
+    // devices that are not in our catalog and the Excel import reconciles on the
+    // exact stored string.
+    this.form.get('phoneBrand')!.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((keyword: string) => {
+          const term = (keyword || '').trim();
+          if (term.length < 2) {
+            this.phoneSuggestions = [];
+            this.showPhoneSuggestions = false;
+            return of(null);
+          }
+          this.isSearchingPhones = true;
+          return this.phoneService.getPhonesPage(0, term, 8).pipe(
+            // A failing lookup must never block typing in the field.
+            catchError(() => of(null))
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((data: any) => {
+        this.isSearchingPhones = false;
+        if (data) {
+          this.phoneSuggestions = data.content || [];
+          // A response landing after the user left the field must not reopen it.
+          this.showPhoneSuggestions = this.isPhoneFieldFocused;
+        }
+      });
+
     this.route.paramMap.subscribe((params) => {
       const idParam = params.get('id');
       if (idParam) {
@@ -113,7 +156,6 @@ export class ExternalRepairFormComponent implements OnInit {
         next: (repair) => {
           this.form.patchValue({
             clientName: repair.clientName,
-            phoneBrand: repair.phoneBrand,
             solution: repair.solution,
             repairPrice: repair.repairPrice,
             partCost: repair.partCost || 0,
@@ -123,6 +165,11 @@ export class ExternalRepairFormComponent implements OnInit {
             partCatalogId: repair.partCatalogId ?? null,
             partQuantity: repair.partQuantity ?? null
           });
+
+          // Kept out of the patchValue above: without emitEvent: false, opening an
+          // existing repair fires a search and pops the suggestion list open
+          // before the user has touched anything.
+          this.form.get('phoneBrand')!.setValue(repair.phoneBrand, { emitEvent: false });
 
           // Older records have no inventory part; leave the selector empty for those.
           if (repair.partCatalogId) {
@@ -152,6 +199,31 @@ export class ExternalRepairFormComponent implements OnInit {
           this.showPartSelector = true;
         }
       });
+  }
+
+  selectPhone(phone: Phone): void {
+    // emitEvent: false stops the dropdown from reopening on the value just written.
+    this.form.get('phoneBrand')!.setValue(`${phone.brand} ${phone.model}`, { emitEvent: false });
+    this.showPhoneSuggestions = false;
+    this.phoneSuggestions = [];
+  }
+
+  onPhoneBrandFocus(): void {
+    this.isPhoneFieldFocused = true;
+  }
+
+  /**
+   * Closes the suggestion list on blur without ever clearing the typed text —
+   * the delay lets a mousedown on a suggestion land first.
+   */
+  onPhoneBrandBlur(): void {
+    this.isPhoneFieldFocused = false;
+    setTimeout(() => this.showPhoneSuggestions = false, 200);
+  }
+
+  closePhoneSuggestions(): void {
+    this.showPhoneSuggestions = false;
+    this.phoneSuggestions = [];
   }
 
   togglePartSelector(): void {
