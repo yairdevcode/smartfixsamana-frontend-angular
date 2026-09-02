@@ -13,7 +13,7 @@ export class ExternalRepairService {
 
   constructor(private http: HttpClient) {}
 
-  getPage(page: number, size: number = 20, status?: string, startDate?: string, endDate?: string): Observable<any> {
+  getPage(page: number, size: number = 20, status?: string, startDate?: string, endDate?: string, keyword?: string): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
@@ -21,6 +21,7 @@ export class ExternalRepairService {
     if (status) params = params.set('status', status);
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
+    if (keyword && keyword.trim()) params = params.set('keyword', keyword.trim());
 
     return this.http.get<any>(this.baseUrl, { params });
   }

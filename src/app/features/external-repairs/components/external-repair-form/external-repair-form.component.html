@@ -50,14 +50,45 @@
                 <span class="label-icon">📱</span>
                 Marca / Modelo
               </label>
-              <input
-                id="phoneBrand"
-                type="text"
-                formControlName="phoneBrand"
-                class="form-input"
-                placeholder="Ej: Samsung A54, iPhone 15..."
-                [class.is-invalid]="form.get('phoneBrand')?.invalid && form.get('phoneBrand')?.touched"
-              />
+              <div class="phone-combo">
+                <input
+                  id="phoneBrand"
+                  type="text"
+                  formControlName="phoneBrand"
+                  class="form-input"
+                  placeholder="Ej: Samsung A54, iPhone 15..."
+                  autocomplete="off"
+                  role="combobox"
+                  [attr.aria-expanded]="showPhoneSuggestions"
+                  aria-autocomplete="list"
+                  (focus)="onPhoneBrandFocus()"
+                  (blur)="onPhoneBrandBlur()"
+                  (keydown.escape)="closePhoneSuggestions()"
+                  [class.is-invalid]="form.get('phoneBrand')?.invalid && form.get('phoneBrand')?.touched"
+                />
+
+                @if (showPhoneSuggestions) {
+                  @if (phoneSuggestions.length > 0) {
+                    <div class="phone-suggestions" role="listbox">
+                      @for (phone of phoneSuggestions; track phone.id) {
+                        <div
+                          class="phone-suggestion-item"
+                          role="option"
+                          (mousedown)="selectPhone(phone)">
+                          <span class="suggestion-icon">📱</span>
+                          {{ phone.brand }} {{ phone.model }}
+                        </div>
+                      }
+                    </div>
+                  } @else if (!isSearchingPhones) {
+                    <div class="phone-suggestions">
+                      <div class="phone-suggestions-empty">
+                        Sin coincidencias &mdash; puedes escribirlo manualmente
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
               @if (form.get('phoneBrand')?.invalid && form.get('phoneBrand')?.touched) {
                 <div class="error-message">
                   <span class="error-icon">⚠️</span>

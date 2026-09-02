@@ -145,6 +145,29 @@
   box-shadow: 0 0 0 3px var(--input-focus-shadow);
 }
 
+/* Keyword search: wider than the date fields since it holds names */
+.filter-group-search {
+  flex: 1 1 260px;
+  min-width: 200px;
+}
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-field .search-input {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-primary);
+}
+
+.search-icon {
+  font-size: 0.95rem;
+  opacity: 0.6;
+}
+
 .btn-clear-filters {
   padding: 0.5rem 0.75rem;
   background: var(--btn-delete-bg);
@@ -558,6 +581,11 @@
 
   .filter-select, .filter-input {
     width: 100%;
+  }
+
+  .filter-group-search {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .table-container > .data-table thead { display: none; }

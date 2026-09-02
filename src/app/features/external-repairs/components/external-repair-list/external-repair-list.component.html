@@ -40,6 +40,23 @@
 
   <!-- Filters -->
   <div class="filter-section">
+    <div class="filter-group filter-group-search">
+      <label class="filter-label" for="searchInput">Buscar</label>
+      <div class="search-field">
+        <input
+          id="searchInput"
+          type="text"
+          [formControl]="searchControl"
+          placeholder="Cliente o equipo..."
+          class="filter-input search-input"
+        />
+        @if (isSearching) {
+          <app-spinner size="small" [showMessage]="false"></app-spinner>
+        } @else {
+          <span class="search-icon">🔍</span>
+        }
+      </div>
+    </div>
     <div class="filter-group">
       <label class="filter-label">Estado</label>
       <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="filter-select">
@@ -57,7 +74,7 @@
       <label class="filter-label">Hasta</label>
       <input type="date" [(ngModel)]="endDate" (change)="applyFilters()" class="filter-input" />
     </div>
-    @if (statusFilter || startDate || endDate) {
+    @if (searchControl.value || statusFilter || startDate || endDate) {
       <button class="btn-clear-filters" (click)="clearFilters()">
         Limpiar filtros
       </button>
@@ -157,7 +174,7 @@
   }
 
   <div class="table-container">
-    @if (isLoading) {
+    @if (isLoading && !isSearching) {
       <div class="loading-container">
         <app-spinner
           size="large"

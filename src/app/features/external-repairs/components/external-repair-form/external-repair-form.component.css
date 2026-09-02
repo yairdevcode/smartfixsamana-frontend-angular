@@ -437,6 +437,55 @@
   font-size: 1.2rem;
 }
 
+/* Catalog suggestions over the free-text "Marca / Modelo" input */
+.phone-combo {
+  position: relative;
+}
+
+.phone-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.phone-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background 0.2s ease;
+}
+
+.phone-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.phone-suggestion-item:hover {
+  background: var(--bg-hover);
+}
+
+.suggestion-icon {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.phone-suggestions-empty {
+  padding: 0.65rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 .part-search-container {
   position: relative;
   display: flex;
