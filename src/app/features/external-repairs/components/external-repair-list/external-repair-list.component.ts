@@ -1,8 +1,9 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { ExternalRepairService } from '../../services/external-repair.service';
 import { ExternalRepair, ImportReconciliationResponse } from '../../../../shared/models/external-repair';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -17,6 +18,7 @@ import Swal from 'sweetalert2';
     CommonModule,
     RouterModule,
     FormsModule,
+    ReactiveFormsModule,
     PaginationComponent,
     SpinnerComponent
   ],
@@ -28,11 +30,16 @@ export class ExternalRepairListComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
 
+  private destroyRef = inject(DestroyRef);
+
   repairs: ExternalRepair[] = [];
   isLoading = false;
   isDeleting = false;
+  isSearching = false;
 
   // Filters
+  searchControl = new FormControl('');
+  private lastLoadedKeyword = '';
   statusFilter: string = '';
   startDate: string = '';
   endDate: string = '';
@@ -48,14 +55,43 @@ export class ExternalRepairListComponent implements OnInit {
   importFile: File | null = null;
 
   ngOnInit(): void {
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(400),
+        // Compared against what was actually loaded rather than the previous
+        // emission, so clearFilters() — which resets the control with
+        // emitEvent: false — cannot leave the stream unable to re-run a term.
+        distinctUntilChanged((_prev, curr) => (curr || '').trim() === this.lastLoadedKeyword),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.currentPage = 0;
+        this.isSearching = true;
+        this.loadRepairs();
+      });
+
     this.loadRepairs();
   }
 
+  // The keyword is read here rather than passed in, so pagination, delete and
+  // post-import reloads all keep the active search without extra plumbing.
   loadRepairs(): void {
+    const keyword = (this.searchControl.value || '').trim();
+    this.lastLoadedKeyword = keyword;
     this.isLoading = true;
     this.externalRepairService
-      .getPage(this.currentPage, 20, this.statusFilter || undefined, this.startDate || undefined, this.endDate || undefined)
-      .pipe(finalize(() => this.isLoading = false))
+      .getPage(
+        this.currentPage,
+        20,
+        this.statusFilter || undefined,
+        this.startDate || undefined,
+        this.endDate || undefined,
+        keyword || undefined
+      )
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.isSearching = false;
+      }))
       .subscribe((data: any) => {
         this.repairs = data.content;
         this.totalPages = data.totalPages;
@@ -68,6 +104,9 @@ export class ExternalRepairListComponent implements OnInit {
   }
 
   clearFilters(): void {
+    // emitEvent: false so the valueChanges subscription does not fire a second
+    // load on top of the one below.
+    this.searchControl.setValue('', { emitEvent: false });
     this.statusFilter = '';
     this.startDate = '';
     this.endDate = '';
