@@ -1,3 +1,4 @@
+import { catchError, of } from 'rxjs';
 import { Component, inject } from '@angular/core';
 import { PhoneService } from '../../services/phone.service';
 import { Router, RouterModule } from '@angular/router';
@@ -35,6 +36,7 @@ export class PhoneListComponent {
   private authService = inject(AuthService);
 
   phones: Phone[] = [];
+  loadError = false;
   isLoading = false;
   isSearching = false;
   isDeleting = false;
@@ -42,6 +44,8 @@ export class PhoneListComponent {
   searchControl = new FormControl('');
   currentPage = 0;
   totalPages = 0;
+  totalElements = 0;
+  pageSize = 10;
 
   ngOnInit(): void {
     // Búsqueda reactiva
@@ -52,15 +56,24 @@ export class PhoneListComponent {
         tap(() => {
           this.currentPage = 0;
           this.isSearching = true;
+          this.loadError = false;
         }),
         switchMap((keyword) =>
-          this.phoneService.getPhonesPage(this.currentPage, keyword || '')
-            .pipe(finalize(() => this.isSearching = false))
-        )
+          this.phoneService.getPhonesPage(this.currentPage, keyword || '').pipe(
+            catchError(() => {
+              this.loadError = true;
+              return of(null);
+            }),
+            finalize(() => (this.isSearching = false)),
+          ),
+        ),
       )
       .subscribe((data) => {
+        if (!data) return;
         this.phones = data.content;
         this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+        this.pageSize = data.size || this.pageSize;
       });
 
     // Cargar teléfonos sin filtro al inicio
@@ -70,13 +83,23 @@ export class PhoneListComponent {
   loadPhones(): void {
     const keyword = this.searchControl.value || '';
     this.isLoading = true;
-    
+    this.loadError = false;
+
     this.phoneService
       .getPhonesPage(this.currentPage, keyword)
-      .pipe(finalize(() => this.isLoading = false))
+      .pipe(
+        catchError(() => {
+          this.loadError = true;
+          return of(null);
+        }),
+        finalize(() => (this.isLoading = false)),
+      )
       .subscribe((data) => {
+        if (!data) return;
         this.phones = data.content;
         this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+        this.pageSize = data.size || this.pageSize;
       });
   }
 
@@ -103,8 +126,9 @@ export class PhoneListComponent {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isDeleting = true;
-        this.phoneService.deletePhone(phone.id!)
-          .pipe(finalize(() => this.isDeleting = false))
+        this.phoneService
+          .deletePhone(phone.id!)
+          .pipe(finalize(() => (this.isDeleting = false)))
           .subscribe(() => {
             this.loadPhones();
             Swal.fire({

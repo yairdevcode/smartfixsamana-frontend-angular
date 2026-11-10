@@ -1,10 +1,30 @@
-<div class="form-container">
+<div class="page-header">
+  <button class="btn btn-ghost-secondary btn-sm mb-3" (click)="cancel()">
+    <svg class="icon" aria-hidden="true">
+      <use href="assets/icons/tabler-sprite.svg#arrow-left"></use>
+    </svg>
+    Reparaciones
+  </button>
+  <div class="page-pretitle">TALLER / REPARACIONES</div>
+  <h1 class="page-title">
+    {{ isEditMode ? 'Editar reparación' : 'Nueva reparación' }}
+  </h1>
+  <p class="page-subtitle">
+    {{
+      isEditMode
+        ? 'Actualiza la orden y administra los repuestos utilizados.'
+        : 'Registra el ingreso de un equipo al taller.'
+    }}
+  </p>
+</div>
+<div class="form-layout">
   @if (isLoadingData) {
     <div class="loading-overlay">
       <app-spinner
         size="large"
         message="Cargando datos del formulario..."
-        color="primary">
+        color="primary"
+      >
       </app-spinner>
     </div>
   } @else if (isLoading) {
@@ -12,137 +32,129 @@
       <app-spinner
         size="large"
         message="Cargando datos de la reparación..."
-        color="primary">
+        color="primary"
+      >
       </app-spinner>
     </div>
   } @else {
-    <div class="form-card">
-      <div class="form-header">
-        <div class="form-icon">🛠️</div>
-        <h2 class="form-title">{{ isEditMode ? "Editar Reparación" : "Nueva Reparación" }}</h2>
-        <p class="form-subtitle">{{ isEditMode ? "Actualiza los detalles de la reparación" : "Registra una nueva orden de reparación" }}</p>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">Datos de la reparación</h2>
+          <div class="text-secondary small">
+            Completa la información del cliente, el equipo y la falla.
+          </div>
+        </div>
       </div>
-
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="repair-form">
         <!-- Información del cliente y dispositivo -->
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="section-icon">👤</span>
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#user"></use>
+            </svg>
             Información del Cliente y Dispositivo
           </h3>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="mb-3">
               <app-autocomplete
                 [label]="'Cliente'"
-                [icon]="'👥'"
-                [placeholder]="'Buscar cliente por nombre, apellido o teléfono...'"
+                [initialItem]="selectedCustomer"
+                [placeholder]="
+                  'Buscar cliente por nombre, apellido o teléfono...'
+                "
                 [searchFunction]="searchCustomers"
                 [formatDisplayFn]="formatCustomerDisplay"
                 [disabled]="isSubmitting"
                 [required]="true"
-                (itemSelected)="onCustomerSelected($event)">
+                (itemSelected)="onCustomerSelected($event)"
+              >
               </app-autocomplete>
-              @if (form.get('customerId')?.invalid && form.get('customerId')?.touched) {
+              @if (
+                form.get('customerId')?.invalid &&
+                form.get('customerId')?.touched
+              ) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   El cliente es requerido
                 </div>
               }
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <app-autocomplete
                 [label]="'Dispositivo'"
-                [icon]="'📱'"
+                [initialItem]="selectedPhone"
                 [placeholder]="'Buscar dispositivo por marca o modelo...'"
                 [searchFunction]="searchPhones"
                 [formatDisplayFn]="formatPhoneDisplay"
                 [disabled]="isSubmitting"
                 [required]="true"
-                (itemSelected)="onPhoneSelected($event)">
+                (itemSelected)="onPhoneSelected($event)"
+              >
               </app-autocomplete>
-              @if (form.get('phoneId')?.invalid && form.get('phoneId')?.touched) {
+              @if (
+                form.get('phoneId')?.invalid && form.get('phoneId')?.touched
+              ) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   El dispositivo es requerido
                 </div>
               }
             </div>
           </div>
         </div>
-
-        <!-- Vista previa de la reparación -->
-        @if (getSelectedCustomer() && getSelectedPhone()) {
-          <div class="preview-section">
-            <h3 class="section-title">
-              <span class="section-icon">👁️</span>
-              Vista Previa de la Reparación
-            </h3>
-            <div class="repair-preview">
-              <div class="preview-card">
-                <div class="customer-info">
-                  <div class="preview-icon">👤</div>
-                  <div class="preview-details">
-                    <h4>{{ getSelectedCustomer()?.name }} {{ getSelectedCustomer()?.lastname }}</h4>
-                    <p>Cliente</p>
-                  </div>
-                </div>
-                <div class="arrow">➡️</div>
-                <div class="device-info">
-                  <div class="preview-icon">📱</div>
-                  <div class="preview-details">
-                    <h4>{{ getSelectedPhone()?.brand }} {{ getSelectedPhone()?.model }}</h4>
-                    <p>Dispositivo</p>
-                  </div>
-                </div>
-                @if (getSelectedState()) {
-                  <div class="arrow">➡️</div>
-                  <div class="status-info">
-                    <div class="preview-icon" [style.background-color]="getSelectedState()?.color">📊</div>
-                    <div class="preview-details">
-                      <h4>{{ getSelectedState()?.label }}</h4>
-                      <p>Estado</p>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-        }
-
         <!-- Detalles de la reparación -->
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="section-icon">🔧</span>
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#tools"></use>
+            </svg>
             Detalles de la Reparación
           </h3>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label class="form-label" for="fault">
-              <span class="label-icon">⚠️</span>
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#alert-triangle"></use>
+              </svg>
               Descripción de la Falla
             </label>
             <textarea
               id="fault"
               formControlName="fault"
-              class="form-textarea"
+              class="form-control"
               placeholder="Describe detalladamente el problema del dispositivo..."
               rows="4"
               [disabled]="isSubmitting"
             ></textarea>
             @if (form.get('fault')?.invalid && form.get('fault')?.touched) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 La descripción de la falla es requerida
               </div>
             }
           </div>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="state">
-                <span class="label-icon">📊</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#chart-bar"></use>
+                </svg>
                 Estado
               </label>
               <select
@@ -150,7 +162,8 @@
                 formControlName="state"
                 class="form-select"
                 required
-                [disabled]="isSubmitting">
+                [disabled]="isSubmitting"
+              >
                 <option value="" disabled>Selecciona el estado</option>
                 @for (state of repairStates; track state.value) {
                   <option [value]="state.value">{{ state.label }}</option>
@@ -158,52 +171,70 @@
               </select>
               @if (form.get('state')?.invalid && form.get('state')?.touched) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   El estado es requerido
                 </div>
               }
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="date">
-                <span class="label-icon">📅</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#calendar"></use>
+                </svg>
                 Fecha de Ingreso
               </label>
               <input
                 id="date"
                 type="date"
                 formControlName="date"
-                class="form-input"
+                class="form-control"
                 [max]="todayDate"
                 [disabled]="isSubmitting"
               />
               @if (form.get('date')?.invalid && form.get('date')?.touched) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   La fecha es requerida
                 </div>
               }
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label class="form-label" for="laborCost">
-              <span class="label-icon">💰</span>
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#wallet"></use>
+              </svg>
               Mano de Obra
             </label>
             <input
               id="laborCost"
               type="number"
               formControlName="laborCost"
-              class="form-input"
+              class="form-control"
               min="0"
               step="0.01"
               placeholder="0"
               [disabled]="isSubmitting"
             />
-            @if (form.get('laborCost')?.invalid && form.get('laborCost')?.touched) {
+            @if (
+              form.get('laborCost')?.invalid && form.get('laborCost')?.touched
+            ) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 El costo de mano de obra no puede ser negativo
               </div>
             }
@@ -212,21 +243,27 @@
 
         <!-- Parts Management Section (Edit Mode Only) -->
         @if (isEditMode) {
-          <div class="info-section parts-section">
-            <h3 class="section-title">
-              <span class="section-icon">🔩</span>
+          <div class="form-section parts-section">
+            <h3 class="form-section-title">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#package"></use>
+              </svg>
               Repuestos Utilizados
             </h3>
 
             <!-- Parts List -->
             @if (isLoadingParts) {
               <div class="parts-loading">
-                <app-spinner size="medium" message="Cargando repuestos..." color="primary"></app-spinner>
+                <app-spinner
+                  size="medium"
+                  message="Cargando repuestos..."
+                  color="primary"
+                ></app-spinner>
               </div>
             } @else {
               @if (repairParts.length > 0) {
-                <div class="parts-table-container">
-                  <table class="parts-table">
+                <div class="table-responsive">
+                  <table class="table table-vcenter">
                     <thead>
                       <tr>
                         <th>Repuesto</th>
@@ -249,18 +286,31 @@
                             }
                           </td>
                           <td class="part-qty">{{ part.quantity }}</td>
-                          <td class="part-price">{{ formatPrice(part.priceCharged) }}</td>
-                          <td class="part-subtotal">{{ formatPrice(part.priceCharged * part.quantity) }}</td>
+                          <td class="part-price">
+                            {{ formatPrice(part.priceCharged) }}
+                          </td>
+                          <td class="part-subtotal">
+                            {{ formatPrice(part.priceCharged * part.quantity) }}
+                          </td>
                           <td class="part-actions">
                             <button
                               type="button"
-                              class="btn-remove-part"
+                              class="btn btn-icon btn-ghost-danger"
+                              aria-label="Eliminar repuesto"
                               (click)="removePartFromRepair(part)"
-                              [disabled]="isRemovingPartId === part.id">
+                              [disabled]="isRemovingPartId === part.id"
+                            >
                               @if (isRemovingPartId === part.id) {
-                                <app-spinner size="small" [showMessage]="false"></app-spinner>
+                                <app-spinner
+                                  size="small"
+                                  [showMessage]="false"
+                                ></app-spinner>
                               } @else {
-                                🗑️
+                                <svg class="icon" aria-hidden="true">
+                                  <use
+                                    href="assets/icons/tabler-sprite.svg#trash"
+                                  ></use>
+                                </svg>
                               }
                             </button>
                           </td>
@@ -270,8 +320,13 @@
                   </table>
                 </div>
               } @else {
-                <div class="no-parts">
-                  <span class="no-parts-icon">📦</span>
+                <div class="empty py-4">
+                  <span class="no-parts-icon"
+                    ><svg class="icon" aria-hidden="true">
+                      <use
+                        href="assets/icons/tabler-sprite.svg#package"
+                      ></use></svg
+                  ></span>
                   <p>No hay repuestos agregados a esta reparación</p>
                 </div>
               }
@@ -279,18 +334,33 @@
               <!-- Add Part Button -->
               <button
                 type="button"
-                class="btn-add-part"
+                class="btn btn-outline-primary"
                 (click)="togglePartSelector()"
-                [disabled]="isAddingPart">
-                <span class="btn-icon">{{ showPartSelector ? '✕' : '➕' }}</span>
+                [disabled]="isAddingPart"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    [attr.href]="
+                      'assets/icons/tabler-sprite.svg#' +
+                      (showPartSelector ? 'x' : 'plus')
+                    "
+                  ></use>
+                </svg>
                 {{ showPartSelector ? 'Cancelar' : 'Agregar Repuesto' }}
               </button>
 
               <!-- Part Selector Panel -->
               @if (showPartSelector) {
-                <div class="part-selector-panel">
+                <div
+                  class="part-selector-panel bg-surface-secondary border rounded p-3 mt-3"
+                >
                   <h4 class="selector-title">
-                    <span class="selector-icon">🔍</span>
+                    <span class="selector-icon"
+                      ><svg class="icon" aria-hidden="true">
+                        <use
+                          href="assets/icons/tabler-sprite.svg#search"
+                        ></use></svg
+                    ></span>
                     Buscar Repuesto
                   </h4>
 
@@ -298,11 +368,14 @@
                     <input
                       type="text"
                       [formControl]="partSearchControl"
-                      class="part-search-input"
+                      class="form-control"
                       placeholder="Buscar por repuesto, marca o modelo..."
                     />
                     @if (isSearchingParts) {
-                      <app-spinner size="small" [showMessage]="false"></app-spinner>
+                      <app-spinner
+                        size="small"
+                        [showMessage]="false"
+                      ></app-spinner>
                     }
                   </div>
 
@@ -310,18 +383,37 @@
                   @if (availableParts.length > 0 && !selectedPart) {
                     <div class="search-results">
                       @for (part of availableParts; track part.id) {
-                        <div class="search-result-item" (click)="selectPart(part)">
+                        <div
+                          class="search-result-item"
+                          role="button"
+                          tabindex="0"
+                          (keydown.enter)="selectPart(part)"
+                          (click)="selectPart(part)"
+                        >
                           <div class="result-info">
                             <span class="result-name">{{ part.name }}</span>
                             @if (part.phoneId) {
-                              <span class="result-phone">📱 {{ part.phoneBrand }} {{ part.phoneModel }}</span>
+                              <span class="result-phone"
+                                ><svg class="icon" aria-hidden="true">
+                                  <use
+                                    href="assets/icons/tabler-sprite.svg#smartphone"
+                                  ></use>
+                                </svg>
+                                {{ part.phoneBrand }}
+                                {{ part.phoneModel }}</span
+                              >
                             }
                           </div>
                           <div class="result-meta">
-                            <span class="result-stock" [class.low]="part.isLowStock">
+                            <span
+                              class="result-stock"
+                              [class.low]="part.isLowStock"
+                            >
                               {{ part.quantity }} disp.
                             </span>
-                            <span class="result-price">{{ formatPrice(part.salePrice || 0) }}</span>
+                            <span class="result-price">{{
+                              formatPrice(part.salePrice || 0)
+                            }}</span>
                           </div>
                         </div>
                       }
@@ -332,11 +424,24 @@
                   @if (selectedPart) {
                     <div class="selected-part-form">
                       <div class="selected-part-info">
-                        <span class="selected-part-name">{{ selectedPart.name }}</span>
+                        <span class="selected-part-name">{{
+                          selectedPart.name
+                        }}</span>
                         @if (selectedPart.phoneId) {
-                          <span class="selected-part-phone">📱 {{ selectedPart.phoneBrand }} {{ selectedPart.phoneModel }}</span>
+                          <span class="selected-part-phone"
+                            ><svg class="icon" aria-hidden="true">
+                              <use
+                                href="assets/icons/tabler-sprite.svg#smartphone"
+                              ></use>
+                            </svg>
+                            {{ selectedPart.phoneBrand }}
+                            {{ selectedPart.phoneModel }}</span
+                          >
                         }
-                        <span class="selected-part-stock">Disponible: {{ selectedPart.quantity }} unidades</span>
+                        <span class="selected-part-stock"
+                          >Disponible:
+                          {{ selectedPart.quantity }} unidades</span
+                        >
                       </div>
 
                       <div class="part-form-row">
@@ -345,10 +450,10 @@
                           <input
                             type="number"
                             [(ngModel)]="partQuantity"
-                            [ngModelOptions]="{standalone: true}"
+                            [ngModelOptions]="{ standalone: true }"
                             min="1"
                             [max]="selectedPart.quantity"
-                            class="part-form-input"
+                            class="form-control"
                           />
                         </div>
                         <div class="part-form-group">
@@ -356,10 +461,10 @@
                           <input
                             type="number"
                             [(ngModel)]="partPrice"
-                            [ngModelOptions]="{standalone: true}"
+                            [ngModelOptions]="{ standalone: true }"
                             min="0"
                             step="0.01"
-                            class="part-form-input"
+                            class="form-control"
                           />
                         </div>
                       </div>
@@ -367,19 +472,33 @@
                       <div class="part-form-actions">
                         <button
                           type="button"
-                          class="btn-cancel-part"
-                          (click)="resetPartSelector()">
+                          class="btn btn-outline-secondary"
+                          (click)="resetPartSelector()"
+                        >
                           Cambiar
                         </button>
                         <button
                           type="button"
-                          class="btn-confirm-part"
+                          class="btn btn-primary"
                           (click)="addPartToRepair()"
-                          [disabled]="isAddingPart || partQuantity < 1 || partQuantity > selectedPart.quantity">
+                          [disabled]="
+                            isAddingPart ||
+                            partQuantity < 1 ||
+                            partQuantity > selectedPart.quantity
+                          "
+                        >
                           @if (isAddingPart) {
-                            <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+                            <app-spinner
+                              size="small"
+                              color="white"
+                              [showMessage]="false"
+                            ></app-spinner>
                           } @else {
-                            <span class="btn-icon">✓</span>
+                            <svg class="icon" aria-hidden="true">
+                              <use
+                                href="assets/icons/tabler-sprite.svg#check"
+                              ></use>
+                            </svg>
                           }
                           Agregar
                         </button>
@@ -392,24 +511,32 @@
           </div>
 
           <!-- Cost Summary Section -->
-          <div class="info-section cost-section">
-            <h3 class="section-title">
-              <span class="section-icon">💰</span>
+          <div class="form-section cost-section">
+            <h3 class="form-section-title">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#wallet"></use>
+              </svg>
               Resumen de Costos
             </h3>
 
             <div class="cost-summary">
               <div class="cost-summary-row">
                 <span class="cost-summary-label">Total Repuestos:</span>
-                <span class="cost-summary-value">{{ formatPrice(totalPartsCost) }}</span>
+                <span class="cost-summary-value">{{
+                  formatPrice(totalPartsCost)
+                }}</span>
               </div>
               <div class="cost-summary-row">
                 <span class="cost-summary-label">Mano de Obra:</span>
-                <span class="cost-summary-value">{{ formatPrice(form.get('laborCost')?.value || 0) }}</span>
+                <span class="cost-summary-value">{{
+                  formatPrice(form.get('laborCost')?.value || 0)
+                }}</span>
               </div>
               <div class="cost-summary-row total">
                 <span class="cost-summary-label">TOTAL:</span>
-                <span class="cost-summary-value">{{ formatPrice(totalCost) }}</span>
+                <span class="cost-summary-value">{{
+                  formatPrice(totalCost)
+                }}</span>
               </div>
             </div>
           </div>
@@ -418,22 +545,32 @@
         <div class="form-actions">
           <button
             type="button"
-            class="btn-cancel"
+            class="btn btn-outline-secondary"
             (click)="cancel()"
-            [disabled]="isSubmitting">
-            <span class="btn-icon">❌</span>
+            [disabled]="isSubmitting"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#x"></use>
+            </svg>
             Cancelar
           </button>
           <button
             type="submit"
-            class="btn-submit"
-            [disabled]="form.invalid || isSubmitting || !isFormReady">
+            class="btn btn-primary"
+            [disabled]="form.invalid || isSubmitting || !isFormReady"
+          >
             @if (isSubmitting) {
-              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
-              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+              <app-spinner
+                size="small"
+                color="white"
+                [showMessage]="false"
+              ></app-spinner>
+              {{ isEditMode ? 'Actualizando...' : 'Guardando...' }}
             } @else {
-              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
-              {{ isEditMode ? "Actualizar" : "Guardar" }}
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#device-floppy"></use>
+              </svg>
+              {{ isEditMode ? 'Actualizar' : 'Guardar' }}
             }
           </button>
         </div>

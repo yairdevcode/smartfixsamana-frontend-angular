@@ -1,8 +1,18 @@
-
-<div class="dashboard-layout">
-  <app-sidebar></app-sidebar>
-
-  <main class="main-content">
-    <router-outlet></router-outlet>
+<app-sidebar />
+<div class="app-content">
+  <header class="workspace-header">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item text-secondary">Espacio de trabajo</li>
+      <li class="breadcrumb-item active">Mi taller</li>
+    </ol>
+    <span class="workspace-label"
+      >SmartFix Samaná · Gestión de reparaciones</span
+    >
+  </header>
+  <main id="main-content" class="workspace-body">
+    <router-outlet />
+    <footer class="workspace-footer">
+      <span>SmartFix Samaná</span><span>Tu taller, en orden.</span>
+    </footer>
   </main>
 </div>

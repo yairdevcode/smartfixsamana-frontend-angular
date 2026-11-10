@@ -12,6 +12,10 @@ export class ThemeService {
       const theme = this.themeSignal();
       document.body.classList.remove('theme-dark', 'theme-light');
       document.body.classList.add(theme);
+      document.documentElement.setAttribute(
+        'data-bs-theme',
+        theme === 'theme-dark' ? 'dark' : 'light',
+      );
       localStorage.setItem(this.STORAGE_KEY, theme);
     });
   }
@@ -25,11 +29,13 @@ export class ThemeService {
   }
 
   toggleTheme(): void {
-    this.themeSignal.set(this.themeSignal() === 'theme-dark' ? 'theme-light' : 'theme-dark');
+    this.themeSignal.set(
+      this.themeSignal() === 'theme-dark' ? 'theme-light' : 'theme-dark',
+    );
   }
 
   private getStoredTheme(): Theme {
     const stored = localStorage.getItem(this.STORAGE_KEY);
-    return stored === 'theme-light' ? 'theme-light' : 'theme-dark';
+    return stored === 'theme-dark' ? 'theme-dark' : 'theme-light';
   }
 }

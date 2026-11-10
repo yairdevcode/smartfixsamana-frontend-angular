@@ -1,161 +1,199 @@
-<!-- Mobile Overlay -->
-<div class="mobile-overlay"
-     [class.show]="isMobileMenuOpen"
-     (click)="closeMobileMenu()"></div>
-
-<!-- Mobile Header (visible only on mobile) -->
 <header class="mobile-header">
-  <h2 class="mobile-app-title">Smartfix Samana</h2>
-  <div class="mobile-header-actions">
-    <button class="theme-toggle-btn" (click)="toggleTheme()" [attr.aria-label]="themeService.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
-      {{ themeService.isDark() ? '☀️' : '🌙' }}
-    </button>
-    <span class="mobile-username">{{ username }}</span>
-  </div>
+  <a routerLink="/dashboard" class="brand"
+    ><span class="brand-mark"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#tool"></use></svg></span
+    ><span
+      ><span class="brand-name">SmartFix</span
+      ><span class="brand-place">Samaná</span></span
+    ></a
+  ><button
+    class="btn btn-icon btn-ghost-secondary"
+    (click)="toggleMobileMenu()"
+    aria-label="Abrir navegación"
+    #menuToggle
+    aria-controls="main-navigation"
+    [attr.aria-expanded]="isMobileMenuOpen"
+  >
+    <svg class="icon" aria-hidden="true">
+      <use href="assets/icons/tabler-sprite.svg#menu-2"></use>
+    </svg>
+  </button>
 </header>
-
-<!-- Floating menu button (mobile only, bottom-right for thumb reach) -->
-<button class="mobile-menu-fab"
-        [class.fab-hidden]="isMobileMenuOpen"
-        (click)="toggleMobileMenu()"
-        [attr.aria-expanded]="isMobileMenuOpen"
-        aria-label="Abrir menú">
-  <span class="hamburger-line"></span>
-  <span class="hamburger-line"></span>
-  <span class="hamburger-line"></span>
-</button>
-
-<div [class.sidebar-collapsed]="isSidebarCollapsed">
-  <!-- Sidebar -->
-  <aside class="sidebar"
-         [class.collapsed]="isSidebarCollapsed"
-         [class.mobile-open]="isMobileMenuOpen">
-
-    <!-- Desktop Header -->
-    <div class="sidebar-header desktop-only">
-      <button class="toggle-btn" (click)="toggleSidebar()">☰</button>
-      @if (!isSidebarCollapsed) {
-        <h2 class="app-title">Smartfix Samana</h2>
-        <button class="theme-toggle-btn" (click)="toggleTheme()" [attr.aria-label]="themeService.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
-          {{ themeService.isDark() ? '☀️' : '🌙' }}
-        </button>
-      }
-    </div>
-
-    <!-- Mobile Header Inside Sidebar -->
-    <div class="sidebar-header mobile-only">
-      <div class="mobile-sidebar-header">
-        <h2 class="app-title">Smartfix Samana</h2>
-        <button class="close-mobile-menu" (click)="closeMobileMenu()">✕</button>
-      </div>
-      <div class="mobile-user-profile">
-        <div class="user-avatar">👤</div>
-        <div class="user-details">
-          <span class="user-name">{{ username }}</span>
-          <span class="user-role">{{ admin ? 'Administrador' : 'Usuario' }}</span>
+@if (isMobileMenuOpen) {
+  <button
+    class="sidebar-backdrop"
+    (click)="closeMobileMenu()"
+    aria-label="Cerrar navegación"
+  ></button>
+}
+<aside
+  id="main-navigation"
+  #navigation
+  [attr.role]="isMobile ? 'dialog' : null"
+  [attr.aria-modal]="isMobile && isMobileMenuOpen ? true : null"
+  class="app-sidebar navbar-vertical"
+  [class.mobile-open]="isMobileMenuOpen"
+  [attr.inert]="isMobile && !isMobileMenuOpen ? '' : null"
+  aria-label="Navegación principal"
+>
+  <div class="sidebar-brand">
+    <a class="brand" routerLink="/dashboard" (click)="onMobileLinkClick()"
+      ><span class="brand-mark"
+        ><svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#tool"></use></svg></span
+      ><span
+        ><span class="brand-name">SmartFix</span
+        ><span class="brand-place">Samaná</span></span
+      ></a
+    ><button
+      class="mobile-menu-close btn btn-icon btn-ghost-secondary"
+      (click)="closeMobileMenu()"
+      aria-label="Cerrar navegación"
+    >
+      <svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#x"></use>
+      </svg>
+    </button>
+  </div>
+  <nav class="sidebar-links nav flex-column">
+    <div class="nav-section-label">Taller</div>
+    <a
+      class="nav-link"
+      routerLink="/dashboard"
+      [class.active]="isHomeActive"
+      [attr.aria-current]="isHomeActive ? 'page' : null"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#layout-dashboard"></use></svg
+      ><span>Resumen</span></a
+    ><a
+      class="nav-link"
+      routerLink="/dashboard/repairs"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#tool"></use></svg
+      ><span>Reparaciones</span></a
+    ><a
+      class="nav-link"
+      routerLink="/dashboard/external-repairs"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#building-store"></use></svg
+      ><span>Reparaciones externas</span></a
+    ><a
+      class="nav-link"
+      routerLink="/dashboard/customers"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#users"></use></svg
+      ><span>Clientes</span></a
+    >
+    <div class="nav-section-label">Catálogo e inventario</div>
+    <a
+      class="nav-link"
+      routerLink="/dashboard/phones"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#smartphone"></use></svg
+      ><span>Celulares</span></a
+    ><a
+      class="nav-link"
+      routerLink="/dashboard/parts"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#package"></use></svg
+      ><span>Repuestos</span></a
+    ><a
+      class="nav-link"
+      routerLink="/dashboard/part-types"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#tags"></use></svg
+      ><span>Tipos de repuesto</span></a
+    ><a
+      class="nav-link"
+      routerLink="/dashboard/inventory"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#box"></use></svg
+      ><span>Inventario</span></a
+    >
+    <div class="nav-section-label">Administración</div>
+    <a
+      class="nav-link"
+      routerLink="/dashboard/earnings"
+      routerLinkActive="active"
+      ariaCurrentWhenActive="page"
+      (click)="onMobileLinkClick()"
+      ><svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#wallet"></use></svg
+      ><span>Ganancias</span></a
+    >
+  </nav>
+  <div class="sidebar-bottom">
+    @if (admin) {
+      <button
+        class="btn btn-outline-secondary w-100 mb-3"
+        (click)="onRegister()"
+      >
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#user"></use>
+        </svg>
+        Crear usuario
+      </button>
+    }
+    <div class="user-profile">
+      <span class="avatar avatar-sm">{{
+        username.slice(0, 2).toUpperCase()
+      }}</span>
+      <div>
+        <div class="user-name">{{ username }}</div>
+        <div class="text-secondary small">
+          {{ admin ? 'Administrador' : 'Usuario' }}
         </div>
       </div>
     </div>
-
-    <nav class="sidebar-nav">
-      <a routerLink="dashboard-home"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">📊</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Inicio</span>
-      </a>
-      <a routerLink="customers"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">👥</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Clientes</span>
-      </a>
-      <a routerLink="phones"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">📱</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Celulares</span>
-      </a>
-      <a routerLink="repairs"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">🛠️</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Reparaciones</span>
-      </a>
-      <a routerLink="parts"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">🔩</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Repuestos</span>
-      </a>
-      <a routerLink="part-types"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">🏷️</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Tipos de Repuesto</span>
-      </a>
-      <a routerLink="inventory"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">📦</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Inventario</span>
-      </a>
-      <a routerLink="external-repairs"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">🏪</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Rep. Externas</span>
-      </a>
-      <a routerLink="earnings"
-         routerLinkActive="active-link"
-         (click)="onMobileLinkClick()">
-        <span class="nav-icon">💰</span>
-        <span class="nav-text" [class.d-none]="isSidebarCollapsed && !isMobileMenuOpen">Ganancias</span>
-      </a>
-    </nav>
-
-    <div class="profile-section">
-      <!-- Desktop Profile Section -->
-      <div class="desktop-profile desktop-only">
-        @if (!isSidebarCollapsed) {
-          <p class="profile-username">{{ username }}</p>
-        }
-
-        <button class="profile-btn" (click)="toggleProfileMenu()">
-          <span class="profile-icon">👤</span>
-          <span class="profile-text" [class.d-none]="isSidebarCollapsed">Perfil</span>
-        </button>
-
-        <div class="profile-dropdown" [class.show]="profileMenuOpen">
-          <button class="dropdown-btn logout-btn" (click)="onLogout()">
-            <span class="btn-icon">🔒</span>
-            <span class="btn-text" [class.d-none]="isSidebarCollapsed">Cerrar sesion</span>
-          </button>
-
-          @if (admin) {
-            <button class="dropdown-btn register-btn" (click)="onRegister()">
-              <span class="btn-icon">🧑‍💼</span>
-              <span class="btn-text" [class.d-none]="isSidebarCollapsed">Crear usuarios</span>
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- Mobile Profile Section -->
-      <div class="mobile-profile mobile-only">
-        <div class="mobile-profile-actions">
-          @if (admin) {
-            <button class="mobile-action-btn" (click)="onRegister(); closeMobileMenu()">
-              <span class="btn-icon">🧑‍💼</span>
-              <span class="btn-text">Crear usuarios</span>
-            </button>
-          }
-          <button class="mobile-action-btn logout-btn" (click)="onLogout()">
-            <span class="btn-icon">🔒</span>
-            <span class="btn-text">Cerrar sesion</span>
-          </button>
-        </div>
-      </div>
+    <div class="d-flex gap-2">
+      <button
+        class="btn btn-ghost-secondary flex-fill"
+        (click)="toggleTheme()"
+        [attr.aria-label]="
+          themeService.isDark() ? 'Activar tema claro' : 'Activar tema oscuro'
+        "
+      >
+        <svg class="icon" aria-hidden="true">
+          <use
+            [attr.href]="
+              'assets/icons/tabler-sprite.svg#' +
+              (themeService.isDark() ? 'sun' : 'moon')
+            "
+          ></use></svg
+        >{{ themeService.isDark() ? 'Claro' : 'Oscuro' }}</button
+      ><button
+        class="btn btn-icon btn-ghost-secondary"
+        (click)="onLogout()"
+        aria-label="Cerrar sesión"
+        title="Cerrar sesión"
+      >
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#logout"></use>
+        </svg>
+      </button>
     </div>
-  </aside>
-</div>
+  </div>
+</aside>

@@ -1,3 +1,4 @@
+import { catchError, of } from 'rxjs';
 import { Component, inject, OnInit } from '@angular/core';
 import { Customer } from '../../../../shared/models/customer';
 import { CustomerService } from '../../services/customers.service';
@@ -35,6 +36,7 @@ export class CustomersListComponent implements OnInit {
   private authService = inject(AuthService);
 
   customers: Customer[] = [];
+  loadError = false;
   isLoading = false;
   isSearching = false;
   isDeleting = false;
@@ -42,6 +44,8 @@ export class CustomersListComponent implements OnInit {
   searchControl = new FormControl('');
   currentPage = 0;
   totalPages = 0;
+  totalElements = 0;
+  pageSize = 10;
 
   ngOnInit(): void {
     // Búsqueda reactiva
@@ -52,15 +56,26 @@ export class CustomersListComponent implements OnInit {
         tap(() => {
           this.currentPage = 0;
           this.isSearching = true;
+          this.loadError = false;
         }),
         switchMap((keyword) =>
-          this.customerService.getCustomersPage(this.currentPage, keyword || '')
-            .pipe(finalize(() => this.isSearching = false))
-        )
+          this.customerService
+            .getCustomersPage(this.currentPage, keyword || '')
+            .pipe(
+              catchError(() => {
+                this.loadError = true;
+                return of(null);
+              }),
+              finalize(() => (this.isSearching = false)),
+            ),
+        ),
       )
       .subscribe((data) => {
+        if (!data) return;
         this.customers = data.content;
         this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+        this.pageSize = data.size || this.pageSize;
       });
     // Cargar clientes sin filtro al inicio
     this.loadCustomers();
@@ -69,13 +84,23 @@ export class CustomersListComponent implements OnInit {
   loadCustomers(): void {
     const keyword = this.searchControl.value || '';
     this.isLoading = true;
-    
+    this.loadError = false;
+
     this.customerService
       .getCustomersPage(this.currentPage, keyword)
-      .pipe(finalize(() => this.isLoading = false))
+      .pipe(
+        catchError(() => {
+          this.loadError = true;
+          return of(null);
+        }),
+        finalize(() => (this.isLoading = false)),
+      )
       .subscribe((data) => {
+        if (!data) return;
         this.customers = data.content;
         this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+        this.pageSize = data.size || this.pageSize;
       });
   }
 
@@ -102,8 +127,9 @@ export class CustomersListComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isDeleting = true;
-        this.customerService.deleteCustomer(customer.id!)
-          .pipe(finalize(() => this.isDeleting = false))
+        this.customerService
+          .deleteCustomer(customer.id!)
+          .pipe(finalize(() => (this.isDeleting = false)))
           .subscribe(() => {
             this.loadCustomers();
             Swal.fire({

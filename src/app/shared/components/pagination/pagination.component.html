@@ -1,60 +1,63 @@
 @if (showPagination) {
-  <div class="pagination-container">
-    <!-- Información de resultados y selector de tamaño -->
-    <div class="pagination-info">
+  <nav class="pagination-footer" aria-label="Paginación">
+    <div class="text-secondary small">
       @if (showResultsInfo && totalElements > 0) {
-        <span class="results-info">
-          Mostrando {{ startItem }}-{{ endItem }} de {{ totalElements }} resultados
-        </span>
+        {{ startItem }}–{{ endItem }} de {{ totalElements }} registros
       }
     </div>
-
-    <!-- Controles de paginación -->
-    @if (totalPages > 1) {
-      <div class="pagination">
-        <!-- Botón Primera Página -->
-        <button
-          class="pagination-btn first-page"
-          [disabled]="!hasPreviousPage"
-          (click)="goToFirstPage()"
-          title="Primera página">
-          <span class="btn-icon">⏮️</span>
-        </button>
-
-        <!-- Botón Página Anterior -->
-        <button
-          class="pagination-btn previous-page"
-          [disabled]="!hasPreviousPage"
-          (click)="goToPreviousPage()"
-          title="Página anterior">
-          <span class="btn-icon">◀️</span>
-        </button>
-
-        <!-- Indicador de Página Actual -->
-        <div class="current-page-indicator">
-          <span class="page-info">
-            Página {{ displayPageNumber }} de {{ totalPages }}
-          </span>
-        </div>
-
-        <!-- Botón Página Siguiente -->
-        <button
-          class="pagination-btn next-page"
-          [disabled]="!hasNextPage"
-          (click)="goToNextPage()"
-          title="Página siguiente">
-          <span class="btn-icon">▶️</span>
-        </button>
-
-        <!-- Botón Última Página -->
-        <button
-          class="pagination-btn last-page"
-          [disabled]="!hasNextPage"
-          (click)="goToLastPage()"
-          title="Última página">
-          <span class="btn-icon">⏭️</span>
-        </button>
-      </div>
+    @if (showPageSizeSelector && pageSizeChange.observed) {
+      <label class="d-flex align-items-center gap-2 small text-secondary"
+        >Por página<select
+          class="form-select form-select-sm"
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange(+$event)"
+        >
+          @for (size of pageSizeOptions; track size) {
+            <option [ngValue]="size">{{ size }}</option>
+          }
+        </select></label
+      >
     }
-  </div>
+    <div class="d-flex align-items-center gap-1">
+      <button
+        class="btn btn-icon btn-sm btn-outline-secondary"
+        [disabled]="!hasPreviousPage"
+        (click)="goToFirstPage()"
+        aria-label="Primera página"
+      >
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#chevrons-left"></use>
+        </svg></button
+      ><button
+        class="btn btn-icon btn-sm btn-outline-secondary"
+        [disabled]="!hasPreviousPage"
+        (click)="goToPreviousPage()"
+        aria-label="Página anterior"
+      >
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#chevron-left"></use>
+        </svg></button
+      ><span class="page-position"
+        >Página {{ displayPageNumber }} de {{ totalPages || 1 }}</span
+      ><button
+        class="btn btn-icon btn-sm btn-outline-secondary"
+        [disabled]="!hasNextPage"
+        (click)="goToNextPage()"
+        aria-label="Página siguiente"
+      >
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#chevron-right"></use>
+        </svg></button
+      ><button
+        class="btn btn-icon btn-sm btn-outline-secondary"
+        [disabled]="!hasNextPage"
+        (click)="goToLastPage()"
+        aria-label="Última página"
+      >
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#chevrons-right"></use>
+        </svg>
+      </button>
+    </div>
+  </nav>
 }

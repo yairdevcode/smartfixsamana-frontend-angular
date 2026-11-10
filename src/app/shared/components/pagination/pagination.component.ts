@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './pagination.component.html',
-  styleUrl: './pagination.component.css'
+  styleUrl: './pagination.component.css',
 })
 export class PaginationComponent {
   @Input() currentPage: number = 0;
@@ -68,6 +68,10 @@ export class PaginationComponent {
   get endItem(): number {
     const end = (this.currentPage + 1) * this.pageSize;
     return Math.min(end, this.totalElements);
+  }
+
+  get pageSizeOptions(): number[] {
+    return [...new Set([this.pageSize, 10, 20, 50])].sort((a, b) => a - b);
   }
 
   get showPagination(): boolean {

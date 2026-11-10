@@ -22,6 +22,7 @@ export class InventoryDashboardComponent implements OnInit {
   private router = inject(Router);
 
   lowStockParts: PartCatalogResponse[] = [];
+  loadError = false;
   isLoading = false;
 
   ngOnInit(): void {
@@ -30,6 +31,7 @@ export class InventoryDashboardComponent implements OnInit {
 
   loadLowStockParts(): void {
     this.isLoading = true;
+    this.loadError = false;
     this.partCatalogService.getLowStockParts()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe({
@@ -37,6 +39,7 @@ export class InventoryDashboardComponent implements OnInit {
           this.lowStockParts = parts;
         },
         error: () => {
+          this.loadError = true;
           this.lowStockParts = [];
         }
       });

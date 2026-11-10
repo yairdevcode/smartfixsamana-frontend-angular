@@ -1,119 +1,15 @@
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+:host {
+  display: inline-flex;
 }
-
-.spinner-container.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9999;
-  backdrop-filter: blur(2px);
-}
-
 .spinner-content {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 0.75rem;
 }
-
-.spinner {
-  display: inline-block;
-  position: relative;
-}
-
-.spinner-circle {
-  border-radius: 50%;
-  border-style: solid;
-  animation: spin 1s linear infinite;
-}
-
-/* Tamanos */
-.spinner-small .spinner-circle {
-  width: 20px;
-  height: 20px;
-  border-width: 2px;
-}
-
-.spinner-medium .spinner-circle {
-  width: 32px;
-  height: 32px;
-  border-width: 3px;
-}
-
-.spinner-large .spinner-circle {
-  width: 48px;
-  height: 48px;
-  border-width: 4px;
-}
-
-/* Colores */
-.spinner-primary .spinner-circle {
-  border-color: var(--accent) transparent var(--accent) transparent;
-}
-
-.spinner-secondary .spinner-circle {
-  border-color: var(--text-secondary) transparent var(--text-secondary) transparent;
-}
-
-.spinner-white .spinner-circle {
-  border-color: #ffffff transparent #ffffff transparent;
-}
-
-/* Mensaje */
-.spinner-message {
-  font-size: 14px;
-  color: var(--text-secondary);
-  text-align: center;
-  font-weight: 500;
-}
-
-.overlay .spinner-message {
-  color: #ffffff;
-}
-
-/* Animacion */
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .spinner-container {
-    padding: 15px;
-  }
-
-  .spinner-message {
-    font-size: 12px;
-  }
-}
-
-/* Estados de accesibilidad */
-.spinner:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Variante inline para usar dentro de botones */
-.spinner-inline {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.spinner-inline .spinner-circle {
-  width: 16px;
-  height: 16px;
-  border-width: 2px;
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: var(--tblr-bg-surface);
 }

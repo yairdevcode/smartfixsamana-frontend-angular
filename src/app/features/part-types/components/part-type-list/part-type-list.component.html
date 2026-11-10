@@ -1,54 +1,73 @@
 <div class="part-types-container">
-  <div class="header-section">
-    <h2 class="page-title">
-      <span class="title-icon">🏷️</span>
-      Tipos de Repuesto
-    </h2>
-
-    <div class="header-actions">
-      <div class="search-container">
-        <input
-          type="text"
-          [formControl]="searchControl"
-          placeholder="Buscar tipo..."
-          class="search-input"
-          [disabled]="isLoading"
-        />
-        <span class="search-icon">🔍</span>
+  <div class="page-header">
+    <div class="row align-items-center g-3">
+      <div class="col">
+        <div class="page-pretitle">CATÁLOGO</div>
+        <h1 class="page-title">Tipos de repuesto</h1>
+        <p class="page-subtitle">
+          Organiza los repuestos para encontrarlos con facilidad.
+        </p>
       </div>
-
-      @if (admin) {
-        <button class="btn-primary" (click)="create()">
-          <span class="btn-icon">➕</span>
-          Nuevo Tipo
-        </button>
-      }
+      <div class="col-auto">
+        @if (admin) {
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
+            Nuevo Tipo
+          </button>
+        }
+      </div>
     </div>
   </div>
 
-  <div class="table-container">
+  <div class="card table-responsive">
+    <div class="table-toolbar">
+      <div class="d-flex flex-wrap gap-3 w-100">
+        <div class="search-container">
+          <input
+            type="text"
+            [formControl]="searchControl"
+            placeholder="Buscar tipo..."
+            class="form-control"
+            [disabled]="isLoading"
+          />
+          <span class="search-icon"
+            ><svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#search"></use></svg
+          ></span>
+        </div>
+      </div>
+    </div>
     @if (isLoading) {
       <div class="loading-container">
         <app-spinner
           size="large"
           message="Cargando tipos de repuesto..."
-          color="primary">
+          color="primary"
+        >
         </app-spinner>
       </div>
     } @else if (filteredPartTypes.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">🏷️</div>
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#tags"></use>
+          </svg>
+        </div>
         <h3>No hay tipos de repuesto</h3>
         <p>Comienza agregando tipos de repuesto para organizarte mejor</p>
         @if (admin) {
-          <button class="btn-primary" (click)="create()">
-            <span class="btn-icon">➕</span>
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
             Agregar Tipo
           </button>
         }
       </div>
     } @else {
-      <table class="part-types-table">
+      <table class="table table-vcenter table-hover">
         <thead>
           <tr>
             <th class="th-id">ID</th>
@@ -64,27 +83,47 @@
             <tr>
               <td class="td-id" data-label="ID">{{ partType.id }}</td>
               <td class="td-name" data-label="Nombre">
-                <span class="type-badge">{{ partType.name }}</span>
+                <span class="badge bg-secondary-lt">{{ partType.name }}</span>
               </td>
-              <td class="td-description" data-label="Descripción">{{ partType.description || '-' }}</td>
+              <td class="td-description" data-label="Descripción">
+                {{ partType.description || '-' }}
+              </td>
               @if (admin) {
                 <td class="td-actions" data-label="">
                   <button
-                    class="btn-edit"
+                    class="btn btn-icon btn-ghost-secondary"
+                    aria-label="Editar"
                     (click)="update(partType.id)"
                     [disabled]="isDeleting"
-                    title="Editar">
-                    <span>✏️</span>
+                    title="Editar"
+                  >
+                    <span
+                      ><svg class="icon" aria-hidden="true">
+                        <use
+                          href="assets/icons/tabler-sprite.svg#pencil"
+                        ></use></svg
+                    ></span>
                   </button>
                   <button
-                    class="btn-delete"
+                    class="btn btn-icon btn-ghost-danger"
+                    aria-label="Eliminar"
                     (click)="delete(partType)"
                     [disabled]="isDeleting"
-                    title="Eliminar">
+                    title="Eliminar"
+                  >
                     @if (isDeleting) {
-                      <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+                      <app-spinner
+                        size="small"
+                        color="white"
+                        [showMessage]="false"
+                      ></app-spinner>
                     } @else {
-                      <span>🗑️</span>
+                      <span
+                        ><svg class="icon" aria-hidden="true">
+                          <use
+                            href="assets/icons/tabler-sprite.svg#trash"
+                          ></use></svg
+                      ></span>
                     }
                   </button>
                 </td>
@@ -93,10 +132,6 @@
           }
         </tbody>
       </table>
-
-      <div class="table-footer">
-        <span class="total-count">Total: {{ filteredPartTypes.length }} tipos</span>
-      </div>
     }
   </div>
 </div>

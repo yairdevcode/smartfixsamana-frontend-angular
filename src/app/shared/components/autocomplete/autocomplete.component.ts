@@ -1,7 +1,30 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, forwardRef, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, ReactiveFormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, switchMap, catchError, of, takeUntil } from 'rxjs';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  forwardRef,
+  OnInit,
+  OnDestroy,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
+import {
+  FormControl,
+  ReactiveFormsModule,
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  catchError,
+  of,
+  takeUntil,
+} from 'rxjs';
 
 @Component({
   selector: 'app-autocomplete',
@@ -13,13 +36,20 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, catchError, of,
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => AutocompleteComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
-export class AutocompleteComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class AutocompleteComponent
+  implements ControlValueAccessor, OnInit, OnDestroy, OnChanges
+{
   @Input() placeholder: string = 'Buscar...';
-  @Input() icon: string = '🔍';
+  @Input() icon: string = 'search';
+  @Input() initialItem: any = null;
+  private static nextId = 0;
+  readonly inputId = `autocomplete-${AutocompleteComponent.nextId++}`;
+  activeIndex = -1;
+  searchFailed = false;
   @Input() displayProperty: string = 'name';
   @Input() searchFunction!: (keyword: string) => any;
   @Input() formatDisplayFn!: (item: any) => string;
@@ -39,6 +69,15 @@ export class AutocompleteComponent implements ControlValueAccessor, OnInit, OnDe
   private destroy$ = new Subject<void>();
   private onChange: any = () => {};
   private onTouched: any = () => {};
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['initialItem'] && this.initialItem) {
+      this.selectedItem = this.initialItem;
+      this.searchControl.setValue(this.getDisplayText(this.initialItem), {
+        emitEvent: false,
+      });
+    }
+  }
 
   ngOnInit(): void {
     this.setupSearch();
@@ -63,16 +102,19 @@ export class AutocompleteComponent implements ControlValueAccessor, OnInit, OnDe
           }
 
           this.isSearching = true;
+          this.searchFailed = false;
+          this.activeIndex = -1;
           this.isDropdownOpen = true;
 
           return this.searchFunction(keyword.trim()).pipe(
             catchError((error) => {
               console.error('Search error:', error);
+              this.searchFailed = true;
               return of({ content: [] });
-            })
+            }),
           );
         }),
-        takeUntil(this.destroy$)
+        takeUntil(this.destroy$),
       )
       .subscribe({
         next: (response: any) => {
@@ -87,22 +129,51 @@ export class AutocompleteComponent implements ControlValueAccessor, OnInit, OnDe
             this.searchResults = [];
           }
 
-          this.noResultsFound = this.searchResults.length === 0 &&
-                                this.searchControl.value !== null &&
-                                this.searchControl.value.trim().length > 0;
+          this.noResultsFound =
+            this.searchResults.length === 0 &&
+            this.searchControl.value !== null &&
+            this.searchControl.value.trim().length > 0;
         },
         error: (error) => {
           console.error('Subscription error:', error);
           this.isSearching = false;
           this.searchResults = [];
           this.noResultsFound = true;
-        }
+        },
       });
+  }
+
+  onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.isDropdownOpen = false;
+      return;
+    }
+    if (!this.isDropdownOpen || !this.searchResults.length) return;
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const delta = event.key === 'ArrowDown' ? 1 : -1;
+      this.activeIndex =
+        (this.activeIndex + delta + this.searchResults.length) %
+        this.searchResults.length;
+    } else if (event.key === 'Enter' && this.activeIndex >= 0) {
+      event.preventDefault();
+      this.selectItem(this.searchResults[this.activeIndex]);
+    }
+  }
+
+  onTextInput(): void {
+    if (this.selectedItem) {
+      this.selectedItem = null;
+      this.onChange(null);
+      this.itemSelected.emit(null);
+    }
   }
 
   selectItem(item: any): void {
     this.selectedItem = item;
-    this.searchControl.setValue(this.getDisplayText(item), { emitEvent: false });
+    this.searchControl.setValue(this.getDisplayText(item), {
+      emitEvent: false,
+    });
     this.isDropdownOpen = false;
     this.searchResults = [];
     this.onChange(item.id);
@@ -122,7 +193,10 @@ export class AutocompleteComponent implements ControlValueAccessor, OnInit, OnDe
   }
 
   onInputFocus(): void {
-    if (this.searchControl.value && this.searchControl.value.trim().length > 0) {
+    if (
+      this.searchControl.value &&
+      this.searchControl.value.trim().length > 0
+    ) {
       this.isDropdownOpen = true;
     }
   }
@@ -151,7 +225,9 @@ export class AutocompleteComponent implements ControlValueAccessor, OnInit, OnDe
   // ControlValueAccessor implementation
   writeValue(value: any): void {
     if (value === null || value === undefined) {
-      this.clearSelection();
+      this.selectedItem = null;
+      this.searchControl.setValue('', { emitEvent: false });
+      this.isDropdownOpen = false;
     }
     // Value is just an ID, we can't display it without fetching the full object
     // The parent component should handle loading the full object if needed

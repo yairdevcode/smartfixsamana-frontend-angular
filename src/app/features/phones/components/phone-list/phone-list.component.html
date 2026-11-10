@@ -1,58 +1,95 @@
 <div class="list-container">
-  <div class="header-section">
-    <h2 class="page-title">
-      <span class="title-icon">📱</span>
-      Catálogo de Celulares
-    </h2>
-
-    <div class="header-actions">
-      <div class="search-container">
-        <input
-          type="text"
-          [formControl]="searchControl"
-          placeholder="Buscar marca o modelo..."
-          class="search-input"
-          [disabled]="isLoading"
-        />
-        @if (isSearching) {
-          <app-spinner size="small" [showMessage]="false"></app-spinner>
-        } @else {
-          <span class="search-icon">🔍</span>
+  <div class="page-header">
+    <div class="row align-items-center g-3">
+      <div class="col">
+        <div class="page-pretitle">CATÁLOGO</div>
+        <h1 class="page-title">Celulares</h1>
+        <p class="page-subtitle">
+          Marcas y modelos disponibles para tus órdenes de reparación.
+        </p>
+      </div>
+      <div class="col-auto">
+        @if (admin) {
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
+            Nuevo Celular
+          </button>
         }
       </div>
-
-      @if (admin) {
-        <button class="btn-primary" (click)="create()">
-          <span class="btn-icon">➕</span>
-          Nuevo Celular
-        </button>
-      }
     </div>
   </div>
 
-  <div class="table-container">
-    @if (isLoading) {
+  <div class="card table-responsive">
+    <div class="table-toolbar">
+      <div class="d-flex flex-wrap gap-3 w-100">
+        <div class="search-container">
+          <input
+            type="text"
+            [formControl]="searchControl"
+            placeholder="Buscar marca o modelo..."
+            class="form-control"
+            [disabled]="isLoading"
+          />
+          @if (isSearching) {
+            <app-spinner size="small" [showMessage]="false"></app-spinner>
+          } @else {
+            <span class="search-icon"
+              ><svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#search"></use></svg
+            ></span>
+          }
+        </div>
+      </div>
+    </div>
+    @if (loadError) {
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#alert-circle"></use>
+          </svg>
+        </div>
+        <h3>No se pudo cargar la información</h3>
+        <p class="text-secondary">
+          Comprueba la conexión y vuelve a intentarlo.
+        </p>
+        <button class="btn btn-outline-secondary" (click)="loadPhones()">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#refresh"></use>
+          </svg>
+          Reintentar
+        </button>
+      </div>
+    } @else if (isLoading || isSearching) {
       <div class="loading-container">
         <app-spinner
           size="large"
           message="Cargando celulares..."
-          color="primary">
+          color="primary"
+        >
         </app-spinner>
       </div>
     } @else if (phones.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">📱</div>
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#smartphone"></use>
+          </svg>
+        </div>
         <h3>No hay celulares disponibles</h3>
         <p>Comienza agregando dispositivos al catálogo</p>
         @if (admin) {
-          <button class="btn-primary" (click)="create()">
-            <span class="btn-icon">➕</span>
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
             Agregar Celular
           </button>
         }
       </div>
     } @else {
-      <table class="data-table">
+      <table class="table table-vcenter table-hover">
         <thead>
           <tr>
             <th class="th-id">ID</th>
@@ -69,7 +106,12 @@
               <td class="td-id" data-label="ID">{{ phone.id }}</td>
               <td class="td-brand" data-label="Marca">
                 <div class="brand-info">
-                  <span class="phone-icon">📱</span>
+                  <span class="phone-icon"
+                    ><svg class="icon" aria-hidden="true">
+                      <use
+                        href="assets/icons/tabler-sprite.svg#smartphone"
+                      ></use></svg
+                  ></span>
                   <span class="brand-name">{{ phone.brand }}</span>
                 </div>
               </td>
@@ -78,11 +120,27 @@
               </td>
               @if (admin) {
                 <td class="td-actions" data-label="">
-                  <button class="btn-action btn-edit" (click)="update(phone.id!)" title="Editar" [disabled]="isDeleting">
-                    ✏️
+                  <button
+                    class="btn btn-icon btn-ghost-secondary"
+                    aria-label="Editar"
+                    (click)="update(phone.id!)"
+                    title="Editar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#pencil"></use>
+                    </svg>
                   </button>
-                  <button class="btn-action btn-delete" (click)="delete(phone)" title="Eliminar" [disabled]="isDeleting">
-                    🗑️
+                  <button
+                    class="btn btn-icon btn-ghost-danger"
+                    aria-label="Eliminar"
+                    (click)="delete(phone)"
+                    title="Eliminar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#trash"></use>
+                    </svg>
                   </button>
                 </td>
               }
@@ -90,16 +148,15 @@
           }
         </tbody>
       </table>
-
-      <div class="table-footer">
-        <span class="total-count">Total: {{ phones.length }} celulares</span>
-      </div>
     }
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="totalElements"
+      [pageSize]="pageSize"
+      [showPageSizeSelector]="false"
+      (pageChange)="goToPage($event)"
+    >
+    </app-pagination>
   </div>
-
-  <app-pagination
-    [currentPage]="currentPage"
-    [totalPages]="totalPages"
-    (pageChange)="goToPage($event)">
-  </app-pagination>
 </div>

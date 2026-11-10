@@ -1,19 +1,23 @@
 <div class="list-container">
-  <div class="header-section">
-    <h2 class="page-title">
-      <span class="title-icon">💰</span>
-      Liquidaciones
-    </h2>
+  <div class="page-header sf-page-header">
+    <h2 class="page-title">Liquidaciones</h2>
 
     <div class="header-actions">
-      <a routerLink="/dashboard/external-repairs" class="btn-back">
-        <span class="btn-icon">⬅️</span>
+      <a
+        routerLink="/dashboard/external-repairs"
+        class="btn btn-outline-secondary"
+      >
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#arrow-left"></use>
+        </svg>
         Volver a Reparaciones
       </a>
 
       @if (admin) {
-        <button class="btn-primary" (click)="toggleCreateForm()">
-          <span class="btn-icon">{{ showCreateForm ? '✕' : '➕' }}</span>
+        <button class="btn btn-primary" (click)="toggleCreateForm()">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#plus"></use>
+          </svg>
           {{ showCreateForm ? 'Cancelar' : 'Generar Liquidaci&oacute;n' }}
         </button>
       }
@@ -22,30 +26,51 @@
 
   <!-- Create Settlement Form -->
   @if (showCreateForm) {
-    <div class="create-form-section">
+    <div class="card card-body mb-4">
       <h3 class="create-form-title">
-        <span class="section-icon">📋</span>
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#clipboard-list"></use>
+        </svg>
         Nueva Liquidaci&oacute;n
       </h3>
-      <p class="create-form-hint">Selecciona el rango de fechas para liquidar las reparaciones pendientes.</p>
+      <p class="create-form-hint">
+        Selecciona el rango de fechas para liquidar las reparaciones pendientes.
+      </p>
 
       <div class="create-form-row">
-        <div class="form-group">
-          <label class="form-label">Desde</label>
-          <input type="date" [(ngModel)]="newStartDate" class="form-input" />
+        <div class="mb-3">
+          <label class="form-label" for="field-newStartDate">Desde</label>
+          <input
+            id="field-newStartDate"
+            type="date"
+            [(ngModel)]="newStartDate"
+            class="form-control"
+          />
         </div>
-        <div class="form-group">
-          <label class="form-label">Hasta</label>
-          <input type="date" [(ngModel)]="newEndDate" class="form-input" />
+        <div class="mb-3">
+          <label class="form-label" for="field-newEndDate">Hasta</label>
+          <input
+            id="field-newEndDate"
+            type="date"
+            [(ngModel)]="newEndDate"
+            class="form-control"
+          />
         </div>
         <button
-          class="btn-generate"
+          class="btn btn-primary"
           (click)="createSettlement()"
-          [disabled]="isCreating || !newStartDate || !newEndDate">
+          [disabled]="isCreating || !newStartDate || !newEndDate"
+        >
           @if (isCreating) {
-            <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+            <app-spinner
+              size="small"
+              color="white"
+              [showMessage]="false"
+            ></app-spinner>
           } @else {
-            <span class="btn-icon">✅</span>
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#circle-check"></use>
+            </svg>
           }
           Generar
         </button>
@@ -61,29 +86,44 @@
 
         <div class="reconciliation-summary">
           <div class="summary-card summary-entregadas">
-            <div class="summary-number">{{ importPreview.totalEntregadas }}</div>
+            <div class="summary-number">
+              {{ importPreview.totalEntregadas }}
+            </div>
             <div class="summary-label">Entregadas</div>
-            <div class="summary-hint">No est&aacute;n en el Excel &rarr; ya fueron entregadas</div>
-            @if (importPreview.entregadasNuevas > 0 || importPreview.entregadasPendientesAnteriores > 0) {
+            <div class="summary-hint">
+              No est&aacute;n en el Excel &rarr; ya fueron entregadas
+            </div>
+            @if (
+              importPreview.entregadasNuevas > 0 ||
+              importPreview.entregadasPendientesAnteriores > 0
+            ) {
               <div class="summary-breakdown">
-                {{ importPreview.entregadasNuevas }} nuevas + {{ importPreview.entregadasPendientesAnteriores }} pendientes anteriores
+                {{ importPreview.entregadasNuevas }} nuevas +
+                {{ importPreview.entregadasPendientesAnteriores }} pendientes
+                anteriores
               </div>
             }
           </div>
           <div class="summary-card summary-pendientes">
-            <div class="summary-number">{{ importPreview.totalPendientesRecoger }}</div>
+            <div class="summary-number">
+              {{ importPreview.totalPendientesRecoger }}
+            </div>
             <div class="summary-label">Pendientes de Recoger</div>
-            <div class="summary-hint">A&uacute;n est&aacute;n en el Excel &rarr; cliente no ha recogido</div>
+            <div class="summary-hint">
+              A&uacute;n est&aacute;n en el Excel &rarr; cliente no ha recogido
+            </div>
           </div>
         </div>
 
         @if (importPreview.entregadas.length > 0) {
           <div class="preview-section-block">
             <h4 class="preview-section-title status-entregado-title">
-              Se marcar&aacute;n como ENTREGADO ({{ importPreview.entregadas.length }})
+              Se marcar&aacute;n como ENTREGADO ({{
+                importPreview.entregadas.length
+              }})
             </h4>
-            <div class="import-preview-table-container">
-              <table class="data-table">
+            <div class="table-responsive">
+              <table class="table table-vcenter table-hover">
                 <thead>
                   <tr>
                     <th>Cliente</th>
@@ -98,7 +138,9 @@
                       <td>{{ item.clientName }}</td>
                       <td>{{ item.phoneBrand }}</td>
                       <td>{{ item.solution }}</td>
-                      <td class="td-number">{{ formatPrice(item.repairPrice) }}</td>
+                      <td class="td-number">
+                        {{ formatPrice(item.repairPrice) }}
+                      </td>
                     </tr>
                   }
                 </tbody>
@@ -110,10 +152,12 @@
         @if (importPreview.pendientesRecoger.length > 0) {
           <div class="preview-section-block">
             <h4 class="preview-section-title status-pendiente-title">
-              Se marcar&aacute;n como PENDIENTE_RECOGER ({{ importPreview.pendientesRecoger.length }})
+              Se marcar&aacute;n como PENDIENTE_RECOGER ({{
+                importPreview.pendientesRecoger.length
+              }})
             </h4>
-            <div class="import-preview-table-container">
-              <table class="data-table">
+            <div class="table-responsive">
+              <table class="table table-vcenter table-hover">
                 <thead>
                   <tr>
                     <th>Cliente</th>
@@ -123,12 +167,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (item of importPreview.pendientesRecoger; track item.id) {
+                  @for (
+                    item of importPreview.pendientesRecoger;
+                    track item.id
+                  ) {
                     <tr class="pendiente-recoger">
                       <td>{{ item.clientName }}</td>
                       <td>{{ item.phoneBrand }}</td>
                       <td>{{ item.solution }}</td>
-                      <td class="td-number">{{ formatPrice(item.repairPrice) }}</td>
+                      <td class="td-number">
+                        {{ formatPrice(item.repairPrice) }}
+                      </td>
                     </tr>
                   }
                 </tbody>
@@ -138,10 +187,24 @@
         }
 
         <div class="import-preview-actions">
-          <button class="btn-cancel" (click)="cancelImport()" [disabled]="isImporting">Cancelar</button>
-          <button class="btn-primary" (click)="confirmImport()" [disabled]="isImporting">
+          <button
+            class="btn btn-outline-secondary"
+            (click)="cancelImport()"
+            [disabled]="isImporting"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary"
+            (click)="confirmImport()"
+            [disabled]="isImporting"
+          >
             @if (isImporting) {
-              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
+              <app-spinner
+                size="small"
+                color="white"
+                [showMessage]="false"
+              ></app-spinner>
             }
             Aplicar Cambios
           </button>
@@ -150,23 +213,30 @@
     </div>
   }
 
-  <div class="table-container">
+  <div class="card table-responsive">
     @if (isLoading) {
       <div class="loading-container">
         <app-spinner
           size="large"
           message="Cargando liquidaciones..."
-          color="primary">
+          color="primary"
+        >
         </app-spinner>
       </div>
     } @else if (settlements.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">💰</div>
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#wallet"></use>
+          </svg>
+        </div>
         <h3>No hay liquidaciones</h3>
-        <p>Genera tu primera liquidaci&oacute;n seleccionando un rango de fechas</p>
+        <p>
+          Genera tu primera liquidaci&oacute;n seleccionando un rango de fechas
+        </p>
       </div>
     } @else {
-      <table class="data-table">
+      <table class="table table-vcenter table-hover">
         <thead>
           <tr>
             <th>Per&iacute;odo</th>
@@ -187,25 +257,55 @@
                 <span class="date-separator">→</span>
                 <span class="date-badge">{{ settlement.endDate }}</span>
               </td>
-              <td class="td-count" data-label="Reparaciones">{{ settlement.repairCount }}</td>
-              <td class="td-number" data-label="Total Rep.">{{ formatPrice(settlement.totalRepairPrice) }}</td>
-              <td class="td-number" data-label="Total Repuestos">{{ formatPrice(settlement.totalPartCost) }}</td>
-              <td class="td-number td-mine" data-label="Mi Parte">{{ formatPrice(settlement.totalMyShare) }}</td>
-              <td class="td-number td-store" data-label="Parte Tienda">{{ formatPrice(settlement.totalStoreShare) }}</td>
+              <td class="td-count" data-label="Reparaciones">
+                {{ settlement.repairCount }}
+              </td>
+              <td class="td-number" data-label="Total Rep.">
+                {{ formatPrice(settlement.totalRepairPrice) }}
+              </td>
+              <td class="td-number" data-label="Total Repuestos">
+                {{ formatPrice(settlement.totalPartCost) }}
+              </td>
+              <td class="td-number td-mine" data-label="Mi Parte">
+                {{ formatPrice(settlement.totalMyShare) }}
+              </td>
+              <td class="td-number td-store" data-label="Parte Tienda">
+                {{ formatPrice(settlement.totalStoreShare) }}
+              </td>
               <td class="td-status" data-label="Estado">
-                <span class="status-badge" [ngClass]="'status-' + settlement.status.toLowerCase()">
-                  {{ settlement.status === 'LIQUIDADA' ? 'Liquidada' : 'Abierta' }}
+                <span
+                  class="status-badge"
+                  [ngClass]="'status-' + settlement.status.toLowerCase()"
+                >
+                  {{
+                    settlement.status === 'LIQUIDADA' ? 'Liquidada' : 'Abierta'
+                  }}
                 </span>
               </td>
               <td class="td-actions" data-label="">
-                <button class="btn-action btn-export" (click)="exportSettlement(settlement.id!)" title="Exportar Excel">
-                  📥
+                <button
+                  class="btn btn-icon btn-outline-secondary"
+                  (click)="exportSettlement(settlement.id!)"
+                  title="Exportar Excel"
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use href="assets/icons/tabler-sprite.svg#download"></use>
+                  </svg>
                 </button>
                 @if (admin) {
-                  <label class="btn-action btn-import-label" title="Importar Excel">
-                    📤
-                    <input type="file" accept=".xlsx,.xls"
-                      (change)="onImportFileSelected($event, settlement.id!)" hidden />
+                  <label
+                    class="btn btn-icon btn-outline-secondary"
+                    title="Importar Excel"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#upload"></use>
+                    </svg>
+                    <input
+                      type="file"
+                      accept=".xlsx,.xls"
+                      (change)="onImportFileSelected($event, settlement.id!)"
+                      hidden
+                    />
                   </label>
                 }
               </td>
