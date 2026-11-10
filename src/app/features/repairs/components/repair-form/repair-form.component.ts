@@ -17,16 +17,32 @@ import { PartCatalogService } from '../../../parts/services/parts-catalog.servic
 import { Customer } from '../../../../shared/models/customer';
 import { Phone } from '../../../../shared/models/phone';
 import { PartCatalogResponse } from '../../../../shared/models/part-catalog';
-import { RepairPart, RepairPartRequest } from '../../../../shared/models/repair-part';
+import {
+  RepairPart,
+  RepairPartRequest,
+} from '../../../../shared/models/repair-part';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import { AutocompleteComponent } from '../../../../shared/components/autocomplete/autocomplete.component';
-import { finalize, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
+import {
+  finalize,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  of,
+  catchError,
+} from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-repair-form',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, CommonModule, SpinnerComponent, AutocompleteComponent],
+  imports: [
+    ReactiveFormsModule,
+    FormsModule,
+    CommonModule,
+    SpinnerComponent,
+    AutocompleteComponent,
+  ],
   templateUrl: './repair-form.component.html',
   styleUrl: './repair-form.component.css',
 })
@@ -65,14 +81,13 @@ export class RepairFormComponent implements OnInit {
   partQuantity = 1;
   partPrice: number | null = null;
 
-
   // Estados de reparación disponibles
   repairStates = [
     { value: 'Pendiente', label: 'Pendiente', color: '#f59e0b' },
     { value: 'En Proceso', label: 'En Proceso', color: '#3b82f6' },
     { value: 'Completado', label: 'Completado', color: '#10b981' },
     { value: 'Entregado', label: 'Entregado', color: '#6366f1' },
-    { value: 'Cancelado', label: 'Cancelado', color: '#ef4444' }
+    { value: 'Cancelado', label: 'Cancelado', color: '#ef4444' },
   ];
 
   ngOnInit(): void {
@@ -97,14 +112,21 @@ export class RepairFormComponent implements OnInit {
           }
           this.isSearchingParts = true;
           const phoneId = this.selectedPhone?.id;
-          return this.partCatalogService.searchAvailableParts(keyword, phoneId).pipe(
-            catchError((err) => {
-              console.error('Part search HTTP error:', err.status, err.message, err);
-              this.isSearchingParts = false;
-              return of([]);
-            })
-          );
-        })
+          return this.partCatalogService
+            .searchAvailableParts(keyword, phoneId)
+            .pipe(
+              catchError((err) => {
+                console.error(
+                  'Part search HTTP error:',
+                  err.status,
+                  err.message,
+                  err,
+                );
+                this.isSearchingParts = false;
+                return of([]);
+              }),
+            );
+        }),
       )
       .subscribe({
         next: (parts) => {
@@ -114,7 +136,7 @@ export class RepairFormComponent implements OnInit {
         error: () => {
           this.availableParts = [];
           this.isSearchingParts = false;
-        }
+        },
       });
 
     // Modo edición
@@ -162,8 +184,9 @@ export class RepairFormComponent implements OnInit {
 
   private loadRepairData(): void {
     this.isLoading = true;
-    this.repairService.getRepairById(this.repairId)
-      .pipe(finalize(() => this.isLoading = false))
+    this.repairService
+      .getRepairById(this.repairId)
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (repair) => {
           if (repair) {
@@ -189,9 +212,9 @@ export class RepairFormComponent implements OnInit {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'Error al cargar los datos de la reparación'
+            text: 'Error al cargar los datos de la reparación',
           });
-        }
+        },
       });
   }
 
@@ -199,15 +222,16 @@ export class RepairFormComponent implements OnInit {
     if (!this.repairId) return;
 
     this.isLoadingParts = true;
-    this.repairPartService.getPartsByRepair(this.repairId)
-      .pipe(finalize(() => this.isLoadingParts = false))
+    this.repairPartService
+      .getPartsByRepair(this.repairId)
+      .pipe(finalize(() => (this.isLoadingParts = false)))
       .subscribe({
         next: (parts) => {
           this.repairParts = parts;
         },
         error: (err) => {
           console.error('Error loading repair parts:', err);
-        }
+        },
       });
   }
 
@@ -237,7 +261,11 @@ export class RepairFormComponent implements OnInit {
     if (!this.selectedPart || !this.repairId || this.partQuantity < 1) return;
 
     if (this.partQuantity > this.selectedPart.quantity) {
-      Swal.fire('Error', `Solo hay ${this.selectedPart.quantity} unidades disponibles.`, 'error');
+      Swal.fire(
+        'Error',
+        `Solo hay ${this.selectedPart.quantity} unidades disponibles.`,
+        'error',
+      );
       return;
     }
 
@@ -245,22 +273,28 @@ export class RepairFormComponent implements OnInit {
     const request: RepairPartRequest = {
       partCatalogId: this.selectedPart.id,
       quantity: this.partQuantity,
-      priceCharged: this.partPrice || this.selectedPart.salePrice || 0
+      priceCharged: this.partPrice || this.selectedPart.salePrice || 0,
     };
 
-    this.repairPartService.addPartToRepair(this.repairId, request)
-      .pipe(finalize(() => this.isAddingPart = false))
+    this.repairPartService
+      .addPartToRepair(this.repairId, request)
+      .pipe(finalize(() => (this.isAddingPart = false)))
       .subscribe({
         next: () => {
-          Swal.fire('Agregado', 'El repuesto ha sido agregado a la reparación.', 'success');
+          Swal.fire(
+            'Agregado',
+            'El repuesto ha sido agregado a la reparación.',
+            'success',
+          );
           this.loadRepairParts();
           this.resetPartSelector();
           this.showPartSelector = false;
         },
         error: (err) => {
-          const message = err?.error?.message || 'No se pudo agregar el repuesto.';
+          const message =
+            err?.error?.message || 'No se pudo agregar el repuesto.';
           Swal.fire('Error', message, 'error');
-        }
+        },
       });
   }
 
@@ -273,20 +307,25 @@ export class RepairFormComponent implements OnInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
+      cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
         this.isRemovingPartId = part.id!;
-        this.repairPartService.removePartFromRepair(this.repairId, part.id!)
-          .pipe(finalize(() => this.isRemovingPartId = null))
+        this.repairPartService
+          .removePartFromRepair(this.repairId, part.id!)
+          .pipe(finalize(() => (this.isRemovingPartId = null)))
           .subscribe({
             next: () => {
-              Swal.fire('Eliminado', 'El repuesto ha sido eliminado.', 'success');
+              Swal.fire(
+                'Eliminado',
+                'El repuesto ha sido eliminado.',
+                'success',
+              );
               this.loadRepairParts();
             },
             error: () => {
               Swal.fire('Error', 'No se pudo eliminar el repuesto.', 'error');
-            }
+            },
           });
       }
     });
@@ -294,7 +333,10 @@ export class RepairFormComponent implements OnInit {
 
   // Cost calculations
   get totalPartsCost(): number {
-    return this.repairParts.reduce((sum, part) => sum + (part.priceCharged * part.quantity), 0);
+    return this.repairParts.reduce(
+      (sum, part) => sum + part.priceCharged * part.quantity,
+      0,
+    );
   }
 
   get totalCost(): number {
@@ -304,7 +346,7 @@ export class RepairFormComponent implements OnInit {
   formatPrice(price: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: 'COP'
+      currency: 'COP',
     }).format(price);
   }
 
@@ -317,25 +359,44 @@ export class RepairFormComponent implements OnInit {
     if (this.isEditMode && this.repairId != null) {
       this.repairService
         .updateRepair(this.repairId, repairDto)
-        .pipe(finalize(() => this.isSubmitting = false))
-        .subscribe(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Reparación actualizada',
-            text: 'La reparación se ha actualizado correctamente.',
-          });
-          this.router.navigate(['/dashboard/repairs']);
+        .pipe(finalize(() => (this.isSubmitting = false)))
+        .subscribe({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Reparación actualizada',
+              text: 'La reparación se ha actualizado correctamente.',
+            });
+            this.router.navigate(['/dashboard/repairs']);
+          },
+          error: () => {
+            Swal.fire(
+              'No se pudo guardar',
+              'Revisa los datos e inténtalo nuevamente.',
+              'error',
+            );
+          },
         });
     } else {
-      this.repairService.createRepair(repairDto)
-        .pipe(finalize(() => this.isSubmitting = false))
-        .subscribe(() => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Reparación agregada',
-            text: 'La reparación se ha agregado correctamente.',
-          });
-          this.router.navigate(['/dashboard/repairs']);
+      this.repairService
+        .createRepair(repairDto)
+        .pipe(finalize(() => (this.isSubmitting = false)))
+        .subscribe({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Reparación agregada',
+              text: 'La reparación se ha agregado correctamente.',
+            });
+            this.router.navigate(['/dashboard/repairs']);
+          },
+          error: () => {
+            Swal.fire(
+              'No se pudo guardar',
+              'Revisa los datos e inténtalo nuevamente.',
+              'error',
+            );
+          },
         });
     }
   }

@@ -1,57 +1,81 @@
-<div class="form-container">
+<div class="form-layout">
   @if (isLoading) {
     <div class="loading-overlay">
-      <app-spinner 
-        size="large" 
+      <app-spinner
+        size="large"
         message="Cargando datos del cliente..."
-        color="primary">
+        color="primary"
+      >
       </app-spinner>
     </div>
   } @else {
-    <div class="form-card">
-      <div class="form-header">
-        <div class="form-icon">👥</div>
-        <h2 class="form-title">{{ isEditMode ? "Editar Cliente" : "Nuevo Cliente" }}</h2>
-        <p class="form-subtitle">{{ isEditMode ? "Actualiza la información del cliente" : "Registra un nuevo cliente en el sistema" }}</p>
+    <div class="card">
+      <div class="card-header sf-form-header">
+        <h2 class="card-title">
+          {{ isEditMode ? 'Editar Cliente' : 'Nuevo Cliente' }}
+        </h2>
+        <p class="text-secondary small mb-0">
+          {{
+            isEditMode
+              ? 'Actualiza la información del cliente'
+              : 'Registra un nuevo cliente en el sistema'
+          }}
+        </p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="customer-form">
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">👤</span>
+          <div class="mb-3">
+            <label class="form-label" for="field-name">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#user"></use>
+              </svg>
               Nombre
             </label>
-            <input 
-              type="text" 
-              formControlName="name" 
-              class="form-input"
+            <input
+              id="field-name"
+              type="text"
+              formControlName="name"
+              class="form-control"
               placeholder="Ingresa el nombre"
               [disabled]="isSubmitting"
             />
             @if (form.get('name')?.invalid && form.get('name')?.touched) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 El nombre es requerido
               </div>
             }
           </div>
 
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">👤</span>
+          <div class="mb-3">
+            <label class="form-label" for="field-lastname">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#user"></use>
+              </svg>
               Apellido
             </label>
-            <input 
-              type="text" 
-              formControlName="lastname" 
-              class="form-input"
+            <input
+              id="field-lastname"
+              type="text"
+              formControlName="lastname"
+              class="form-control"
               placeholder="Ingresa el apellido"
               [disabled]="isSubmitting"
             />
-            @if (form.get('lastname')?.invalid && form.get('lastname')?.touched) {
+            @if (
+              form.get('lastname')?.invalid && form.get('lastname')?.touched
+            ) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 El apellido es requerido
               </div>
             }
@@ -59,29 +83,35 @@
         </div>
 
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">📞</span>
+          <div class="mb-3">
+            <label class="form-label" for="field-phone">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#headphones"></use>
+              </svg>
               Teléfono
             </label>
-            <input 
-              type="tel" 
-              formControlName="phone" 
-              class="form-input"
+            <input
+              id="field-phone"
+              type="tel"
+              formControlName="phone"
+              class="form-control"
               placeholder="(809) 555-0123"
               [disabled]="isSubmitting"
             />
           </div>
 
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">✉️</span>
+          <div class="mb-3">
+            <label class="form-label" for="field-email">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#mail"></use>
+              </svg>
               Email
             </label>
-            <input 
-              type="email" 
-              formControlName="email" 
-              class="form-input"
+            <input
+              id="field-email"
+              type="email"
+              formControlName="email"
+              class="form-control"
               placeholder="cliente@ejemplo.com"
               [disabled]="isSubmitting"
             />
@@ -89,24 +119,34 @@
         </div>
 
         <div class="form-actions">
-          <button 
-            type="button" 
-            class="btn-cancel" 
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
             (click)="cancel()"
-            [disabled]="isSubmitting">
-            <span class="btn-icon">❌</span>
+            [disabled]="isSubmitting"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#x"></use>
+            </svg>
             Cancelar
           </button>
-          <button 
-            type="submit" 
-            class="btn-submit" 
-            [disabled]="form.invalid || isSubmitting">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || isSubmitting"
+          >
             @if (isSubmitting) {
-              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
-              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+              <app-spinner
+                size="small"
+                color="white"
+                [showMessage]="false"
+              ></app-spinner>
+              {{ isEditMode ? 'Actualizando...' : 'Guardando...' }}
             } @else {
-              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
-              {{ isEditMode ? "Actualizar" : "Guardar" }}
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#device-floppy"></use>
+              </svg>
+              {{ isEditMode ? 'Actualizar' : 'Guardar' }}
             }
           </button>
         </div>

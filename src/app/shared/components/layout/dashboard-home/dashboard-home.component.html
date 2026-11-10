@@ -1,335 +1,204 @@
-<!-- Contenido principal -->
-<div class="dashboard-container">
-  @if (isLoadingDashboard) {
-    <div class="loading-overlay">
-      <app-spinner 
-        size="large" 
-        message="Cargando dashboard..."
-        color="primary">
-      </app-spinner>
+<div class="page-header">
+  <div class="row align-items-center g-3">
+    <div class="col">
+      <div class="page-pretitle">{{ today | date: "EEEE, d MMMM yyyy" }}</div>
+      <h1 class="page-title">Tu taller, de un vistazo</h1>
+      <p class="page-subtitle">
+        Hola, {{ username }}. Esto es lo que ocurre en SmartFix Samaná.
+      </p>
     </div>
-  } @else {
-    <main class="main-content">
-      <!-- Header del Dashboard -->
-      <div class="dashboard-header">
-        <div class="header-content">
-          <h1 class="dashboard-title">
-            <span class="title-icon">📊</span>
-              SmartFix Samaná
-          </h1>
-          <p class="dashboard-subtitle">Panel de control y estadísticas del sistema</p>
-        </div>
-        <div class="header-date">
-          <span class="date-icon">📅</span>
-          <span>{{ currentDate | date:'fullDate' }}</span>
-        </div>
+    @if (admin) {
+      <div class="col-auto">
+        <a class="btn btn-primary" routerLink="/dashboard/repairs/new"
+          ><svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#plus"></use>
+          </svg>
+          Nueva reparación</a
+        >
       </div>
-
-      <!-- Tarjetas de Resumen General -->
-      <div class="summary-grid">
-        @if (isLoadingStats) {
-          <div class="stats-loading">
-            <app-spinner 
-              size="medium" 
-              message="Cargando estadísticas..."
-              color="primary">
-            </app-spinner>
+    }
+  </div>
+</div>
+@if (isLoading) {
+  <div class="card loading-container">
+    <app-spinner message="Cargando información del taller…" />
+  </div>
+} @else {
+  @if (hasError) {
+    <div
+      class="alert alert-warning d-flex align-items-center gap-2"
+      role="alert"
+    >
+      <svg class="icon" aria-hidden="true">
+        <use href="assets/icons/tabler-sprite.svg#alert-triangle"></use></svg
+      ><span
+        >Parte de la información no está disponible. Los indicadores afectados
+        muestran «Sin datos».</span
+      ><button
+        class="btn btn-sm btn-outline-secondary ms-auto"
+        (click)="loadData()"
+      >
+        Reintentar
+      </button>
+    </div>
+  }
+  <div class="metric-grid">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between gap-2">
+          <div class="metric-label">Reparaciones registradas</div>
+          <span class="metric-icon"
+            ><svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#tool"></use></svg
+          ></span>
+        </div>
+        <div class="metric-value">
+          {{ totalRepairs === null ? "Sin datos" : totalRepairs }}
+        </div>
+        <div class="metric-hint">Todas las órdenes del taller</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between gap-2">
+          <div class="metric-label">Pendientes de revisión</div>
+          <span class="metric-icon"
+            ><svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#clock"></use></svg
+          ></span>
+        </div>
+        <div class="metric-value">
+          {{ pendingCount === null ? "Sin datos" : pendingCount }}
+        </div>
+        <div class="metric-hint">Órdenes con estado pendiente</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between gap-2">
+          <div class="metric-label">Listas para entregar</div>
+          <span class="metric-icon"
+            ><svg class="icon" aria-hidden="true">
+              <use
+                href="assets/icons/tabler-sprite.svg#circle-check"
+              ></use></svg
+          ></span>
+        </div>
+        <div class="metric-value">
+          {{ readyCount === null ? "Sin datos" : readyCount }}
+        </div>
+        <div class="metric-hint">Órdenes completadas</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between gap-2">
+          <div class="metric-label">Repuestos por reabastecer</div>
+          <span class="metric-icon"
+            ><svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#package"></use></svg
+          ></span>
+        </div>
+        <div class="metric-value">
+          {{ lowStockCount === null ? "Sin datos" : lowStockCount }}
+        </div>
+        <div class="metric-hint">Existencias en el mínimo o por debajo</div>
+      </div>
+    </div>
+  </div>
+  <div class="dashboard-columns">
+    <section>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Últimos ingresos</h2>
+            <div class="text-secondary small">
+              Las cinco órdenes con fecha de ingreso más reciente
+            </div>
+          </div>
+          <a
+            class="btn btn-sm btn-ghost-secondary ms-auto"
+            routerLink="/dashboard/repairs"
+            >Ver todas
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#arrow-right"></use></svg
+          ></a>
+        </div>
+        @if (!repairsAvailable) {
+          <div class="empty">
+            <div class="empty-img">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#alert-circle"></use>
+              </svg>
+            </div>
+            <p class="empty-title">Sin datos de reparaciones</p>
+            <p class="empty-subtitle text-secondary">
+              No pudimos consultar las órdenes del taller.
+            </p>
+          </div>
+        } @else if (!recentRepairs.length) {
+          <div class="empty">
+            <div class="empty-img">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#tool"></use>
+              </svg>
+            </div>
+            <p class="empty-title">Tu próxima reparación empieza aquí</p>
+            <p class="empty-subtitle text-secondary">
+              Las nuevas órdenes aparecerán en este resumen.
+            </p>
+            @if (admin) {
+              <div class="empty-action">
+                <a routerLink="/dashboard/repairs/new" class="btn btn-primary"
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="assets/icons/tabler-sprite.svg#plus"></use>
+                  </svg>
+                  Registrar reparación</a
+                >
+              </div>
+            }
           </div>
         } @else {
-          <div class="summary-card customers">
-            <div class="card-header">
-              <div class="card-icon">👥</div>
-              <div class="card-info">
-                <h3>Clientes</h3>
-                <p class="card-count">{{ totalCustomers }}</p>
-              </div>
-            </div>
-            <div class="card-footer">
-              <span class="status-text">Total registrados</span>
-              <span class="trend-indicator positive">↗️ +{{ newCustomersThisMonth }}</span>
-            </div>
-          </div>
-
-          <div class="summary-card phones">
-            <div class="card-header">
-              <div class="card-icon">📱</div>
-              <div class="card-info">
-                <h3>Dispositivos</h3>
-                <p class="card-count">{{ totalPhones }}</p>
-              </div>
-            </div>
-            <div class="card-footer">
-              <span class="status-text">Modelos registrados</span>
-              <span class="trend-indicator neutral">📊 Catálogo</span>
-            </div>
-          </div>
-
-          <div class="summary-card repairs">
-            <div class="card-header">
-              <div class="card-icon">🛠️</div>
-              <div class="card-info">
-                <h3>Reparaciones</h3>
-                <p class="card-count">{{ totalRepairs }}</p>
-              </div>
-            </div>
-            <div class="card-footer">
-              <span class="status-text">Total procesadas</span>
-              <span class="trend-indicator positive">↗️ +{{ repairsThisMonth }}</span>
-            </div>
-          </div>
-
-          <div class="summary-card parts">
-            <div class="card-header">
-              <div class="card-icon">🔩</div>
-              <div class="card-info">
-                <h3>Repuestos</h3>
-                <p class="card-count">{{ totalParts }}</p>
-              </div>
-            </div>
-            <div class="card-footer">
-              <span class="status-text">En inventario</span>
-              <span class="trend-indicator neutral">📦 Stock</span>
-            </div>
-          </div>
-        }
-      </div>
-
-      <!-- Sección de Estadísticas del Mes -->
-      <div class="monthly-stats">
-        <div class="stats-header">
-          <h2 class="stats-title">
-            <span class="stats-icon">📈</span>
-            Resumen del Último Mes
-          </h2>
-          <div class="stats-period">
-            <span class="period-icon">🗓️</span>
-            <span>{{ currentMonth }}</span>
-          </div>
-        </div>
-
-        <div class="stats-grid">
-          <!-- Reparaciones por Estado -->
-          <div class="stat-card repairs-status">
-            <div class="stat-header">
-              <h3>Reparaciones por Estado</h3>
-              <span class="stat-icon">📊</span>
-            </div>
-            <div class="stat-content">
-              @if (isLoadingCharts) {
-                <div class="chart-loading">
-                  <app-spinner 
-                    size="small" 
-                    message="Cargando gráficos..."
-                    color="secondary">
-                  </app-spinner>
-                </div>
-              } @else {
-                <div class="status-item">
-                  <div class="status-indicator pending"></div>
-                  <span class="status-label">Pendientes</span>
-                  <span class="status-count">{{ repairsByStatus.pending || 0 }}</span>
-                </div>
-                <div class="status-item">
-                  <div class="status-indicator in-progress"></div>
-                  <span class="status-label">En Proceso</span>
-                  <span class="status-count">{{ repairsByStatus.inProgress || 0 }}</span>
-                </div>
-                <div class="status-item">
-                  <div class="status-indicator completed"></div>
-                  <span class="status-label">Completadas</span>
-                  <span class="status-count">{{ repairsByStatus.completed || 0 }}</span>
-                </div>
-                <div class="status-item">
-                  <div class="status-indicator delivered"></div>
-                  <span class="status-label">Entregadas</span>
-                  <span class="status-count">{{ repairsByStatus.delivered || 0 }}</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- Dispositivos Más Reparados -->
-          <div class="stat-card popular-devices">
-            <div class="stat-header">
-              <h3>Dispositivos Más Reparados</h3>
-              <span class="stat-icon">🏆</span>
-            </div>
-            <div class="stat-content">
-              @if (isLoadingCharts) {
-                <div class="chart-loading">
-                  <app-spinner 
-                    size="small" 
-                    message="Analizando dispositivos..."
-                    color="secondary">
-                  </app-spinner>
-                </div>
-              } @else {
-                @for (device of topRepairedDevices; track device.id) {
-                  <div class="device-item">
-                    <div class="device-info">
-                      <span class="device-icon">📱</span>
-                      <div class="device-details">
-                        <span class="device-name">{{ device.brand }} {{ device.model }}</span>
-                        <span class="device-count">{{ device.repairCount }} reparaciones</span>
-                      </div>
-                    </div>
-                    <div class="device-progress">
-                      <div class="progress-bar" [style.width.%]="(device.repairCount / maxRepairCount) * 100"></div>
-                    </div>
-                  </div>
-                }
-                @if (topRepairedDevices.length === 0) {
-                  <div class="no-data">
-                    <span class="no-data-icon">📭</span>
-                    <p>No hay datos de reparaciones este mes</p>
-                  </div>
-                }
-              }
-            </div>
-          </div>
-
-          <!-- Métricas de Rendimiento -->
-          <div class="stat-card performance-metrics">
-            <div class="stat-header">
-              <h3>Métricas de Rendimiento</h3>
-              <span class="stat-icon">⚡</span>
-            </div>
-            <div class="stat-content">
-              @if (isLoadingCharts) {
-                <div class="chart-loading">
-                  <app-spinner 
-                    size="small" 
-                    message="Calculando métricas..."
-                    color="secondary">
-                  </app-spinner>
-                </div>
-              } @else {
-                <div class="metric-item">
-                  <div class="metric-icon">⏱️</div>
-                  <div class="metric-info">
-                    <span class="metric-label">Tiempo Promedio</span>
-                    <span class="metric-value">{{ averageRepairTime }} días</span>
-                  </div>
-                </div>
-                <div class="metric-item">
-                  <div class="metric-icon">✅</div>
-                  <div class="metric-info">
-                    <span class="metric-label">Tasa de Éxito</span>
-                    <span class="metric-value">{{ successRate }}%</span>
-                  </div>
-                </div>
-                <div class="metric-item">
-                  <div class="metric-icon">😊</div>
-                  <div class="metric-info">
-                    <span class="metric-label">Satisfacción</span>
-                    <span class="metric-value">{{ customerSatisfaction }}/5</span>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- Actividad Reciente -->
-          <div class="stat-card recent-activity">
-            <div class="stat-header">
-              <h3>Actividad Reciente</h3>
-              <span class="stat-icon">🔔</span>
-            </div>
-            <div class="stat-content">
-              @for (activity of recentActivities; track activity.id) {
-                <div class="activity-item">
-                  <div class="activity-icon" [class]="activity.type">
-                    {{ getActivityIcon(activity.type) }}
-                  </div>
-                  <div class="activity-info">
-                    <span class="activity-text">{{ activity.description }}</span>
-                    <span class="activity-time">{{ activity.timestamp | date:'short':'es' }}</span>
-                  </div>
-                </div>
-              }
-              @if (recentActivities.length === 0) {
-                <div class="no-data">
-                  <span class="no-data-icon">🔕</span>
-                  <p>No hay actividad reciente</p>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Repairs Section -->
-      <div class="recent-repairs-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="section-icon">🔧</span>
-            Reparaciones Recientes
-          </h2>
-          <a href="/dashboard/repairs" class="view-all-link">
-            Ver todas →
-          </a>
-        </div>
-
-        @if (isLoadingCharts) {
-          <div class="loading-container">
-            <app-spinner
-              size="medium"
-              message="Cargando reparaciones..."
-              color="primary">
-            </app-spinner>
-          </div>
-        } @else if (recentRepairs.length === 0) {
-          <div class="no-data">
-            <span class="no-data-icon">📭</span>
-            <p>No hay reparaciones recientes</p>
-          </div>
-        } @else {
-          <div class="table-wrapper">
-            <table class="repairs-table">
+          <div class="table-responsive">
+            <table class="table table-vcenter">
               <thead>
                 <tr>
-                  <th class="th-customer">Cliente</th>
-                  <th class="th-device">Dispositivo</th>
-                  <th class="th-fault">Falla</th>
-                  <th class="th-date">Fecha</th>
-                  <th class="th-status">Estado</th>
-                  <th class="th-actions">Acciones</th>
+                  <th>Equipo y cliente</th>
+                  <th>Ingreso</th>
+                  <th>Estado</th>
                 </tr>
               </thead>
               <tbody>
                 @for (repair of recentRepairs; track repair.id) {
                   <tr>
-                    <td class="td-customer" data-label="Cliente">
-                      <div class="customer-cell">
-                        <span class="customer-avatar">👤</span>
-                        <span class="customer-name">{{ repair.customer.name }} {{ repair.customer.lastname }}</span>
+                    <td>
+                      @if (admin) {
+                        <a
+                          [routerLink]="['/dashboard/repairs/edit', repair.id]"
+                          class="fw-medium text-reset"
+                          >{{ repair.phone.brand }} {{ repair.phone.model }}</a
+                        >
+                      } @else {
+                        <span class="fw-medium"
+                          >{{ repair.phone.brand }}
+                          {{ repair.phone.model }}</span
+                        >
+                      }
+                      <div class="text-secondary small">
+                        {{ repair.customer.name }}
+                        {{ repair.customer.lastname }}
                       </div>
                     </td>
-                    <td class="td-device" data-label="Dispositivo">
-                      <div class="device-cell">
-                        <span class="device-icon">📱</span>
-                        <span class="device-name">{{ repair.phone.brand }} {{ repair.phone.model }}</span>
-                      </div>
+                    <td class="text-secondary text-nowrap">
+                      {{ repair.date | date: "dd MMM yyyy" }}
                     </td>
-                    <td class="td-fault" data-label="Falla">
-                      <span class="fault-text" [title]="repair.fault">{{ repair.fault }}</span>
+                    <td>
+                      <span
+                        class="status-badge"
+                        [ngClass]="statusClass(repair.state)"
+                        >{{ normalizeState(repair.state) }}</span
+                      >
                     </td>
-                    <td class="td-date" data-label="Fecha">
-                      <span class="date-badge">{{ formatDate(repair.date) }}</span>
-                    </td>
-                    <td class="td-status" data-label="Estado">
-                      <span class="status-badge" [style.background-color]="getStateColor(repair.state)">
-                        <span class="state-icon">{{ getStateIcon(repair.state) }}</span>
-                        {{ repair.state }}
-                      </span>
-                    </td>
-                    @if (admin) {
-                    <td class="td-actions" data-label="">
-                      <a [href]="'/dashboard/repairs/edit/' + repair.id" class="btn-view" title="Ver detalles">
-                        👁️
-                      </a>
-                    </td>
-                  }
                   </tr>
                 }
               </tbody>
@@ -337,53 +206,98 @@
           </div>
         }
       </div>
-
-      <!-- Quick Actions Section -->
-
-      @if (admin) {
-      <div class="quick-actions-section">
-        <div class="section-header">
-          <h2 class="section-title">
-            <span class="section-icon">⚡</span>
-            Acciones Rápidas
-          </h2>
-        </div>
-
-        <div class="actions-grid">
-          <a href="/dashboard/repairs/new" class="action-card">
-            <div class="action-icon">🛠️</div>
-            <div class="action-content">
-              <h3>Nueva Reparación</h3>
-              <p>Registrar nueva orden de reparación</p>
+      <div class="card mt-4">
+        <div class="card-body">
+          <h2 class="card-title mb-1">El siguiente paso</h2>
+          <p class="text-secondary small mb-2">
+            Accesos a las tareas de todos los días.
+          </p>
+          <div class="row">
+            <div class="col-md-6">
+              <a class="quick-link" routerLink="/dashboard/customers"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#users"></use>
+                </svg>
+                <div>
+                  <div>Clientes</div>
+                  <div class="text-secondary small">
+                    {{
+                      totalCustomers === null
+                        ? "Sin datos"
+                        : totalCustomers + " registrados"
+                    }}
+                  </div>
+                </div>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#arrow-right"
+                  ></use></svg
+              ></a>
             </div>
-          </a>
-
-          <a href="/dashboard/customers/new" class="action-card">
-            <div class="action-icon">👥</div>
-            <div class="action-content">
-              <h3>Nuevo Cliente</h3>
-              <p>Agregar cliente al sistema</p>
+            <div class="col-md-6">
+              <a class="quick-link" routerLink="/dashboard/inventory"
+                ><svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#package"></use>
+                </svg>
+                <div>
+                  <div>Revisar inventario</div>
+                  <div class="text-secondary small">
+                    Entradas, salidas y existencias
+                  </div>
+                </div>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#arrow-right"
+                  ></use></svg
+              ></a>
             </div>
-          </a>
-
-          <a href="/dashboard/phones/new" class="action-card">
-            <div class="action-icon">📱</div>
-            <div class="action-content">
-              <h3>Nuevo Dispositivo</h3>
-              <p>Registrar modelo de dispositivo</p>
-            </div>
-          </a>
-
-          <a href="/dashboard/parts/new" class="action-card">
-            <div class="action-icon">🔩</div>
-            <div class="action-content">
-              <h3>Nuevo Repuesto</h3>
-              <p>Agregar repuesto al inventario</p>
-            </div>
-          </a>
+          </div>
         </div>
       </div>
-    }
-    </main>
-  }
-</div>
+    </section>
+    <aside>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Estado de las reparaciones</h2>
+        </div>
+        <div class="card-body">
+          @if (!repairsAvailable) {
+            <p class="text-secondary">Sin datos</p>
+          } @else {
+            @for (status of statusCounts; track status.label) {
+              <div class="status-count">
+                <span class="status-badge" [ngClass]="status.className">{{
+                  status.label
+                }}</span
+                ><strong>{{ status.count }}</strong>
+              </div>
+            }
+          }
+          <p class="text-secondary small mt-3 mb-0">
+            Conteos de las órdenes registradas, según su estado actual.
+          </p>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-body">
+          <span class="metric-icon mb-3"
+            ><svg class="icon" aria-hidden="true">
+              <use
+                href="assets/icons/tabler-sprite.svg#clipboard-list"
+              ></use></svg
+          ></span>
+          <h2 class="card-title">Todo conectado</h2>
+          <p class="text-secondary small">
+            Relaciona cada orden con un cliente y un celular del catálogo para
+            conservar su seguimiento.
+          </p>
+          <a routerLink="/dashboard/phones" class="text-primary small"
+            >Ir al catálogo de celulares
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#arrow-right"></use></svg
+          ></a>
+        </div>
+      </div>
+    </aside>
+  </div>
+}

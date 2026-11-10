@@ -1,75 +1,103 @@
 <div class="list-container">
-  <div class="header-section">
-    <h2 class="page-title">
-      <span class="title-icon">📦</span>
-      Catálogo de Repuestos
-    </h2>
-
-    <div class="header-actions">
-      <div class="search-container">
-        <input
-          type="text"
-          [formControl]="searchControl"
-          placeholder="Buscar repuesto..."
-          class="search-input"
-          [disabled]="isLoading"
-        />
-        @if (isSearching) {
-          <app-spinner size="small" [showMessage]="false"></app-spinner>
-        } @else {
-          <span class="search-icon">🔍</span>
-        }
+  <div class="page-header">
+    <div class="row align-items-center g-3">
+      <div class="col">
+        <div class="page-pretitle">CATÁLOGO E INVENTARIO</div>
+        <h1 class="page-title">Repuestos</h1>
+        <p class="page-subtitle">
+          Consulta compatibilidad, existencias y precios en un solo lugar.
+        </p>
       </div>
-
-      <div class="filter-container">
-        <select
-          [formControl]="phoneFilterControl"
-          class="filter-select"
-          [disabled]="isLoading">
-          <option [ngValue]="null">Todos los dispositivos</option>
-          @for (phone of phones; track phone.id) {
-            <option [ngValue]="phone.id">{{ phone.brand }} {{ phone.model }}</option>
-          }
-        </select>
-        @if (phoneFilterControl.value) {
-          <button class="btn-clear-filter" (click)="clearPhoneFilter()" title="Limpiar filtro">
-            ✕
+      <div class="col-auto">
+        @if (admin) {
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
+            Nuevo Repuesto
           </button>
         }
       </div>
-
-      @if (admin) {
-        <button class="btn-primary" (click)="create()">
-          <span class="btn-icon">➕</span>
-          Nuevo Repuesto
-        </button>
-      }
     </div>
   </div>
 
-  <div class="table-container">
+  <div class="card table-responsive">
+    <div class="table-toolbar">
+      <div class="d-flex flex-wrap gap-3 w-100">
+        <div class="search-container">
+          <input
+            type="text"
+            [formControl]="searchControl"
+            placeholder="Buscar repuesto..."
+            class="form-control"
+            [disabled]="isLoading"
+          />
+          @if (isSearching) {
+            <app-spinner size="small" [showMessage]="false"></app-spinner>
+          } @else {
+            <span class="search-icon"
+              ><svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#search"></use></svg
+            ></span>
+          }
+        </div>
+        <div class="filter-container">
+          <select
+            [formControl]="phoneFilterControl"
+            class="form-select"
+            [disabled]="isLoading"
+          >
+            <option [ngValue]="null">Todos los dispositivos</option>
+            @for (phone of phones; track phone.id) {
+              <option [ngValue]="phone.id">
+                {{ phone.brand }} {{ phone.model }}
+              </option>
+            }
+          </select>
+          @if (phoneFilterControl.value) {
+            <button
+              class="btn btn-icon btn-ghost-secondary"
+              aria-label="Editar"
+              (click)="clearPhoneFilter()"
+              title="Limpiar filtro"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#x"></use>
+              </svg>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
     @if (isLoading) {
       <div class="loading-container">
         <app-spinner
           size="large"
           message="Cargando catálogo..."
-          color="primary">
+          color="primary"
+        >
         </app-spinner>
       </div>
     } @else if (partsCatalog.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">📦</div>
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#package"></use>
+          </svg>
+        </div>
         <h3>No hay repuestos en el catálogo</h3>
         <p>Comienza agregando repuestos al inventario</p>
         @if (admin) {
-          <button class="btn-primary" (click)="create()">
-            <span class="btn-icon">➕</span>
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
             Agregar Repuesto
           </button>
         }
       </div>
     } @else {
-      <table class="data-table">
+      <table class="table table-vcenter table-hover">
         <thead>
           <tr>
             <th class="th-id">ID</th>
@@ -88,12 +116,21 @@
         </thead>
         <tbody>
           @for (item of partsCatalog; track item.id) {
-            <tr [class.row-warning]="isLowStock(item)" [class.row-critical]="item.quantity === 0">
+            <tr
+              [class.row-warning]="isLowStock(item)"
+              [class.row-critical]="item.quantity === 0"
+            >
               <td class="td-id" data-label="ID">{{ item.id }}</td>
               <td class="td-type" data-label="Tipo">
-                <span class="type-badge">{{ item.partTypeName || item.name }}</span>
+                <span class="badge bg-secondary-lt">{{
+                  item.partTypeName || item.name
+                }}</span>
               </td>
-              <td class="td-description" data-label="Descripción" [title]="item.description || ''">
+              <td
+                class="td-description"
+                data-label="Descripción"
+                [title]="item.description || ''"
+              >
                 @if (item.description) {
                   {{ item.description }}
                 } @else {
@@ -102,38 +139,69 @@
               </td>
               <td class="td-device" data-label="Dispositivo">
                 @if (item.phoneId) {
-                  <span class="device-badge">📱 {{ item.phoneBrand }} {{ item.phoneModel }}</span>
+                  <span class="device-badge"
+                    ><svg class="icon" aria-hidden="true">
+                      <use
+                        href="assets/icons/tabler-sprite.svg#smartphone"
+                      ></use>
+                    </svg>
+                    {{ item.phoneBrand }} {{ item.phoneModel }}</span
+                  >
                 } @else {
                   <span class="device-universal">Universal</span>
                 }
               </td>
               <td class="td-stock" data-label="Stock">
-                <span class="stock-value" [class.low]="isLowStock(item)" [class.critical]="item.quantity === 0">
+                <span
+                  class="stock-value"
+                  [class.low]="isLowStock(item)"
+                  [class.critical]="item.quantity === 0"
+                >
                   {{ item.quantity }}
                 </span>
               </td>
               @if (admin) {
-              <td class="td-min" data-label="Mín.">{{ item.minStock }}</td>
-              <td class="td-purchase" data-label="P. Compra">{{ formatPrice(item.purchasePrice) }}</td>
-              <td class="td-sale" data-label="P. Venta">{{ formatPrice(item.salePrice) }}</td>
+                <td class="td-min" data-label="Mín.">{{ item.minStock }}</td>
+                <td class="td-purchase" data-label="P. Compra">
+                  {{ formatPrice(item.purchasePrice) }}
+                </td>
+                <td class="td-sale" data-label="P. Venta">
+                  {{ formatPrice(item.salePrice) }}
+                </td>
 
-              <td class="td-status" data-label="Estado">
-                @if (item.quantity === 0) {
-                  <span class="status-badge critical">Sin Stock</span>
-                } @else if (isLowStock(item)) {
-                  <span class="status-badge warning">Stock Bajo</span>
-                } @else {
-                  <span class="status-badge healthy">Disponible</span>
-                }
-              </td>
-            }
+                <td class="td-status" data-label="Estado">
+                  @if (item.quantity === 0) {
+                    <span class="status-badge critical">Sin Stock</span>
+                  } @else if (isLowStock(item)) {
+                    <span class="status-badge warning">Stock Bajo</span>
+                  } @else {
+                    <span class="status-badge healthy">Disponible</span>
+                  }
+                </td>
+              }
               @if (admin) {
                 <td class="td-actions" data-label="">
-                  <button class="btn-action btn-edit" (click)="update(item.id!)" title="Editar" [disabled]="isDeleting">
-                    ✏️
+                  <button
+                    class="btn btn-icon btn-ghost-secondary"
+                    aria-label="Editar"
+                    (click)="update(item.id!)"
+                    title="Editar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#pencil"></use>
+                    </svg>
                   </button>
-                  <button class="btn-action btn-delete" (click)="delete(item)" title="Eliminar" [disabled]="isDeleting">
-                    🗑️
+                  <button
+                    class="btn btn-icon btn-ghost-danger"
+                    aria-label="Eliminar"
+                    (click)="delete(item)"
+                    title="Eliminar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#trash"></use>
+                    </svg>
                   </button>
                 </td>
               }
@@ -141,19 +209,15 @@
           }
         </tbody>
       </table>
-
-      <div class="table-footer">
-        <span class="total-count">Total: {{ totalElements }} repuestos</span>
-      </div>
     }
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="totalElements"
+      [pageSize]="pageSize"
+      (pageChange)="goToPage($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    >
+    </app-pagination>
   </div>
-
-  <app-pagination
-    [currentPage]="currentPage"
-    [totalPages]="totalPages"
-    [totalElements]="totalElements"
-    [pageSize]="pageSize"
-    (pageChange)="goToPage($event)"
-    (pageSizeChange)="onPageSizeChange($event)">
-  </app-pagination>
 </div>

@@ -1,15 +1,16 @@
 <div class="inventory-container">
-  <div class="header-section">
-    <h2 class="page-title">
-      <span class="title-icon">📦</span>
-      Gestión de Inventario
-    </h2>
+  <div class="page-header sf-page-header">
+    <h2 class="page-title">Gestión de Inventario</h2>
   </div>
 
   <!-- Quick Actions -->
   <div class="quick-actions">
     <button class="action-card" (click)="navigateToStockEntry()">
-      <div class="action-icon">📥</div>
+      <div class="action-icon">
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#download"></use>
+        </svg>
+      </div>
       <div class="action-content">
         <h3>Registrar Movimiento</h3>
         <p>Entrada o salida de stock</p>
@@ -18,7 +19,11 @@
     </button>
 
     <button class="action-card" (click)="navigateToMovements()">
-      <div class="action-icon">📋</div>
+      <div class="action-icon">
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#clipboard-list"></use>
+        </svg>
+      </div>
       <div class="action-content">
         <h3>Historial de Movimientos</h3>
         <p>Ver todos los movimientos</p>
@@ -27,7 +32,11 @@
     </button>
 
     <button class="action-card" (click)="navigateToCatalog()">
-      <div class="action-icon">🔩</div>
+      <div class="action-icon">
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#package"></use>
+        </svg>
+      </div>
       <div class="action-content">
         <h3>Catálogo de Repuestos</h3>
         <p>Gestionar items del catálogo</p>
@@ -37,28 +46,52 @@
   </div>
 
   <!-- Low Stock Alerts -->
-  <div class="alerts-section">
-    <div class="section-header">
-      <h3 class="section-title">
-        <span class="section-icon">⚠️</span>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="form-section-title">
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#alert-triangle"></use>
+        </svg>
         Alertas de Stock Bajo
       </h3>
       @if (lowStockParts.length > 0) {
-        <span class="alert-badge">{{ lowStockParts.length }}</span>
+        <span class="badge bg-yellow-lt ms-auto">{{
+          lowStockParts.length
+        }}</span>
       }
     </div>
 
-    @if (isLoading) {
+    @if (loadError) {
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#alert-circle"></use>
+          </svg>
+        </div>
+        <h3>Sin datos de existencias</h3>
+        <p class="text-secondary">
+          No pudimos consultar las alertas de inventario.
+        </p>
+        <button class="btn btn-outline-secondary" (click)="loadLowStockParts()">
+          Reintentar
+        </button>
+      </div>
+    } @else if (isLoading) {
       <div class="loading-container">
         <app-spinner
           size="medium"
           message="Cargando alertas..."
-          color="primary">
+          color="primary"
+        >
         </app-spinner>
       </div>
     } @else if (lowStockParts.length === 0) {
-      <div class="empty-alerts">
-        <div class="empty-icon">✅</div>
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#circle-check"></use>
+          </svg>
+        </div>
         <h4>Sin alertas de stock bajo</h4>
         <p>Todos los repuestos tienen stock suficiente</p>
       </div>
@@ -67,20 +100,27 @@
         @for (part of lowStockParts; track part.id) {
           <div class="alert-card">
             <div class="alert-header">
-              <div class="alert-icon">🔩</div>
+              <div class="alert-icon">
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#package"></use>
+                </svg>
+              </div>
               <div class="alert-info">
-                <h4 class="alert-name">{{ part.name }} {{ part.phoneBrand}} {{ part.phoneModel }}</h4>
+                <h4 class="alert-name">
+                  {{ part.name }} {{ part.phoneBrand }} {{ part.phoneModel }}
+                </h4>
                 <p class="alert-status">Stock crítico</p>
               </div>
             </div>
 
             <div class="stock-indicator">
               <div class="stock-bar">
-                <div class="stock-fill"
-                     [style.width.%]="getStockPercentage(part)"
-                     [class.critical]="part.quantity === 0"
-                     [class.warning]="part.quantity > 0">
-                </div>
+                <div
+                  class="stock-fill"
+                  [style.width.%]="getStockPercentage(part)"
+                  [class.critical]="part.quantity === 0"
+                  [class.warning]="part.quantity > 0"
+                ></div>
               </div>
               <div class="stock-numbers">
                 <span class="current-stock">{{ part.quantity }} </span>
@@ -90,8 +130,10 @@
             </div>
 
             <div class="alert-actions">
-              <button class="btn-restock" (click)="restock(part)">
-                <span class="btn-icon">📥</span>
+              <button class="btn btn-outline-primary" (click)="restock(part)">
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#download"></use>
+                </svg>
                 Reabastecer
               </button>
             </div>

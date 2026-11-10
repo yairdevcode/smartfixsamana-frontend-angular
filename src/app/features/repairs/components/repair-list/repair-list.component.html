@@ -1,105 +1,177 @@
-<div class="list-container">
-  <div class="header-section">
-    <h2 class="page-title">
-      <span class="title-icon">🛠️</span>
-      Gestión de Reparaciones
-    </h2>
-
-    <div class="header-actions">
-      <div class="search-container">
-        <input
-          type="text"
-          [formControl]="searchControl"
-          placeholder="Buscar por celular o cliente..."
-          class="search-input"
-          [disabled]="isLoading"
-        />
-        @if (isSearching) {
-          <app-spinner size="small" [showMessage]="false"></app-spinner>
-        } @else {
-          <span class="search-icon">🔍</span>
-        }
-      </div>
-
-      @if (admin) {
-        <button class="btn-primary" (click)="create()">
-          <span class="btn-icon">➕</span>
-          Nueva Reparación
+<div class="page-header">
+  <div class="row align-items-center g-3">
+    <div class="col">
+      <div class="page-pretitle">TALLER</div>
+      <h1 class="page-title">Reparaciones</h1>
+      <p class="page-subtitle">
+        Gestiona cada equipo, desde el ingreso hasta la entrega.
+      </p>
+    </div>
+    @if (admin) {
+      <div class="col-auto">
+        <button class="btn btn-primary" (click)="create()">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#plus"></use>
+          </svg>
+          Nueva reparación
         </button>
+      </div>
+    }
+  </div>
+</div>
+<div class="card">
+  <div class="table-toolbar">
+    <div class="input-icon">
+      <span class="input-icon-addon"
+        ><svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#search"></use></svg></span
+      ><input
+        class="form-control"
+        [formControl]="searchControl"
+        placeholder="Buscar por cliente o celular…"
+        aria-label="Buscar reparaciones"
+      />
+    </div>
+    <div class="toolbar-count text-secondary small">
+      @if (isSearching) {
+        Buscando…
+      } @else if (!loadError && !isLoading) {
+        {{ totalElements }} registros
       }
     </div>
   </div>
-
-  <div class="table-container">
-    @if (isLoading) {
-      <div class="loading-container">
-        <app-spinner
-          size="large"
-          message="Cargando reparaciones..."
-          color="primary">
-        </app-spinner>
+  @if (loadError) {
+    <div class="empty">
+      <div class="empty-img">
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#alert-circle"></use>
+        </svg>
       </div>
-    } @else if (repairs.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">🔧</div>
-        <h3>No hay reparaciones disponibles</h3>
-        <p>Comienza registrando tu primera reparación</p>
-        @if (admin) {
-          <button class="btn-primary" (click)="create()">
-            <span class="btn-icon">➕</span>
-            Nueva Reparación
+      <p class="empty-title">No pudimos cargar las reparaciones</p>
+      <p class="empty-subtitle text-secondary">
+        Comprueba la conexión con el servidor e inténtalo de nuevo.
+      </p>
+      <div class="empty-action">
+        <button class="btn btn-outline-secondary" (click)="loadRepairs()">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#refresh"></use>
+          </svg>
+          Reintentar
+        </button>
+      </div>
+    </div>
+  } @else if (isLoading || isSearching) {
+    <div class="loading-container">
+      <app-spinner message="Cargando reparaciones…" />
+    </div>
+  } @else if (!repairs.length) {
+    <div class="empty">
+      <div class="empty-img">
+        <svg class="icon" aria-hidden="true">
+          <use href="assets/icons/tabler-sprite.svg#tool"></use>
+        </svg>
+      </div>
+      <p class="empty-title">
+        {{
+          searchControl.value
+            ? 'Sin resultados para esta búsqueda'
+            : 'Todo listo para la primera reparación'
+        }}
+      </p>
+      <p class="empty-subtitle text-secondary">
+        {{
+          searchControl.value
+            ? 'Prueba con otro nombre, marca o modelo.'
+            : 'Registra un cliente y su equipo para comenzar.'
+        }}
+      </p>
+      <div class="empty-action">
+        @if (searchControl.value) {
+          <button
+            class="btn btn-outline-secondary"
+            (click)="searchControl.setValue('')"
+          >
+            Limpiar búsqueda
+          </button>
+        } @else if (admin) {
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
+            Nueva reparación
           </button>
         }
       </div>
-    } @else {
-      <table class="data-table">
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-vcenter table-hover">
         <thead>
           <tr>
-            <th class="th-id">ID</th>
-            <th class="th-customer">Cliente</th>
-            <th class="th-device">Dispositivo</th>
-            <th class="th-fault">Falla</th>
-            <th class="th-date">Fecha</th>
-            <th class="th-status">Estado</th>
+            <th>Orden</th>
+            <th>Cliente</th>
+            <th>Dispositivo</th>
+            <th>Falla reportada</th>
+            <th>Ingreso</th>
+            <th>Estado</th>
             @if (admin) {
-              <th class="th-actions">Acciones</th>
+              <th class="text-end">Acciones</th>
             }
           </tr>
         </thead>
         <tbody>
           @for (repair of repairs; track repair.id) {
             <tr>
-              <td class="td-id" data-label="ID">{{ repair.id }}</td>
-              <td class="td-customer" data-label="Cliente">
-                <div class="customer-info">
-                  <span class="customer-avatar">👤</span>
-                  <span class="customer-name">{{ repair.customer.name }} {{ repair.customer.lastname }}</span>
+              <td class="cell-id">#{{ repair.id }}</td>
+              <td>
+                <div class="fw-medium">
+                  {{ repair.customer.name }} {{ repair.customer.lastname }}
+                </div>
+                <div class="text-secondary small">
+                  {{ repair.customer.phone }}
                 </div>
               </td>
-              <td class="td-device" data-label="Dispositivo">
-                <div class="device-info">
-                  <span class="device-icon">📱</span>
-                  <span class="device-name">{{ repair.phone.brand }} {{ repair.phone.model }}</span>
-                </div>
+              <td>
+                <div class="fw-medium">{{ repair.phone.brand }}</div>
+                <div class="text-secondary small">{{ repair.phone.model }}</div>
               </td>
-              <td class="td-fault" data-label="Falla">
-                <span class="fault-text" [title]="repair.fault">{{ repair.fault }}</span>
+              <td class="cell-fault">
+                <span [title]="repair.fault">{{ repair.fault }}</span>
               </td>
-              <td class="td-date" data-label="Fecha">
-                <span class="date-badge">📅 {{ repair.date | date : "dd/MM/yyyy" }}</span>
+              <td class="text-nowrap text-secondary">
+                {{ repair.date | date: 'dd MMM yyyy' }}
               </td>
-              <td class="td-status" data-label="Estado">
-                <span class="status-badge" [class]="'status-' + repair.state.toLowerCase().replace(' ', '-')">
-                  {{ repair.state }}
-                </span>
+              <td>
+                <span
+                  class="status-badge"
+                  [ngClass]="
+                    'status-' + repair.state.toLowerCase().replace(' ', '-')
+                  "
+                  >{{ repair.state }}</span
+                >
               </td>
               @if (admin) {
-                <td class="td-actions" data-label="">
-                  <button class="btn-action btn-edit" (click)="update(repair.id!)" title="Editar" [disabled]="isDeleting">
-                    ✏️
-                  </button>
-                  <button class="btn-action btn-delete" (click)="delete(repair)" title="Eliminar" [disabled]="isDeleting">
-                    🗑️
+                <td class="table-actions text-end">
+                  <button
+                    class="btn btn-icon btn-ghost-secondary"
+                    (click)="update(repair.id!)"
+                    [attr.aria-label]="'Editar reparación ' + repair.id"
+                    title="Editar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#pencil"></use>
+                    </svg></button
+                  ><button
+                    class="btn btn-icon btn-ghost-danger"
+                    (click)="delete(repair)"
+                    [attr.aria-label]="'Eliminar reparación ' + repair.id"
+                    title="Eliminar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#trash"></use>
+                    </svg>
                   </button>
                 </td>
               }
@@ -107,16 +179,16 @@
           }
         </tbody>
       </table>
-
-      <div class="table-footer">
-        <span class="total-count">Total: {{ repairs.length }} reparaciones</span>
-      </div>
-    }
-  </div>
-
-  <app-pagination
-    [currentPage]="currentPage"
-    [totalPages]="totalPages"
-    (pageChange)="goToPage($event)">
-  </app-pagination>
+    </div>
+  }
+  @if (!loadError) {
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="totalElements"
+      [pageSize]="pageSize"
+      [showPageSizeSelector]="false"
+      (pageChange)="goToPage($event)"
+    />
+  }
 </div>

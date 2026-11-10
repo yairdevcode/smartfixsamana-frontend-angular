@@ -1,38 +1,45 @@
-<div class="form-container">
+<div class="form-layout">
   @if (isLoading) {
     <div class="loading-overlay">
       <app-spinner
         size="large"
         message="Cargando catálogo de repuestos..."
-        color="primary">
+        color="primary"
+      >
       </app-spinner>
     </div>
   } @else {
-    <div class="form-card">
-      <div class="form-header">
-        <div class="form-icon">📥</div>
-        <h2 class="form-title">Registrar Movimiento de Stock</h2>
-        <p class="form-subtitle">Registra entradas o salidas de inventario</p>
+    <div class="card">
+      <div class="card-header sf-form-header">
+        <h2 class="card-title">Registrar Movimiento de Stock</h2>
+        <p class="text-secondary small mb-0">
+          Registra entradas o salidas de inventario
+        </p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="movement-form">
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="section-icon">🔩</span>
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#package"></use>
+            </svg>
             Seleccionar Repuesto
           </h3>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label class="form-label" for="partCatalogId">
-              <span class="label-icon">📦</span>
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#package"></use>
+              </svg>
               Repuesto
             </label>
             <div class="part-dropdown" [class.disabled]="isSubmitting">
               <div
-                class="form-input form-select part-dropdown-trigger"
+                class="form-control form-select part-dropdown-trigger"
                 [class.open]="partDropdownOpen"
-                [class.placeholder]="!form.get('partCatalogId')?.value"
-                (click)="togglePartDropdown()">
+                [class.is-unselected]="!form.get('partCatalogId')?.value"
+                (click)="togglePartDropdown()"
+              >
                 {{ selectedPartLabel }}
               </div>
               @if (partDropdownOpen) {
@@ -41,7 +48,7 @@
                     <input
                       #partSearchInput
                       type="text"
-                      class="form-input part-search-input"
+                      class="form-control"
                       placeholder="Buscar por nombre, tipo o dispositivo..."
                       [(ngModel)]="partSearchTerm"
                       [ngModelOptions]="{ standalone: true }"
@@ -52,13 +59,21 @@
                     @for (part of filteredParts; track part.id) {
                       <div
                         class="part-dropdown-option"
-                        [class.selected]="form.get('partCatalogId')?.value === part.id"
-                        (click)="selectPart(part)">
+                        [class.selected]="
+                          form.get('partCatalogId')?.value === part.id
+                        "
+                        (click)="selectPart(part)"
+                      >
                         <span class="part-option-name">{{ part.name }}</span>
                         @if (part.phoneBrand) {
-                          <span class="part-option-device">{{ part.phoneBrand }} {{ part.phoneModel }}</span>
+                          <span class="part-option-device"
+                            >{{ part.phoneBrand }} {{ part.phoneModel }}</span
+                          >
                         }
-                        <span class="part-option-stock" [class.low]="part.isLowStock">
+                        <span
+                          class="part-option-stock"
+                          [class.low]="part.isLowStock"
+                        >
                           Stock: {{ part.quantity }}
                         </span>
                       </div>
@@ -72,20 +87,29 @@
                 </div>
               }
             </div>
-            @if (form.get('partCatalogId')?.invalid && form.get('partCatalogId')?.touched) {
+            @if (
+              form.get('partCatalogId')?.invalid &&
+              form.get('partCatalogId')?.touched
+            ) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 Debes seleccionar un repuesto
               </div>
             }
           </div>
 
           @if (selectedPart) {
-            <div class="current-stock-info">
+            <div class="alert alert-info">
               <div class="stock-display">
                 <span class="stock-label">Stock Actual:</span>
-                <span class="stock-value"
-                      [class.low]="selectedPart.quantity <= selectedPart.minStock">
+                <span
+                  class="stock-value"
+                  [class.low]="selectedPart.quantity <= selectedPart.minStock"
+                >
                   {{ selectedPart.quantity }}
                 </span>
               </div>
@@ -97,91 +121,125 @@
           }
         </div>
 
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="section-icon">📋</span>
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#clipboard-list"></use>
+            </svg>
             Detalles del Movimiento
           </h3>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="movementType">
-                <span class="label-icon">🔄</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#refresh"></use>
+                </svg>
                 Tipo de Movimiento
               </label>
               <select
                 id="movementType"
                 formControlName="movementType"
                 class="form-select"
-                [disabled]="isSubmitting">
-                <option value="IN">📥 Entrada (IN)</option>
-                <option value="OUT">📤 Salida (OUT)</option>
+                [disabled]="isSubmitting"
+              >
+                <option value="IN">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="assets/icons/tabler-sprite.svg#download"></use>
+                  </svg>
+                  Entrada (IN)
+                </option>
+                <option value="OUT">
+                  <svg class="icon" aria-hidden="true">
+                    <use href="assets/icons/tabler-sprite.svg#upload"></use>
+                  </svg>
+                  Salida (OUT)
+                </option>
               </select>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="quantity">
-                <span class="label-icon">🔢</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#chart-bar"></use>
+                </svg>
                 Cantidad
               </label>
               <input
                 id="quantity"
                 type="number"
                 formControlName="quantity"
-                class="form-input"
+                class="form-control"
                 min="1"
                 [disabled]="isSubmitting"
               />
-              @if (form.get('quantity')?.invalid && form.get('quantity')?.touched) {
+              @if (
+                form.get('quantity')?.invalid && form.get('quantity')?.touched
+              ) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   La cantidad debe ser al menos 1
                 </div>
               }
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label class="form-label" for="reason">
-              <span class="label-icon">📋</span>
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#clipboard-list"></use>
+              </svg>
               Razón del Movimiento
             </label>
             <input
               id="reason"
               type="text"
               formControlName="reason"
-              class="form-input"
+              class="form-control"
               placeholder="Ej: Compra a proveedor, Reparación, Ajuste de inventario..."
               [disabled]="isSubmitting"
             />
             @if (form.get('reason')?.invalid && form.get('reason')?.touched) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 La razón es requerida
               </div>
             }
           </div>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label class="form-label" for="notes">
-              <span class="label-icon">📝</span>
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#clipboard-list"></use>
+              </svg>
               Notas (Opcional)
             </label>
             <textarea
               id="notes"
               formControlName="notes"
-              class="form-textarea"
+              class="form-control"
               rows="3"
               placeholder="Detalles adicionales, proveedor, referencia..."
-              [disabled]="isSubmitting">
+              [disabled]="isSubmitting"
+            >
             </textarea>
           </div>
         </div>
 
         @if (selectedPart) {
-          <div class="preview-section">
-            <h3 class="section-title">
-              <span class="section-icon">👁️</span>
+          <div class="form-section bg-surface-secondary">
+            <h3 class="form-section-title">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#eye"></use>
+              </svg>
               Vista Previa del Resultado
             </h3>
             <div class="stock-preview">
@@ -190,26 +248,34 @@
                 <span class="preview-value">{{ selectedPart.quantity }}</span>
               </div>
               <div class="preview-arrow">
-                {{ form.get('movementType')?.value === 'IN' ? '➕' : '➖' }}
+                {{ form.get('movementType')?.value === 'IN' ? '+' : '−' }}
               </div>
               <div class="preview-item">
                 <span class="preview-label">Cantidad</span>
-                <span class="preview-value">{{ form.get('quantity')?.value }}</span>
+                <span class="preview-value">{{
+                  form.get('quantity')?.value
+                }}</span>
               </div>
               <div class="preview-arrow">=</div>
               <div class="preview-item result">
                 <span class="preview-label">Nuevo Stock</span>
-                <span class="preview-value"
-                      [class.low]="isLowStockAfterMovement()"
-                      [class.healthy]="!isLowStockAfterMovement()">
+                <span
+                  class="preview-value"
+                  [class.low]="isLowStockAfterMovement()"
+                  [class.healthy]="!isLowStockAfterMovement()"
+                >
                   {{ getNewQuantity() }}
                 </span>
               </div>
             </div>
 
             @if (isLowStockAfterMovement()) {
-              <div class="low-stock-warning">
-                <span class="warning-icon">⚠️</span>
+              <div class="alert alert-warning">
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 El nuevo stock estará por debajo del mínimo requerido
               </div>
             }
@@ -217,32 +283,49 @@
         }
 
         @if (admin) {
-        <div class="form-actions">
-          <button
-            type="button"
-            class="btn-cancel"
-            (click)="cancel()"
-            [disabled]="isSubmitting">
-            <span class="btn-icon">❌</span>
-            Cancelar
-          </button>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="cancel()"
+              [disabled]="isSubmitting"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#x"></use>
+              </svg>
+              Cancelar
+            </button>
 
-          <button
-            type="submit"
-            class="btn-submit"
-            [class.btn-in]="form.get('movementType')?.value === 'IN'"
-            [class.btn-out]="form.get('movementType')?.value === 'OUT'"
-            [disabled]="form.invalid || isSubmitting">
-            @if (isSubmitting) {
-              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
-              Registrando...
-            } @else {
-              <span class="btn-icon">{{ form.get('movementType')?.value === 'IN' ? '📥' : '📤' }}</span>
-              Registrar {{ form.get('movementType')?.value === 'IN' ? 'Entrada' : 'Salida' }}
-            }
-          </button>
-        </div>
-      }
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [class.btn-in]="form.get('movementType')?.value === 'IN'"
+              [class.btn-out]="form.get('movementType')?.value === 'OUT'"
+              [disabled]="form.invalid || isSubmitting"
+            >
+              @if (isSubmitting) {
+                <app-spinner
+                  size="small"
+                  color="white"
+                  [showMessage]="false"
+                ></app-spinner>
+                Registrando...
+              } @else {
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#device-floppy"
+                  ></use>
+                </svg>
+                Registrar
+                {{
+                  form.get('movementType')?.value === 'IN'
+                    ? 'Entrada'
+                    : 'Salida'
+                }}
+              }
+            </button>
+          </div>
+        }
       </form>
     </div>
   }

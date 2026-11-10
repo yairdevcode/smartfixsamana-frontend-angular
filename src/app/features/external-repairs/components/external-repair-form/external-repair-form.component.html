@@ -1,53 +1,81 @@
-<div class="form-container">
+<div class="form-layout">
   @if (isLoading) {
     <div class="loading-overlay">
       <app-spinner
         size="large"
         message="Cargando datos de la reparaci&oacute;n..."
-        color="primary">
+        color="primary"
+      >
       </app-spinner>
     </div>
   } @else {
-    <div class="form-card">
-      <div class="form-header">
-        <div class="form-icon">🏪</div>
-        <h2 class="form-title">{{ isEditMode ? "Editar Reparaci&oacute;n Externa" : "Nueva Reparaci&oacute;n Externa" }}</h2>
-        <p class="form-subtitle">{{ isEditMode ? "Actualiza los detalles de la reparaci&oacute;n" : "Registra una nueva reparaci&oacute;n externa" }}</p>
+    <div class="card">
+      <div class="card-header sf-form-header">
+        <h2 class="card-title">
+          {{
+            isEditMode
+              ? 'Editar Reparaci&oacute;n Externa'
+              : 'Nueva Reparaci&oacute;n Externa'
+          }}
+        </h2>
+        <p class="text-secondary small mb-0">
+          {{
+            isEditMode
+              ? 'Actualiza los detalles de la reparaci&oacute;n'
+              : 'Registra una nueva reparaci&oacute;n externa'
+          }}
+        </p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="repair-form">
         <!-- Client and Phone Info -->
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="section-icon">👤</span>
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#user"></use>
+            </svg>
             Informaci&oacute;n del Cliente
           </h3>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="clientName">
-                <span class="label-icon">👤</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#user"></use>
+                </svg>
                 Nombre del Cliente
               </label>
               <input
                 id="clientName"
                 type="text"
                 formControlName="clientName"
-                class="form-input"
+                class="form-control"
                 placeholder="Nombre del cliente..."
-                [class.is-invalid]="form.get('clientName')?.invalid && form.get('clientName')?.touched"
+                [class.is-invalid]="
+                  form.get('clientName')?.invalid &&
+                  form.get('clientName')?.touched
+                "
               />
-              @if (form.get('clientName')?.invalid && form.get('clientName')?.touched) {
+              @if (
+                form.get('clientName')?.invalid &&
+                form.get('clientName')?.touched
+              ) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   El nombre del cliente es requerido
                 </div>
               }
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="phoneBrand">
-                <span class="label-icon">📱</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#smartphone"></use>
+                </svg>
                 Marca / Modelo
               </label>
               <div class="phone-combo">
@@ -55,7 +83,7 @@
                   id="phoneBrand"
                   type="text"
                   formControlName="phoneBrand"
-                  class="form-input"
+                  class="form-control"
                   placeholder="Ej: Samsung A54, iPhone 15..."
                   autocomplete="off"
                   role="combobox"
@@ -64,7 +92,10 @@
                   (focus)="onPhoneBrandFocus()"
                   (blur)="onPhoneBrandBlur()"
                   (keydown.escape)="closePhoneSuggestions()"
-                  [class.is-invalid]="form.get('phoneBrand')?.invalid && form.get('phoneBrand')?.touched"
+                  [class.is-invalid]="
+                    form.get('phoneBrand')?.invalid &&
+                    form.get('phoneBrand')?.touched
+                  "
                 />
 
                 @if (showPhoneSuggestions) {
@@ -74,8 +105,14 @@
                         <div
                           class="phone-suggestion-item"
                           role="option"
-                          (mousedown)="selectPhone(phone)">
-                          <span class="suggestion-icon">📱</span>
+                          (mousedown)="selectPhone(phone)"
+                        >
+                          <span class="suggestion-icon"
+                            ><svg class="icon" aria-hidden="true">
+                              <use
+                                href="assets/icons/tabler-sprite.svg#smartphone"
+                              ></use></svg
+                          ></span>
                           {{ phone.brand }} {{ phone.model }}
                         </div>
                       }
@@ -89,9 +126,16 @@
                   }
                 }
               </div>
-              @if (form.get('phoneBrand')?.invalid && form.get('phoneBrand')?.touched) {
+              @if (
+                form.get('phoneBrand')?.invalid &&
+                form.get('phoneBrand')?.touched
+              ) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   La marca es requerida
                 </div>
               }
@@ -100,78 +144,95 @@
         </div>
 
         <!-- Repair Details -->
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="section-icon">🔧</span>
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#tool"></use>
+            </svg>
             Detalles de la Reparaci&oacute;n
           </h3>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label class="form-label" for="solution">
-              <span class="label-icon">✅</span>
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#circle-check"></use>
+              </svg>
               Soluci&oacute;n / Trabajo Realizado
             </label>
             <textarea
               id="solution"
               formControlName="solution"
-              class="form-textarea"
+              class="form-control"
               placeholder="Describe la soluci&oacute;n o trabajo realizado..."
               rows="3"
             ></textarea>
-            @if (form.get('solution')?.invalid && form.get('solution')?.touched) {
+            @if (
+              form.get('solution')?.invalid && form.get('solution')?.touched
+            ) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 La soluci&oacute;n es requerida
               </div>
             }
           </div>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="status">
-                <span class="label-icon">📊</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#chart-bar"></use>
+                </svg>
                 Estado
               </label>
-              <select
-                id="status"
-                formControlName="status"
-                class="form-select">
+              <select id="status" formControlName="status" class="form-select">
                 @for (s of repairStatuses; track s.value) {
                   <option [value]="s.value">{{ s.label }}</option>
                 }
               </select>
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="date">
-                <span class="label-icon">📅</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#calendar"></use>
+                </svg>
                 Fecha
               </label>
               <input
                 id="date"
                 type="date"
                 formControlName="date"
-                class="form-input"
+                class="form-control"
                 [max]="todayDate"
               />
               @if (form.get('date')?.invalid && form.get('date')?.touched) {
                 <div class="error-message">
-                  <span class="error-icon">⚠️</span>
+                  <svg class="icon" aria-hidden="true">
+                    <use
+                      href="assets/icons/tabler-sprite.svg#alert-triangle"
+                    ></use>
+                  </svg>
                   La fecha es requerida
                 </div>
               }
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="mb-3">
             <label class="form-label" for="notes">
-              <span class="label-icon">📝</span>
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#clipboard-list"></use>
+              </svg>
               Notas (opcional)
             </label>
             <textarea
               id="notes"
               formControlName="notes"
-              class="form-textarea"
+              class="form-control"
               placeholder="Notas adicionales..."
               rows="2"
             ></textarea>
@@ -179,22 +240,34 @@
         </div>
 
         <!-- Inventory Part Section -->
-        <div class="info-section">
-          <h3 class="section-title">
-            <span class="section-icon">🔩</span>
+        <div class="form-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#package"></use>
+            </svg>
             Repuesto del Inventario
           </h3>
 
-          <p class="section-hint">
-            Selecciona un repuesto del cat&aacute;logo para descontarlo del stock autom&aacute;ticamente.
-            Si no usaste un repuesto del inventario, deja esta secci&oacute;n vac&iacute;a y escribe el costo manualmente.
+          <p class="form-hint">
+            Selecciona un repuesto del cat&aacute;logo para descontarlo del
+            stock autom&aacute;ticamente. Si no usaste un repuesto del
+            inventario, deja esta secci&oacute;n vac&iacute;a y escribe el costo
+            manualmente.
           </p>
 
           <button
             type="button"
-            class="btn-add-part"
-            (click)="togglePartSelector()">
-            <span class="btn-icon">{{ showPartSelector ? '✕' : '🔍' }}</span>
+            class="btn btn-outline-primary"
+            (click)="togglePartSelector()"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use
+                [attr.href]="
+                  'assets/icons/tabler-sprite.svg#' +
+                  (showPartSelector ? 'x' : 'plus')
+                "
+              ></use>
+            </svg>
             {{ showPartSelector ? 'Ocultar buscador' : 'Seleccionar Repuesto' }}
           </button>
 
@@ -202,7 +275,12 @@
             <div class="part-selector-panel">
               @if (!selectedPart) {
                 <h4 class="selector-title">
-                  <span class="selector-icon">🔍</span>
+                  <span class="selector-icon"
+                    ><svg class="icon" aria-hidden="true">
+                      <use
+                        href="assets/icons/tabler-sprite.svg#search"
+                      ></use></svg
+                  ></span>
                   Buscar Repuesto
                 </h4>
 
@@ -210,29 +288,48 @@
                   <input
                     type="text"
                     [formControl]="partSearchControl"
-                    class="part-search-input"
+                    class="form-control"
                     placeholder="Buscar por repuesto, marca o modelo..."
                   />
                   @if (isSearchingParts) {
-                    <app-spinner size="small" [showMessage]="false"></app-spinner>
+                    <app-spinner
+                      size="small"
+                      [showMessage]="false"
+                    ></app-spinner>
                   }
                 </div>
 
                 @if (availableParts.length > 0) {
                   <div class="search-results">
                     @for (part of availableParts; track part.id) {
-                      <div class="search-result-item" (click)="selectPart(part)">
+                      <div
+                        class="search-result-item"
+                        (click)="selectPart(part)"
+                      >
                         <div class="result-info">
                           <span class="result-name">{{ part.name }}</span>
                           @if (part.phoneId) {
-                            <span class="result-phone">📱 {{ part.phoneBrand }} {{ part.phoneModel }}</span>
+                            <span class="result-phone"
+                              ><svg class="icon" aria-hidden="true">
+                                <use
+                                  href="assets/icons/tabler-sprite.svg#smartphone"
+                                ></use>
+                              </svg>
+                              {{ part.phoneBrand }} {{ part.phoneModel }}</span
+                            >
                           }
                         </div>
                         <div class="result-meta">
-                          <span class="result-stock" [class.low]="part.isLowStock">
+                          <span
+                            class="result-stock"
+                            [class.low]="part.isLowStock"
+                          >
                             {{ part.quantity }} disp.
                           </span>
-                          <span class="result-price">Costo: {{ formatPrice(part.purchasePrice || 0) }}</span>
+                          <span class="result-price"
+                            >Costo:
+                            {{ formatPrice(part.purchasePrice || 0) }}</span
+                          >
                         </div>
                       </div>
                     }
@@ -241,24 +338,37 @@
               } @else {
                 <div class="selected-part-form">
                   <div class="selected-part-info">
-                    <span class="selected-part-name">{{ selectedPart.name }}</span>
+                    <span class="selected-part-name">{{
+                      selectedPart.name
+                    }}</span>
                     @if (selectedPart.phoneId) {
-                      <span class="selected-part-phone">📱 {{ selectedPart.phoneBrand }} {{ selectedPart.phoneModel }}</span>
+                      <span class="selected-part-phone"
+                        ><svg class="icon" aria-hidden="true">
+                          <use
+                            href="assets/icons/tabler-sprite.svg#smartphone"
+                          ></use>
+                        </svg>
+                        {{ selectedPart.phoneBrand }}
+                        {{ selectedPart.phoneModel }}</span
+                      >
                     }
-                    <span class="selected-part-stock">Disponible: {{ selectedPart.quantity }} unidades</span>
+                    <span class="selected-part-stock"
+                      >Disponible: {{ selectedPart.quantity }} unidades</span
+                    >
                   </div>
 
                   <div class="part-form-row">
                     <div class="part-form-group">
-                      <label>Cantidad</label>
+                      <label for="field-partQuantity">Cantidad</label>
                       <input
+                        id="field-partQuantity"
                         type="number"
                         [(ngModel)]="partQuantity"
-                        [ngModelOptions]="{standalone: true}"
+                        [ngModelOptions]="{ standalone: true }"
                         (ngModelChange)="onPartQuantityChange()"
                         min="1"
                         [max]="selectedPart.quantity"
-                        class="part-form-input"
+                        class="form-control"
                       />
                     </div>
                     <div class="part-form-group">
@@ -266,7 +376,7 @@
                       <input
                         type="text"
                         [value]="formatPrice(form.get('partCost')?.value || 0)"
-                        class="part-form-input"
+                        class="form-control"
                         readonly
                       />
                     </div>
@@ -274,17 +384,27 @@
 
                   @if (isPartQuantityInvalid) {
                     <div class="error-message">
-                      <span class="error-icon">⚠️</span>
-                      Solo hay {{ selectedPart.quantity }} unidades disponibles de este repuesto
+                      <svg class="icon" aria-hidden="true">
+                        <use
+                          href="assets/icons/tabler-sprite.svg#alert-triangle"
+                        ></use>
+                      </svg>
+                      Solo hay {{ selectedPart.quantity }} unidades disponibles
+                      de este repuesto
                     </div>
                   }
 
                   <div class="part-form-actions">
                     <button
                       type="button"
-                      class="btn-cancel-part"
-                      (click)="clearSelectedPart()">
-                      <span class="btn-icon">🔄</span>
+                      class="btn btn-outline-secondary"
+                      (click)="clearSelectedPart()"
+                    >
+                      <svg class="icon" aria-hidden="true">
+                        <use
+                          href="assets/icons/tabler-sprite.svg#refresh"
+                        ></use>
+                      </svg>
                       Cambiar repuesto
                     </button>
                   </div>
@@ -295,39 +415,47 @@
         </div>
 
         <!-- Pricing Section -->
-        <div class="info-section pricing-section">
-          <h3 class="section-title">
-            <span class="section-icon">💰</span>
+        <div class="form-section pricing-section">
+          <h3 class="form-section-title">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#wallet"></use>
+            </svg>
             Precios y Ganancias
           </h3>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="repairPrice">
-                <span class="label-icon">💵</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#currency-dollar"
+                  ></use>
+                </svg>
                 Precio Reparaci&oacute;n
               </label>
               <input
                 id="repairPrice"
                 type="number"
                 formControlName="repairPrice"
-                class="form-input"
+                class="form-control"
                 min="0"
                 step="0.01"
                 placeholder="0.00"
               />
             </div>
 
-            <div class="form-group">
+            <div class="mb-3">
               <label class="form-label" for="partCost">
-                <span class="label-icon">🔩</span>
+                <svg class="icon" aria-hidden="true">
+                  <use href="assets/icons/tabler-sprite.svg#package"></use>
+                </svg>
                 Costo Repuesto
               </label>
               <input
                 id="partCost"
                 type="number"
                 formControlName="partCost"
-                class="form-input"
+                class="form-control"
                 min="0"
                 step="0.01"
                 placeholder="0.00"
@@ -339,15 +467,23 @@
           <div class="cost-summary">
             <div class="cost-summary-row">
               <span class="cost-summary-label">Ganancia Neta:</span>
-              <span class="cost-summary-value" [class.negative]="netProfit < 0">{{ formatPrice(netProfit) }}</span>
+              <span
+                class="cost-summary-value"
+                [class.negative]="netProfit < 0"
+                >{{ formatPrice(netProfit) }}</span
+              >
             </div>
             <div class="cost-summary-row">
               <span class="cost-summary-label">Mi Parte (60% + repuesto):</span>
-              <span class="cost-summary-value highlight-mine">{{ formatPrice(myShare) }}</span>
+              <span class="cost-summary-value highlight-mine">{{
+                formatPrice(myShare)
+              }}</span>
             </div>
             <div class="cost-summary-row">
               <span class="cost-summary-label">Parte Tienda (40%):</span>
-              <span class="cost-summary-value highlight-store">{{ formatPrice(storeShare) }}</span>
+              <span class="cost-summary-value highlight-store">{{
+                formatPrice(storeShare)
+              }}</span>
             </div>
           </div>
         </div>
@@ -355,22 +491,32 @@
         <div class="form-actions">
           <button
             type="button"
-            class="btn-cancel"
+            class="btn btn-outline-secondary"
             (click)="cancel()"
-            [disabled]="isSubmitting">
-            <span class="btn-icon">❌</span>
+            [disabled]="isSubmitting"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#x"></use>
+            </svg>
             Cancelar
           </button>
           <button
             type="submit"
-            class="btn-submit"
-            [disabled]="form.invalid || isSubmitting || isPartQuantityInvalid">
+            class="btn btn-primary"
+            [disabled]="form.invalid || isSubmitting || isPartQuantityInvalid"
+          >
             @if (isSubmitting) {
-              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
-              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+              <app-spinner
+                size="small"
+                color="white"
+                [showMessage]="false"
+              ></app-spinner>
+              {{ isEditMode ? 'Actualizando...' : 'Guardando...' }}
             } @else {
-              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
-              {{ isEditMode ? "Actualizar" : "Guardar" }}
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#device-floppy"></use>
+              </svg>
+              {{ isEditMode ? 'Actualizar' : 'Guardar' }}
             }
           </button>
         </div>

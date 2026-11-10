@@ -1,57 +1,79 @@
-<div class="form-container">
+<div class="form-layout">
   @if (isLoading) {
     <div class="loading-overlay">
-      <app-spinner 
-        size="large" 
+      <app-spinner
+        size="large"
         message="Cargando datos del teléfono..."
-        color="primary">
+        color="primary"
+      >
       </app-spinner>
     </div>
   } @else {
-    <div class="form-card">
-      <div class="form-header">
-        <div class="form-icon">📱</div>
-        <h2 class="form-title">{{ isEditMode ? "Editar Teléfono" : "Nuevo Teléfono" }}</h2>
-        <p class="form-subtitle">{{ isEditMode ? "Actualiza la información del dispositivo" : "Registra un nuevo modelo de teléfono" }}</p>
+    <div class="card">
+      <div class="card-header sf-form-header">
+        <h2 class="card-title">
+          {{ isEditMode ? 'Editar Teléfono' : 'Nuevo Teléfono' }}
+        </h2>
+        <p class="text-secondary small mb-0">
+          {{
+            isEditMode
+              ? 'Actualiza la información del dispositivo'
+              : 'Registra un nuevo modelo de teléfono'
+          }}
+        </p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="phone-form">
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">🏢</span>
+          <div class="mb-3">
+            <label class="form-label" for="field-brand">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#building-store"></use>
+              </svg>
               Marca
             </label>
-            <input 
-              type="text" 
-              formControlName="brand" 
-              class="form-input"
+            <input
+              id="field-brand"
+              type="text"
+              formControlName="brand"
+              class="form-control"
               placeholder="Ej: Samsung, Apple, Xiaomi"
               [disabled]="isSubmitting"
             />
             @if (form.get('brand')?.invalid && form.get('brand')?.touched) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 La marca es requerida
               </div>
             }
           </div>
 
-          <div class="form-group">
-            <label class="form-label">
-              <span class="label-icon">📱</span>
+          <div class="mb-3">
+            <label class="form-label" for="field-model">
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#smartphone"></use>
+              </svg>
               Modelo
             </label>
-            <input 
-              type="text" 
-              formControlName="model" 
-              class="form-input"
+            <input
+              id="field-model"
+              type="text"
+              formControlName="model"
+              class="form-control"
               placeholder="Ej: Galaxy S23, iPhone 14, Redmi Note 12"
               [disabled]="isSubmitting"
             />
             @if (form.get('model')?.invalid && form.get('model')?.touched) {
               <div class="error-message">
-                <span class="error-icon">⚠️</span>
+                <svg class="icon" aria-hidden="true">
+                  <use
+                    href="assets/icons/tabler-sprite.svg#alert-triangle"
+                  ></use>
+                </svg>
                 El modelo es requerido
               </div>
             }
@@ -59,24 +81,34 @@
         </div>
 
         <div class="form-actions">
-          <button 
-            type="button" 
-            class="btn-cancel" 
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
             (click)="cancel()"
-            [disabled]="isSubmitting">
-            <span class="btn-icon">❌</span>
+            [disabled]="isSubmitting"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#x"></use>
+            </svg>
             Cancelar
           </button>
-          <button 
-            type="submit" 
-            class="btn-submit" 
-            [disabled]="form.invalid || isSubmitting">
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid || isSubmitting"
+          >
             @if (isSubmitting) {
-              <app-spinner size="small" color="white" [showMessage]="false"></app-spinner>
-              {{ isEditMode ? "Actualizando..." : "Guardando..." }}
+              <app-spinner
+                size="small"
+                color="white"
+                [showMessage]="false"
+              ></app-spinner>
+              {{ isEditMode ? 'Actualizando...' : 'Guardando...' }}
             } @else {
-              <span class="btn-icon">{{ isEditMode ? "✏️" : "💾" }}</span>
-              {{ isEditMode ? "Actualizar" : "Guardar" }}
+              <svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#device-floppy"></use>
+              </svg>
+              {{ isEditMode ? 'Actualizar' : 'Guardar' }}
             }
           </button>
         </div>

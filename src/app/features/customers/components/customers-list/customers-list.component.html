@@ -1,58 +1,95 @@
 <div class="list-container">
-  <div class="header-section">
-    <h2 class="page-title">
-      <span class="title-icon">👥</span>
-      Gestión de Clientes
-    </h2>
-
-    <div class="header-actions">
-      <div class="search-container">
-        <input
-          type="text"
-          [formControl]="searchControl"
-          placeholder="Buscar clientes..."
-          class="search-input"
-          [disabled]="isLoading"
-        />
-        @if (isSearching) {
-          <app-spinner size="small" [showMessage]="false"></app-spinner>
-        } @else {
-          <span class="search-icon">🔍</span>
+  <div class="page-header">
+    <div class="row align-items-center g-3">
+      <div class="col">
+        <div class="page-pretitle">TALLER</div>
+        <h1 class="page-title">Clientes</h1>
+        <p class="page-subtitle">
+          La información de contacto de quienes confían en tu taller.
+        </p>
+      </div>
+      <div class="col-auto">
+        @if (admin) {
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
+            Nuevo Cliente
+          </button>
         }
       </div>
-
-      @if (admin) {
-        <button class="btn-primary" (click)="create()">
-          <span class="btn-icon">➕</span>
-          Nuevo Cliente
-        </button>
-      }
     </div>
   </div>
 
-  <div class="table-container">
-    @if (isLoading) {
+  <div class="card table-responsive">
+    <div class="table-toolbar">
+      <div class="d-flex flex-wrap gap-3 w-100">
+        <div class="search-container">
+          <input
+            type="text"
+            [formControl]="searchControl"
+            placeholder="Buscar por nombre o teléfono…"
+            class="form-control"
+            [disabled]="isLoading"
+          />
+          @if (isSearching) {
+            <app-spinner size="small" [showMessage]="false"></app-spinner>
+          } @else {
+            <span class="search-icon"
+              ><svg class="icon" aria-hidden="true">
+                <use href="assets/icons/tabler-sprite.svg#search"></use></svg
+            ></span>
+          }
+        </div>
+      </div>
+    </div>
+    @if (loadError) {
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#alert-circle"></use>
+          </svg>
+        </div>
+        <h3>No se pudo cargar la información</h3>
+        <p class="text-secondary">
+          Comprueba la conexión y vuelve a intentarlo.
+        </p>
+        <button class="btn btn-outline-secondary" (click)="loadCustomers()">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#refresh"></use>
+          </svg>
+          Reintentar
+        </button>
+      </div>
+    } @else if (isLoading || isSearching) {
       <div class="loading-container">
         <app-spinner
           size="large"
           message="Cargando clientes..."
-          color="primary">
+          color="primary"
+        >
         </app-spinner>
       </div>
     } @else if (customers.length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">📭</div>
+      <div class="empty">
+        <div class="empty-img">
+          <svg class="icon" aria-hidden="true">
+            <use href="assets/icons/tabler-sprite.svg#inbox"></use>
+          </svg>
+        </div>
         <h3>No hay clientes disponibles</h3>
         <p>Comienza agregando tu primer cliente</p>
         @if (admin) {
-          <button class="btn-primary" (click)="create()">
-            <span class="btn-icon">➕</span>
+          <button class="btn btn-primary" (click)="create()">
+            <svg class="icon" aria-hidden="true">
+              <use href="assets/icons/tabler-sprite.svg#plus"></use>
+            </svg>
             Agregar Cliente
           </button>
         }
       </div>
     } @else {
-      <table class="data-table">
+      <table class="table table-vcenter table-hover">
         <thead>
           <tr>
             <th class="th-id">ID</th>
@@ -70,27 +107,60 @@
               <td class="td-id" data-label="ID">{{ customer.id }}</td>
               <td class="td-name" data-label="Nombre">
                 <div class="customer-info">
-                  <span class="customer-avatar">👤</span>
-                  <span class="customer-name">{{ customer.name }} {{ customer.lastname }}</span>
+                  <span class="customer-avatar"
+                    ><svg class="icon" aria-hidden="true">
+                      <use
+                        href="assets/icons/tabler-sprite.svg#user"
+                      ></use></svg
+                  ></span>
+                  <span class="customer-name"
+                    >{{ customer.name }} {{ customer.lastname }}</span
+                  >
                 </div>
               </td>
               <td class="td-phone" data-label="Teléfono">
-                <span class="phone-badge">📞 {{ customer.phone }}</span>
+                <span class="phone-badge"
+                  ><svg class="icon" aria-hidden="true">
+                    <use href="assets/icons/tabler-sprite.svg#headphones"></use>
+                  </svg>
+                  {{ customer.phone }}</span
+                >
               </td>
               <td class="td-email" data-label="Email">
                 @if (customer.email) {
-                  <span class="email-badge">✉️ {{ customer.email }}</span>
+                  <span class="email-badge"
+                    ><svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#mail"></use>
+                    </svg>
+                    {{ customer.email }}</span
+                  >
                 } @else {
                   <span class="no-email">Sin email</span>
                 }
               </td>
               @if (admin) {
                 <td class="td-actions" data-label="">
-                  <button class="btn-action btn-edit" (click)="update(customer.id!)" title="Editar" [disabled]="isDeleting">
-                    ✏️
+                  <button
+                    class="btn btn-icon btn-ghost-secondary"
+                    aria-label="Editar"
+                    (click)="update(customer.id!)"
+                    title="Editar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#pencil"></use>
+                    </svg>
                   </button>
-                  <button class="btn-action btn-delete" (click)="delete(customer)" title="Eliminar" [disabled]="isDeleting">
-                    🗑️
+                  <button
+                    class="btn btn-icon btn-ghost-danger"
+                    aria-label="Eliminar"
+                    (click)="delete(customer)"
+                    title="Eliminar"
+                    [disabled]="isDeleting"
+                  >
+                    <svg class="icon" aria-hidden="true">
+                      <use href="assets/icons/tabler-sprite.svg#trash"></use>
+                    </svg>
                   </button>
                 </td>
               }
@@ -98,16 +168,15 @@
           }
         </tbody>
       </table>
-
-      <div class="table-footer">
-        <span class="total-count">Total: {{ customers.length }} clientes</span>
-      </div>
     }
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [totalElements]="totalElements"
+      [pageSize]="pageSize"
+      [showPageSizeSelector]="false"
+      (pageChange)="goToPage($event)"
+    >
+    </app-pagination>
   </div>
-
-  <app-pagination
-    [currentPage]="currentPage"
-    [totalPages]="totalPages"
-    (pageChange)="goToPage($event)">
-  </app-pagination>
 </div>

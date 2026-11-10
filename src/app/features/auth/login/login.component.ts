@@ -1,8 +1,14 @@
+import { ThemeService } from '../../../core/services/theme.service';
 import { Component } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { LoginRequest } from '../../../shared/models/login-request';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { finalize } from 'rxjs';
@@ -22,6 +28,7 @@ export class LoginComponent {
   showPassword = false;
 
   constructor(
+    public themeService: ThemeService,
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
@@ -43,11 +50,16 @@ export class LoginComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login(credentials)
-      .pipe(finalize(() => this.isLoading = false))
+    this.authService
+      .login(credentials)
+      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (response) => {
-          this.authService.setLoginData(response.token, response.username, response.admin);
+          this.authService.setLoginData(
+            response.token,
+            response.username,
+            response.admin,
+          );
           Swal.fire({
             icon: 'success',
             title: 'Inicio de sesion exitoso',
@@ -58,8 +70,7 @@ export class LoginComponent {
         error: (err) => {
           this.errorMessage = 'Credenciales incorrectas';
           console.error(err);
-        }
+        },
       });
   }
-
 }

@@ -1,14 +1,14 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { RepairService } from '../../services/repair.service';
 import { Router, RouterModule } from '@angular/router';
 import { Repair } from '../../../../shared/models/repair';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { 
-  debounceTime, 
-  distinctUntilChanged, 
-  switchMap, 
-  tap, 
-  finalize 
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  tap,
+  finalize,
 } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Customer } from '../../../../shared/models/customer';
@@ -17,16 +17,18 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SpinnerComponent } from '../../../../shared/components/spinner/spinner.component';
 import Swal from 'sweetalert2';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-repair',
   standalone: true,
   imports: [
-    RouterModule, 
-    CommonModule, 
-    ReactiveFormsModule, 
+    RouterModule,
+    CommonModule,
+    ReactiveFormsModule,
     PaginationComponent,
-    SpinnerComponent
+    SpinnerComponent,
   ],
   templateUrl: './repair-list.component.html',
   styleUrl: './repair-list.component.css',
@@ -36,6 +38,10 @@ export class RepairListComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
 
+  private destroyRef = inject(DestroyRef);
+  loadError = false;
+  totalElements = 0;
+  pageSize = 10;
   repairs: Repair[] = [];
   customers!: Customer[];
   phones!: Phone[];
@@ -56,15 +62,27 @@ export class RepairListComponent implements OnInit {
         tap(() => {
           this.currentPage = 0;
           this.isSearching = true;
+          this.loadError = false;
         }),
         switchMap((keyword) =>
-          this.repairService.getRepairsPage(this.currentPage, keyword || '')
-            .pipe(finalize(() => this.isSearching = false))
-        )
+          this.repairService
+            .getRepairsPage(this.currentPage, keyword || '')
+            .pipe(
+              catchError(() => {
+                this.loadError = true;
+                return of(null);
+              }),
+              finalize(() => (this.isSearching = false)),
+            ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((data: any) => {
+        if (!data) return;
         this.repairs = data.content;
         this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+        this.pageSize = data.size || this.pageSize;
       });
 
     // Cargar reparaciones sin filtro al inicio
@@ -74,13 +92,24 @@ export class RepairListComponent implements OnInit {
   loadRepairs(): void {
     const keyword = this.searchControl.value || '';
     this.isLoading = true;
-    
+    this.loadError = false;
+
     this.repairService
       .getRepairsPage(this.currentPage, keyword)
-      .pipe(finalize(() => this.isLoading = false))
+      .pipe(
+        catchError(() => {
+          this.loadError = true;
+          return of(null);
+        }),
+        finalize(() => (this.isLoading = false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe((data: any) => {
+        if (!data) return;
         this.repairs = data.content;
         this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+        this.pageSize = data.size || this.pageSize;
       });
   }
 
@@ -96,7 +125,7 @@ export class RepairListComponent implements OnInit {
   update(id: number): void {
     this.router.navigate(['/dashboard/repairs/edit', id]);
   }
-  
+
   delete(repair: Repair): void {
     Swal.fire({
       title: '¿Estás seguro?',
@@ -108,16 +137,21 @@ export class RepairListComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isDeleting = true;
-        this.repairService.deleteRepair(repair.id!)
-          .pipe(finalize(() => this.isDeleting = false))
+        this.repairService
+          .deleteRepair(repair.id!)
+          .pipe(finalize(() => (this.isDeleting = false)))
           .subscribe(() => {
             this.loadRepairs();
-            Swal.fire('Eliminado', 'La reparación ha sido eliminada.', 'success');
+            Swal.fire(
+              'Eliminado',
+              'La reparación ha sido eliminada.',
+              'success',
+            );
           });
       }
     });
   }
-  
+
   get admin(): boolean {
     return this.authService.isAdmin();
   }
