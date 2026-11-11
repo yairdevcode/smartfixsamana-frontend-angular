@@ -422,6 +422,129 @@ textarea {
 .table-responsive {
   overscroll-behavior-x: contain;
 }
+/* Mobile: opt-in stacked cards for list tables (tables on desktop, cards on mobile).
+   Add class "sf-table-cards" to the <table> and data-label="…" to each <td>. */
+@media (max-width: 767.98px) {
+  .sf-table-cards,
+  .sf-table-cards > tbody,
+  .sf-table-cards > tfoot {
+    display: block;
+    width: 100%;
+  }
+  .sf-table-cards > thead {
+    display: none;
+  }
+  .sf-table-cards > tbody {
+    padding: 12px;
+  }
+  .sf-table-cards > tfoot {
+    padding: 0 12px 12px;
+  }
+  .sf-table-cards > tbody > tr,
+  .sf-table-cards > tfoot > tr {
+    display: block;
+    padding: 4px 16px;
+    margin-bottom: 12px;
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius-lg);
+  }
+  .sf-table-cards > tbody > tr:last-child,
+  .sf-table-cards > tfoot > tr:last-child {
+    margin-bottom: 0;
+  }
+  .sf-table-cards > tbody > tr > td,
+  .sf-table-cards > tfoot > tr > td {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: center;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--tblr-border-color);
+    background: transparent;
+    box-shadow: none;
+    text-align: right;
+    max-width: none;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .sf-table-cards > tbody > tr > td:last-child,
+  .sf-table-cards > tfoot > tr > td:last-child {
+    border-bottom: 0;
+  }
+  .sf-table-cards td::before {
+    content: attr(data-label);
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center;
+    text-align: left;
+    color: var(--sf-muted);
+    font-size: 0.625rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .sf-table-cards td > * {
+    grid-column: 2;
+    justify-self: end;
+    min-width: 0;
+    max-width: 100%;
+  }
+  /* Cells without a label (actions, totals title, spacers) */
+  .sf-table-cards td:not([data-label])::before,
+  .sf-table-cards td[data-label='']::before {
+    display: none;
+  }
+  .sf-table-cards td:not([data-label]),
+  .sf-table-cards td[data-label=''] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sf-table-cards td:not([data-label]) > *,
+  .sf-table-cards td[data-label=''] > * {
+    grid-column: 1;
+  }
+  .sf-table-cards td:empty {
+    display: none;
+  }
+  /* Action buttons: one row, aligned right */
+  .sf-table-cards td.td-actions,
+  .sf-table-cards td.table-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  /* Text truncated on desktop wraps inside the card */
+  .sf-table-cards .cell-fault {
+    max-width: none;
+    min-width: 0;
+  }
+  .sf-table-cards .cell-fault span,
+  .sf-table-cards .fault-text,
+  .sf-table-cards .solution-text,
+  .sf-table-cards .part-badge {
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+  }
+  /* Row states keep their meaning as a left accent */
+  .sf-table-cards > tbody > tr.pendiente-recoger,
+  .sf-table-cards > tbody > tr.row-warning {
+    border-left: 4px solid var(--tblr-yellow);
+  }
+  .sf-table-cards > tbody > tr.row-critical {
+    border-left: 4px solid var(--tblr-red);
+  }
+  /* Totals card (external repairs) */
+  .sf-table-cards > tfoot > tr.totals-row {
+    border-color: var(--tblr-primary);
+    background: var(--sf-accent-soft);
+  }
+  .sf-table-cards > tfoot > tr.totals-row > td[colspan] > * {
+    justify-self: center;
+  }
+}
 .badge {
   font-weight: 500;
   letter-spacing: 0;
@@ -1304,6 +1427,52 @@ textarea {
 }
 .movements-cards {
   display: none;
+}
+/* Mobile: movement history shows cards instead of the table */
+@media (max-width: 767.98px) {
+  .movements-table {
+    display: none;
+  }
+  .movements-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .movement-card {
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: var(--tblr-border-radius-lg);
+    padding: 16px;
+  }
+  .movement-card .card-header,
+  .movement-card .card-body {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+  .movement-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+  }
+  .movement-card .card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .movement-card .card-notes {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--tblr-border-color);
+  }
+  .notes-label {
+    color: var(--sf-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
 }
 .time-value,
 span.part-phone {

@@ -160,7 +160,7 @@
           </div>
         } @else {
           <div class="table-responsive">
-            <table class="table table-vcenter">
+            <table class="table table-vcenter sf-table-cards">
               <thead>
                 <tr>
                   <th>Equipo y cliente</th>
@@ -171,7 +171,7 @@
               <tbody>
                 @for (repair of recentRepairs; track repair.id) {
                   <tr>
-                    <td>
+                    <td data-label="Equipo y cliente">
                       @if (admin) {
                         <a
                           [routerLink]="['/dashboard/repairs/edit', repair.id]"
@@ -189,10 +189,10 @@
                         {{ repair.customer.lastname }}
                       </div>
                     </td>
-                    <td class="text-secondary text-nowrap">
+                    <td class="text-secondary text-nowrap" data-label="Ingreso">
                       {{ repair.date | date: "dd MMM yyyy" }}
                     </td>
-                    <td>
+                    <td data-label="Estado">
                       <span
                         class="status-badge"
                         [ngClass]="statusClass(repair.state)"
